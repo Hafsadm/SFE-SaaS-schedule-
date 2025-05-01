@@ -38,7 +38,7 @@
         <div id="time_slots_container" class="time-slots-container" style="{{ old('is_closed') ? 'display: none;' : '' }}">
             <h3>Créneaux horaires</h3>
             <div id="time_slots">
-                @if(old('time_slots'))
+                @if(old('day_of_week') == 'dimanche' && old('time_slots'))
                     @foreach(old('time_slots') as $index => $slot)
                         <div class="time-slot-group">
                             <div class="time-inputs">
@@ -65,6 +65,12 @@
                 @endif
             </div>
 
+            <div class="form-group">
+                <label for="is_closed" class="checkbox-label">
+                    <input type="checkbox" name="is_closed" id="is_closed" {{ old('is_closed') ? 'checked' : '' }}>
+                    Fermé
+                </label>
+            </div>
    
             
             @error('time_slots')

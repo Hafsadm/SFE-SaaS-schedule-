@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Store;
 use App\Models\Schedule;
+use App\Models\Exception;
+use App\Models\Holiday;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -19,21 +21,17 @@ class ScheduleController extends Controller
     {
         // Récupérer les horaires réguliers (jours de la semaine)
         $regularSchedules = $store->schedules()
-            ->whereNotNull('day_of_week')
             ->orderByRaw("FIELD(day_of_week, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')")
             ->get();
         
-        // Récupérer les exceptions (dates spécifiques, non fériées)
-        $exceptionSchedules = $store->schedules()
-            ->whereNotNull('exception_date')
-            ->where('is_holiday', false)
+        // Récupérer les exceptions
+        $exceptionSchedules = $store->exceptions()
             ->orderBy('exception_date')
             ->get();
         
         // Récupérer les jours fériés
-        $holidaySchedules = $store->schedules()
-            ->where('is_holiday', true)
-            ->orderBy('exception_date')
+        $holidaySchedules = $store->holidays()
+            ->orderBy('holiday_date')
             ->get();
         
         return view('admin.stores.schedules.index', compact('store', 'regularSchedules', 'exceptionSchedules', 'holidaySchedules'));
@@ -54,7 +52,6 @@ class ScheduleController extends Controller
     {
         // Récupérer les jours de la semaine déjà configurés
         $existingDays = $store->schedules()
-            ->whereNotNull('day_of_week')
             ->pluck('day_of_week')
             ->toArray();
         
@@ -71,56 +68,39 @@ class ScheduleController extends Controller
         
         // Filtrer les jours disponibles
         $availableDays = array_diff_key($days, array_flip($existingDays));
-        
-        return view('admin.stores.schedules.regular', compact('store', 'availableDays'));
+   
+        // Vérifier si le dimanche est déjà existant 
+        $sundayExists = in_array('sunday', $existingDays);
+        if ($sundayExists) {
+            $sundaySchedule = $store->schedules()
+                ->where('day_of_week', 'sunday')
+                ->first();
+
+            // Si le dimanche est configuré, vérifier s'il est fermé    
+            if ($sundaySchedule && $sundaySchedule->is_closed) {
+                $availableDays['sunday'] = 'Dimanche (fermé)';
+            } else {
+                unset($availableDays['sunday']);
+            }
+        } else {
+            // Si le dimanche n'est pas configuré, l'ajouter à la liste des jours disponibles
+            $availableDays['sunday'] = 'Dimanche (fermé)'; 
+        }   
+ 
+        return view('admin.stores.schedules.regular', compact('store', 'availableDays', 'sundayExists'));
     }
 
     /**
-     * Affiche le formulaire pour ajouter une exception
-     */
-    public function createException(Store $store)
-    {
-        return view('admin.stores.schedules.exception', compact('store'));
-    }
-
-    /**
-     * Affiche le formulaire pour ajouter un jour férié
-     */
-    public function createHoliday(Store $store)
-    {
-        return view('admin.stores.schedules.holiday', compact('store'));
-    }
-
-    /**
-     * Enregistre un nouvel horaire
+     * Enregistre un nouvel horaire régulier
      */
     public function store(Request $request, Store $store)
     {
-        // Validation commune
-        $rules = [
-            'is_closed' => 'boolean',
-        ];
+        Log::info('Début de la méthode store avec les données:', $request->all());
         
-        // Validation spécifique selon le type
-        switch ($request->type) {
-            case 'regular':
-                $rules['day_of_week'] = 'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday';
-                break;
-                
-            case 'exception':
-                $rules['exception_date'] = 'required|date|after_or_equal:today';
-                $rules['exception_reason'] = 'required|string|max:255';
-                break;
-                
-            case 'holiday':
-                $rules['exception_date'] = 'required|date|after_or_equal:today';
-                $rules['exception_reason'] = 'required|string|max:255';
-                $request->merge(['is_holiday' => true]);
-                break;
-                
-            default:
-                return redirect()->back()->with('error', 'Type d\'horaire invalide');
-        }
+        // Validation
+        $rules = [
+            'day_of_week' => 'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
+        ];
         
         // Si le magasin n'est pas fermé, valider les créneaux horaires
         if (!$request->has('is_closed')) {
@@ -132,58 +112,50 @@ class ScheduleController extends Controller
         $validator = Validator::make($request->all(), $rules);
         
         if ($validator->fails()) {
+            Log::error('Validation échouée:', $validator->errors()->toArray());
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
         }
         
         try {
+            // Vérifier si un horaire existe déjà pour ce jour
+            $existingSchedule = $store->schedules()
+                ->where('day_of_week', $request->day_of_week)
+                ->first();
+                
+            if ($existingSchedule) {
+                return redirect()->back()
+                    ->with('error', 'Un horaire existe déjà pour ce jour')
+                    ->withInput();
+            }
+            
             // Préparer les données
             $data = [
                 'store_id' => $store->id,
+                'day_of_week' => $request->day_of_week,
                 'is_closed' => $request->has('is_closed'),
-                'is_holiday' => $request->has('is_holiday'),
                 'time_slots' => $request->has('is_closed') ? [] : $request->time_slots,
             ];
             
-            // Ajouter les données spécifiques au type
-            if ($request->type === 'regular') {
-                $data['day_of_week'] = $request->day_of_week;
-                
-                // Vérifier si un horaire existe déjà pour ce jour
-                $existingSchedule = $store->schedules()
-                    ->where('day_of_week', $request->day_of_week)
-                    ->first();
-                    
-                if ($existingSchedule) {
-                    return redirect()->back()
-                        ->with('error', 'Un horaire existe déjà pour ce jour')
-                        ->withInput();
-                }
-            } else {
-                $data['exception_date'] = $request->exception_date;
-                $data['exception_reason'] = $request->exception_reason;
-                
-                // Vérifier si une exception existe déjà pour cette date
-                $existingException = $store->schedules()
-                    ->where('exception_date', $request->exception_date)
-                    ->first();
-                    
-                if ($existingException) {
-                    return redirect()->back()
-                        ->with('error', 'Une exception existe déjà pour cette date')
-                        ->withInput();
-                }
+            // Cas spécial pour le dimanche
+            if ($request->day_of_week === 'sunday' && !$request->has('sunday_override')) {
+                $data['is_closed'] = true;
             }
             
             // Créer l'horaire
-            $schedule = $store->schedules()->create($data);
+            $schedule = Schedule::create($data);
+            
+            Log::info('Horaire créé avec succès:', ['id' => $schedule->id]);
             
             return redirect()->route('admin.stores.schedules.index', $store)
                 ->with('success', 'Horaire ajouté avec succès');
                 
         } catch (\Exception $e) {
-            Log::error('Erreur lors de la création de l\'horaire: ' . $e->getMessage());
+            Log::error('Erreur lors de la création de l\'horaire: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request_data' => $request->all()
+            ]);
             
             return redirect()->back()
                 ->with('error', 'Une erreur est survenue: ' . $e->getMessage())
@@ -196,38 +168,34 @@ class ScheduleController extends Controller
      */
     public function edit(Store $store, Schedule $schedule)
     {
-        // Déterminer le type d'horaire
-        $type = null;
-        if ($schedule->day_of_week) {
-            $type = 'regular';
-        } elseif ($schedule->is_holiday) {
-            $type = 'holiday';
-        } else {
-            $type = 'exception';
-        }
+        // Liste des jours de la semaine
+        $days = [
+            'monday' => 'Lundi',
+            'tuesday' => 'Mardi',
+            'wednesday' => 'Mercredi',
+            'thursday' => 'Jeudi',
+            'friday' => 'Vendredi',
+            'saturday' => 'Samedi',
+            'sunday' => 'Dimanche',
+        ];
         
-        return view('admin.stores.schedules.edit', compact('store', 'schedule', 'type'));
-    }
-
+        // Vérifier si c'est un dimanche
+        $isSunday = ($schedule->day_of_week === 'sunday');
+        $type = 'regular';
+        return view('admin.stores.schedules.edit', compact('store', 'schedule', 'days', 'isSunday', 'type'));
+}
     /**
      * Met à jour un horaire
      */
+    
     public function update(Request $request, Store $store, Schedule $schedule)
     {
-        // Validation commune
-        $rules = [
-            'is_closed' => 'boolean',
-        ];
+        Log::info('Début de la méthode update avec les données:', $request->all());
         
-        // Validation spécifique selon le type
-        if ($schedule->day_of_week) {
-            // Horaire régulier
-            $rules['day_of_week'] = 'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday';
-        } else {
-            // Exception ou jour férié
-            $rules['exception_date'] = 'required|date';
-            $rules['exception_reason'] = 'required|string|max:255';
-        }
+        // Validation
+        $rules = [
+            'day_of_week' => 'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
+        ];
         
         // Si le magasin n'est pas fermé, valider les créneaux horaires
         if (!$request->has('is_closed')) {
@@ -239,62 +207,52 @@ class ScheduleController extends Controller
         $validator = Validator::make($request->all(), $rules);
         
         if ($validator->fails()) {
+            Log::error('Validation échouée lors de la mise à jour:', $validator->errors()->toArray());
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
         }
         
         try {
+            // Vérifier si un autre horaire existe déjà pour ce jour
+            if ($request->day_of_week !== $schedule->day_of_week) {
+                $existingSchedule = $store->schedules()
+                    ->where('day_of_week', $request->day_of_week)
+                    ->where('id', '!=', $schedule->id)
+                    ->first();
+                    
+                if ($existingSchedule) {
+                    return redirect()->back()
+                        ->with('error', 'Un horaire existe déjà pour ce jour')
+                        ->withInput();
+                }
+            }
+            
             // Préparer les données
             $data = [
+                'day_of_week' => $request->day_of_week,
                 'is_closed' => $request->has('is_closed'),
                 'time_slots' => $request->has('is_closed') ? [] : $request->time_slots,
             ];
             
-            // Ajouter les données spécifiques au type
-            if ($schedule->day_of_week) {
-                $data['day_of_week'] = $request->day_of_week;
-                
-                // Vérifier si un autre horaire existe déjà pour ce jour
-                if ($request->day_of_week !== $schedule->day_of_week) {
-                    $existingSchedule = $store->schedules()
-                        ->where('day_of_week', $request->day_of_week)
-                        ->where('id', '!=', $schedule->id)
-                        ->first();
-                        
-                    if ($existingSchedule) {
-                        return redirect()->back()
-                            ->with('error', 'Un horaire existe déjà pour ce jour')
-                            ->withInput();
-                    }
-                }
-            } else {
-                $data['exception_date'] = $request->exception_date;
-                $data['exception_reason'] = $request->exception_reason;
-                
-                // Vérifier si une autre exception existe déjà pour cette date
-                if ($request->exception_date != $schedule->exception_date->format('Y-m-d')) {
-                    $existingException = $store->schedules()
-                        ->where('exception_date', $request->exception_date)
-                        ->where('id', '!=', $schedule->id)
-                        ->first();
-                        
-                    if ($existingException) {
-                        return redirect()->back()
-                            ->with('error', 'Une exception existe déjà pour cette date')
-                            ->withInput();
-                    }
-                }
+            // Cas spécial pour le dimanche
+            if ($request->day_of_week === 'sunday' && !$request->has('sunday_override')) {
+                $data['is_closed'] = true;
             }
             
             // Mettre à jour l'horaire
             $schedule->update($data);
             
+            Log::info('Horaire mis à jour avec succès:', ['id' => $schedule->id]);
+            
             return redirect()->route('admin.stores.schedules.index', $store)
                 ->with('success', 'Horaire mis à jour avec succès');
                 
         } catch (\Exception $e) {
-            Log::error('Erreur lors de la mise à jour de l\'horaire: ' . $e->getMessage());
+            Log::error('Erreur lors de la mise à jour de l\'horaire: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request_data' => $request->all()
+            ]);
             
             return redirect()->back()
                 ->with('error', 'Une erreur est survenue: ' . $e->getMessage())

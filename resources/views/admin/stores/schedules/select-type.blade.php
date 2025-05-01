@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="type-selection-container">
-    <div class="type-selection-header">
-        <h1 class="type-selection-title">Ajouter un horaire pour {{ $store->nom }}</h1>
+<div class="select-type-container">
+    <div class="select-type-header">
+        <h1 class="select-type-title">Choisir le type d'horaire pour {{ $store->nom }}</h1>
         <a href="{{ route('admin.stores.schedules.index', $store) }}" class="back-button">
             <i data-lucide="arrow-left"></i>
             Retour aux horaires
@@ -11,29 +11,38 @@
     </div>
 
     <div class="type-cards">
-        <a href="{{ route('admin.stores.schedules.regular', $store) }}" class="type-card">
-            <div class="type-icon">
+        <div class="type-card">
+            <div class="card-icon">
                 <i data-lucide="calendar"></i>
             </div>
             <h2>Horaire régulier</h2>
-            <p>Définir les horaires habituels pour un jour de la semaine</p>
-        </a>
+            <p>Définir les horaires d'ouverture habituels pour chaque jour de la semaine.</p>
+            <a href="{{ route('admin.stores.schedules.regular', $store) }}" class="type-button">
+                Choisir
+            </a>
+        </div>
 
-        <a href="{{ route('admin.stores.schedules.exception', $store) }}" class="type-card">
-            <div class="type-icon">
-                <i data-lucide="alert-circle"></i>
+        <div class="type-card">
+            <div class="card-icon">
+                <i data-lucide="alert-triangle"></i>
             </div>
             <h2>Exception</h2>
-            <p>Définir un horaire exceptionnel pour une date spécifique</p>
-        </a>
+            <p>Définir une exception pour une date spécifique (fermeture exceptionnelle, horaires modifiés...).</p>
+            <a href="{{ route('admin.stores.exceptions.create', $store) }}" class="type-button">
+                Choisir
+            </a>
+        </div>
 
-        <a href="{{ route('admin.stores.schedules.holiday', $store) }}" class="type-card">
-            <div class="type-icon">
-                <i data-lucide="star"></i>
+        <div class="type-card">
+            <div class="card-icon">
+                <i data-lucide="calendar-off"></i>
             </div>
             <h2>Jour férié</h2>
-            <p>Définir un horaire pour un jour férié</p>
-        </a>
+            <p>Définir un jour férié où le magasin sera fermé.</p>
+            <a href="{{ route('admin.stores.holidays.create', $store) }}" class="type-button">
+                Choisir
+            </a>
+        </div>
     </div>
 </div>
 
@@ -45,13 +54,13 @@
         --border-color: #D2B48C;
     }
 
-    .type-selection-container {
+    .select-type-container {
         max-width: 1200px;
         margin: 2rem auto;
         padding: 0 1rem;
     }
 
-    .type-selection-header {
+    .select-type-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -62,7 +71,7 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .type-selection-title {
+    .select-type-title {
         font-size: 1.5rem;
         font-weight: 600;
         color: var(--primary-color);
@@ -89,63 +98,70 @@
 
     .type-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 2rem;
     }
 
     .type-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 2rem;
         background: white;
+        padding: 2rem;
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         border: 1px solid var(--border-color);
-        text-decoration: none;
-        color: var(--text-color);
-        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
 
-    .type-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        border-color: var(--primary-color);
-    }
-
-    .type-icon {
+    .card-icon {
+        width: 64px;
+        height: 64px;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 64px;
-        height: 64px;
         background-color: var(--secondary-color);
         border-radius: 50%;
         margin-bottom: 1rem;
     }
 
-    .type-icon i {
+    .card-icon i {
         width: 32px;
         height: 32px;
         color: var(--primary-color);
     }
 
     .type-card h2 {
-        font-size: 1.25rem;
-        font-weight: 600;
         color: var(--primary-color);
-        margin: 0 0 0.5rem 0;
-        text-align: center;
+        margin-bottom: 0.5rem;
     }
 
     .type-card p {
-        text-align: center;
-        margin: 0;
         color: #666;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+    }
+
+    .type-button {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: all 0.2s;
+        width: 100%;
+        text-align: center;
+    }
+
+    .type-button:hover {
+        background-color: #6B2B00;
+        transform: translateY(-1px);
     }
 
     @media (max-width: 768px) {
-        .type-selection-header {
+        .select-type-header {
             flex-direction: column;
             gap: 1rem;
             text-align: center;

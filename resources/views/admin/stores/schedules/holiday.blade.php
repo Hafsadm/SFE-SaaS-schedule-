@@ -16,30 +16,25 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.stores.schedules.store', $store) }}" method="POST" class="schedule-form">
+    <form action="{{ route('admin.stores.holidays.store', $store) }}" method="POST" class="schedule-form">
         @csrf
-        <input type="hidden" name="type" value="holiday">
-        <input type="hidden" name="is_holiday" value="1">
 
         <div class="form-group">
-            <label for="exception_date">Date du jour férié</label>
-            <input type="date" name="exception_date" id="exception_date" class="form-control" value="{{ old('exception_date') }}" min="{{ date('Y-m-d') }}" required>
-            @error('exception_date')
+            <label for="holiday_date">Date du jour férié</label>
+            <input type="date" name="holiday_date" id="holiday_date" class="form-control" value="{{ old('holiday_date') }}" min="{{ date('Y-m-d') }}" required>
+            @error('holiday_date')
                 <div class="error-message">{{ $message }}</div>
             @enderror
         </div>
 
         <div class="form-group">
-            <label for="exception_reason">Nom du jour férié</label>
-            <input type="text" name="exception_reason" id="exception_reason" class="form-control" value="{{ old('exception_reason') }}" required
+            <label for="holiday_name">Nom du jour férié</label>
+            <input type="text" name="holiday_name" id="holiday_name" class="form-control" value="{{ old('holiday_name') }}" required
                    placeholder="Ex: Noël, Pâques, 1er Mai...">
-            @error('exception_reason')
+            @error('holiday_name')
                 <div class="error-message">{{ $message }}</div>
             @enderror
         </div>
-
-
-
 
         <div class="form-actions">
             <button type="submit" class="submit-btn">
@@ -141,87 +136,6 @@
         color: var(--text-color);
     }
 
-    .checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        cursor: pointer;
-    }
-
-    .checkbox-label input[type="checkbox"] {
-        width: 1.25rem;
-        height: 1.25rem;
-        accent-color: var(--primary-color);
-    }
-
-    .time-slots-container {
-        margin-bottom: 1.5rem;
-    }
-
-    .time-slots-container h3 {
-        margin-top: 0;
-        margin-bottom: 1rem;
-        font-size: 1.1rem;
-        color: var(--primary-color);
-    }
-
-    .time-slot-group {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .time-inputs {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        flex: 1;
-    }
-
-    .time-input {
-        padding: 0.5rem;
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        background: white;
-        color: var(--text-color);
-        flex: 1;
-    }
-
-    .time-separator {
-        color: var(--primary-color);
-        font-weight: 600;
-    }
-
-    .remove-slot {
-        background: none;
-        border: none;
-        color: #dc3545;
-        cursor: pointer;
-        padding: 0.25rem;
-    }
-
-    .add-slot-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1rem;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.2s;
-        width: 100%;
-        justify-content: center;
-        margin-bottom: 1.5rem;
-    }
-
-    .add-slot-btn:hover {
-        background-color: #6B2B00;
-        transform: translateY(-1px);
-    }
-
     .form-actions {
         display: flex;
         justify-content: flex-end;
@@ -268,48 +182,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         lucide.createIcons();
-        
-        const isClosedCheckbox = document.getElementById('is_closed');
-        const timeSlotsContainer = document.getElementById('time_slots_container');
-        
-        isClosedCheckbox.addEventListener('change', function() {
-            timeSlotsContainer.style.display = this.checked ? 'none' : 'block';
-            
-            // Gérer les attributs required des champs de temps
-            const timeInputs = timeSlotsContainer.querySelectorAll('input[type="time"]');
-            timeInputs.forEach(input => {
-                input.required = !this.checked;
-            });
-        });
     });
-
-    function addTimeSlot() {
-        const container = document.getElementById('time_slots');
-        const timeSlotCount = container.children.length;
-        
-        const timeSlotGroup = document.createElement('div');
-        timeSlotGroup.className = 'time-slot-group';
-        
-        timeSlotGroup.innerHTML = `
-            <div class="time-inputs">
-                <input type="time" name="time_slots[${timeSlotCount}][start]" class="time-input" required>
-                <span class="time-separator">-</span>
-                <input type="time" name="time_slots[${timeSlotCount}][end]" class="time-input" required>
-            </div>
-            <button type="button" class="remove-slot" onclick="removeTimeSlot(this)">
-                <i data-lucide="x"></i>
-            </button>
-        `;
-        
-        container.appendChild(timeSlotGroup);
-        lucide.createIcons();
-    }
-
-    function removeTimeSlot(button) {
-        const container = document.getElementById('time_slots');
-        if (container.children.length > 1) {
-            button.closest('.time-slot-group').remove();
-        }
-    }
 </script>
 @endsection

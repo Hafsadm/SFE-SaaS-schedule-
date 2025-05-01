@@ -116,7 +116,7 @@
                     <option value="audition">Audition</option>
                     <option value="dentiste">Dentiste</option>
                 </select>
-                <small>Maintenez Ctrl (ou Cmd) pour sélectionner plusieurs services</small>
+                {{-- <small>Maintenez Ctrl (ou Cmd) pour sélectionner plusieurs services</small> --}}
             </div>
 
             <div class="form-group">

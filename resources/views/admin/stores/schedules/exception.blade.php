@@ -16,7 +16,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.stores.schedules.store', $store) }}" method="POST" class="schedule-form">
+    <form action="{{ route('admin.stores.exceptions.store', $store) }}" method="POST" class="schedule-form">
         @csrf
         <input type="hidden" name="type" value="exception">
 
@@ -29,15 +29,63 @@
         </div>
 
         <div class="form-group">
-            <label for="exception_reason">Raison de l'exception</label>
-            <input type="text" name="exception_reason" id="exception_reason" class="form-control" value="{{ old('exception_reason') }}" required
+            <label for="exception_raison">Raison de l'exception</label>
+            <input type="text" name="exception_raison" id="exception_raison" class="form-control" value="{{ old('exception_raison') }}" required
                    placeholder="Ex: Réunion d'équipe, Inventaire...">
-            @error('exception_reason')
+            @error('exception_raison')
                 <div class="error-message">{{ $message }}</div>
             @enderror
         </div>
 
-  
+        <div class="form-group">
+            <label for="is_closed" class="checkbox-label">
+                <input type="checkbox" name="is_closed" id="is_closed" {{ old('is_closed') ? 'checked' : '' }}>
+                Fermé exceptionnellement
+            </label>
+        </div>
+
+        {{-- 
+        <div id="time_slots_container" class="time-slots-container" style="{{ old('is_closed') ? 'display: none;' : '' }}">
+            <h3>Créneaux horaires exceptionnels</h3>
+            <div id="time_slots">
+                @if(old('time_slots'))
+                    @foreach(old('time_slots') as $index => $slot)
+                        <div class="time-slot-group">
+                            <div class="time-inputs">
+                                <input type="time" name="time_slots[{{ $index }}][start]" class="time-input" value="{{ $slot['start'] ?? '' }}" required>
+                                <span class="time-separator">-</span>
+                                <input type="time" name="time_slots[{{ $index }}][end]" class="time-input" value="{{ $slot['end'] ?? '' }}" required>
+                            </div>
+                            <button type="button" class="remove-slot" onclick="removeTimeSlot(this)">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="time-slot-group">
+                        <div class="time-inputs">
+                            <input type="time" name="time_slots[0][start]" class="time-input" required>
+                            <span class="time-separator">-</span>
+                            <input type="time" name="time_slots[0][end]" class="time-input" required>
+                        </div>
+                        <button type="button" class="remove-slot" onclick="removeTimeSlot(this)">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                @endif
+            </div>
+       
+            
+            @error('time_slots')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+            @error('time_slots.*.start')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+            @error('time_slots.*.end')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div> --}}
 
         <div class="form-actions">
             <button type="submit" class="submit-btn">

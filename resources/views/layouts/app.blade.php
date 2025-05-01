@@ -37,16 +37,16 @@
             font-family: Georgia, 'Times New Roman', Times, serif;
         }
 
-        .main-container {
+        /* .main-container {
             min-height: 100vh;
             background-color: #fffbeb;
             display: flex;
             flex-direction: column;
-        }
+        } */
 
-        .main-container.dark {
+        /* .main-container.dark {
             background-color: #887f79;
-        }
+        } */
 
         .content-wrapper {
             flex: 1;
@@ -117,7 +117,7 @@
 
         .nav-logo .logo-link {
             text-decoration: none;
-            color: #331c0c;
+            color: #2b1302;
             font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: 0.5px;
@@ -125,7 +125,7 @@
         }
 
         .nav-logo .logo-link:hover {
-            color: #db8d34;
+            color: #a1804f;
         }
 
         .nav-links {
@@ -205,7 +205,7 @@
             gap: 0.75rem;
             padding: 0.75rem 1rem;
             text-decoration: none;
-            color: #946919;
+            color: #a1804f;
             border-radius: 5px;
             transition: all 0.3s ease;
         }
@@ -246,16 +246,16 @@
 
         .auth-link:hover {
             background-color: rgba(52, 152, 219, 0.1);
-            color: #be8b1d;
+            color: #a1804f;
         }
 
         .auth-link.register {
-            background-color: #7c620e;
+            background-color: #a1804f;
             color: white;
         }
 
         .auth-link.register:hover {
-            background-color: #b97629;
+            background-color: #a1804f;
         }
 
         @media (max-width: 768px) {

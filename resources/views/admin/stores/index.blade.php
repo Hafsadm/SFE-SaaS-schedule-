@@ -3,7 +3,6 @@
 @section('title', 'Points de vente')
    
 <style>
-    
     /* Styles pour les horaires hebdomadaires */
     .hours-dropdown {
         display: none;
@@ -101,6 +100,9 @@
     @media (prefers-color-scheme: dark) {
         .hours-dropdown {
             background-color: #3E2D1F;
+            border-color: #5C4033;  {
+        .hours-dropdown {
+            background-color: #3E2D1F;
             border-color: #5C4033;
         }
         
@@ -140,13 +142,15 @@
             <div id="map"></div>
         </div>
         
+
         <div class="stores-list" id="store-list">
             @foreach($stores as $store)
-            <div class="store-card" data-lat="{{ $store->latitude }}" data-lng="{{ $store->longitude }}">
+            <div class="store-card" >
                 <div class="store-header">
-                    <span class="store-badge">Opticien</span>
-                    <span class="store-status {{ $store->getTodaySchedule() && !$store->getTodaySchedule()->is_closed ? 'open' : 'closed' }}">
-                        {{ $store->getTodaySchedule() ? ($store->getTodaySchedule()->is_closed ? 'Fermé' : 'Ouvert') : 'Horaires non définis' }}
+                    <span class="store-badge">
+                        {{ is_array($store->services) ? implode(', ', $store->services) : ($store->services ?? 'Service non défini') }}
+                    </span>                    <span class="store-status {{ $store->is_closed ? 'closed' : 'open' }}">
+                        {{ $store->is_closed ? 'Fermé' : 'Ouvert' }}
                     </span>
                 </div>
                 
@@ -155,8 +159,9 @@
                     <div class="store-address">{{ $store->adresse }}</div>
                 </div>
                 
+                
                 <div class="store-contact">
-                    <div class="store-phone">{{ $store->telephone ?? 'Aucun téléphone' }}</div>
+                    <div class="store-phone">{{ $store->phone ?? 'Aucun téléphone' }}</div>
                     <div class="store-hours-toggle" onclick="toggleHours(this)">
                         HORAIRES <i class="fas fa-chevron-down"></i>
                         <div class="hours-dropdown">
@@ -164,7 +169,6 @@
                         </div>
                     </div>
                 </div>
-
 
                 <div class="store-locate" onclick="centerMapOnStore({{ $store->latitude }}, {{ $store->longitude }})">
                     <i class="fas fa-map-pin"></i>
@@ -175,13 +179,16 @@
                     <a href="{{ route('admin.stores.schedules.select-type', $store) }}" class="btn-primary">
                         GÉRER LES HORAIRES
                     </a>
-                    <button class="btn-primary">PRENDRE RENDEZ-VOUS</button>
+                    <a href="{{ route('admin.stores.edit', $store) }}" class="btn-primary">
+                        MODIFIER
+                    </a>
                 </div>
                 
-                <a href="{{ route('admin.stores.show', $store) }}" class="btn-secondary">
-                    Voir LA FICHE Des Details
+                <a href="{{ route('admin.stores.manage', $store) }}" class="btn-secondary">
+                     GÉRER L'AFFICHE DES DETAILS
                 </a>
             </div>
+            </DIV>
             @endforeach
         </div>
     </div>
@@ -194,7 +201,7 @@
         --secondary: #D2B48C; /* Beige doré */
         --light-beige: #F5F5DC;
         --dark-beige: #E0C9B4;
-        --text-dark: #5C4033; /* Marron foncé */
+        --text-dark: #000000; /* Marron foncé */
         --text-light: #F8F4E6;
         --success: #82B183; /* Vert doux */
         --error: #C17C74; /* Rouge doux */
@@ -228,7 +235,7 @@
 
     .stores-header h1 {
         font-size: 1.8rem;
-        color: var(--text-dark);
+        color: #ffffff;
         font-weight: 700;
         position: relative;
     }
@@ -314,14 +321,14 @@
     }
 
     /* Carte de boutique */
-    .store-card {
+     .store-card {
         background: white;
         border-radius: 8px;
-        padding: 1.5rem;
+        padding: 0.25rem;
         box-shadow: var(--card-shadow);
         transition: all 0.3s ease;
-        border: 1px solid var(--border);
-    }
+        border: 1px solid var(--border); 
+    } 
 
     .store-card:hover {
         transform: translateY(-3px);
@@ -483,7 +490,8 @@
 
     .btn-secondary {
         display: block;
-        width: 100%;
+        width: 50%;
+        margin: 0 auto;
         padding: 0.75rem;
         background-color: var(--primary);
         color: white;
@@ -543,7 +551,7 @@
         }
         
         .store-card {
-            background-color: #6b5542;
+            background-color: #8f7659;
             border-color: #5C4033;
         }
         
@@ -562,8 +570,8 @@
         }
         
         .hours-dropdown {
-            background-color: #3E2D1F;
-            border-color: #5C4033;
+            background-color: #ffffff;
+            border-color: #080807;
         }
     }
 </style>
@@ -593,6 +601,7 @@
         }
     });
 </script>
+
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8"></script>
 <script>
     // Le script JavaScript reste identique à celui que vous avez fourni
@@ -752,3 +761,5 @@
     });
 </script>
 @endsection
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM8d7x1z5l5e5c5e5e5e5e5e5e5e5e5e5e5e5" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.1.0/lucide.min.js"></script>

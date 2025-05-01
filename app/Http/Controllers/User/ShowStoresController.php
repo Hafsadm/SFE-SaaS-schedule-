@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Store;
@@ -10,88 +10,35 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
-class StoreController extends Controller
+class ShowStoresController extends Controller
 {
-    public function index()
-    {
-        $stores = Store::with(['schedules', 'exceptions', 'holidays'])->get();
-        
-        // Pour chaque magasin, vérifier s'il est fermé aujourd'hui
-        foreach ($stores as $store) {
-            $today = Carbon::today();
-            $dayOfWeek = strtolower($today->englishDayOfWeek);
-            
-            // Vérifier s'il y a une exception pour aujourd'hui
-            $exception = $store->exceptions()
-                ->whereDate('exception_date', $today)
-                ->first();
-            
-            // Vérifier s'il y a un jour férié pour aujourd'hui
-            $holiday = $store->holidays()
-                ->whereDate('holiday_date', $today)
-                ->first();
-            
-            // Vérifier l'horaire régulier pour aujourd'hui
-            $regularSchedule = $store->schedules()
-                ->where('day_of_week', $dayOfWeek)
-                ->first();
-            
-            // Déterminer si le magasin est fermé aujourd'hui
-            $store->is_closed = false;
-            $store->closed_reason = null;
-            
-            if ($exception) {
-                $store->is_closed = $exception->is_closed;
-                if ($exception->is_closed) {
-                    $store->closed_reason = 'Exception: ' . $exception->exception_raison;
-                }
-            } elseif ($holiday) {
-                $store->is_closed = true;
-                $store->closed_reason = 'Jour férié: ' . $holiday->holiday_name;
-            } elseif ($regularSchedule && $regularSchedule->is_closed) {
-                $store->is_closed = true;
-                $store->closed_reason = 'Fermé le ' . $this->getFrenchDayName($dayOfWeek);
-            }
-            
-            // Générer le HTML pour les horaires hebdomadaires
-            $store->formatted_weekly_hours = $this->generateWeeklyHoursHtml($store);
-        }
-        
-        return view('admin.stores.index', compact('stores'));
-    }
+    // public function store(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'nom' => 'required|string|max:255',
+    //         'adresse' => 'required|string|max:255',
+    //         'ville' => 'required|string|max:255',
+    //         'pays' => 'required|string|max:255',
+    //         'phone' => 'nullable|string|max:20',
+    //         'ouvert_jusqua' => 'required|date_format:H:i',
+    //         'lien_rdv' => 'nullable|url',
+    //         'latitude' => 'required|numeric',
+    //         'longitude' => 'required|numeric',
+    //         'services' => 'nullable|array',
+    //         'services.*' => 'string'
+    //     ]);
 
-    public function create()
-    {
-        return view('admin.stores.create');
-    }
+    //     if ($validator->fails()) {
+    //         return redirect()->back()
+    //             ->withErrors($validator)
+    //             ->withInput();
+    //     }
 
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'nom' => 'required|string|max:255',
-            'adresse' => 'required|string|max:255',
-            'ville' => 'required|string|max:255',
-            'pays' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'ouvert_jusqua' => 'required|date_format:H:i',
-            'lien_rdv' => 'nullable|url',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'services' => 'nullable|array',
-            'services.*' => 'string'
-        ]);
+    //     $store = Store::create($request->all());
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $store = Store::create($request->all());
-
-        return redirect()->route('admin.stores.index')
-            ->with('success', 'Point de vente créé avec succès');
-    }
+    //     return redirect()->route('admin.stores.index')
+    //         ->with('success', 'Point de vente créé avec succès');
+    // }
 
     // public function show(Store $store)
     // {
@@ -105,65 +52,32 @@ class StoreController extends Controller
     //     return view('admin.stores.show', compact('store'));
     // }
 
-    public function edit(Store $store)
-    {
-        return view('admin.stores.edit', compact('store'));
-    }
-
-    public function update(Request $request, Store $store)
-    {
-        $validator = Validator::make($request->all(), [
-            'nom' => 'required|string|max:255',
-            'adresse' => 'required|string|max:255',
-            'ville' => 'required|string|max:255',
-            'pays' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'ouvert_jusqua' => 'required|date_format:H:i',
-            'lien_rdv' => 'nullable|url',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'services' => 'nullable|array',
-            'services.*' => 'string'
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $store->update($request->all());
-
-        return redirect()->route('admin.stores.index')
-            ->with('success', 'Point de vente mis à jour avec succès');
-    }
-
-    public function destroy(Store $store)
-    {
-        $store->delete();
-        return redirect()->route('admin.stores.index')
-            ->with('success', 'Point de vente supprimé avec succès');
-    }
     
-    public function search(Request $request)
-    {
-        $query = $request->input('query');
+    // public function search(Request $request)
+    // {
+    //     $query = $request->input('query');
         
-        $stores = Store::query()
-            ->where('ville', 'LIKE', "%{$query}%")
-            ->orWhere('pays', 'LIKE', "%{$query}%")
-            ->orWhere('adresse', 'LIKE', "%{$query}%")
-            ->orWhere('nom', 'LIKE', "%{$query}%")
-            ->with(['schedules', 'exceptions', 'holidays'])
-            ->get();
+    //     $stores = Store::query()
+    //         ->where('ville', 'LIKE', "%{$query}%")
+    //         ->orWhere('pays', 'LIKE', "%{$query}%")
+    //         ->orWhere('adresse', 'LIKE', "%{$query}%")
+    //         ->orWhere('nom', 'LIKE', "%{$query}%")
+    //         ->with(['schedules', 'exceptions', 'holidays'])
+    //         ->get();
             
-        // Pour chaque magasin, ajouter les informations d'horaires
-        foreach ($stores as $store) {
-            $this->addScheduleInfo($store);
-        }
+    //     // Pour chaque magasin, ajouter les informations d'horaires
+    //     foreach ($stores as $store) {
+    //         if ($store instanceof \Illuminate\Database\Eloquent\Collection) {
+    //             foreach ($store as $singleStore) {
+    //                 $this->addScheduleInfo($singleStore);
+    //             }
+    //         } else {
+    //             $this->addScheduleInfo($store);
+    //         }
+    //     }
         
-        return response()->json($stores);
-    }
+    //     return response()->json($stores);
+    // }
     
     /**
      * Ajoute les informations d'horaires à un magasin
@@ -323,31 +237,31 @@ class StoreController extends Controller
 
 
  
-    // public function show($id)
-    // {
-    //     // Récupérer le magasin avec ses relations
-    //     $store = Store::with(['schedules', 'exceptions', 'holidays', 'products', 'staff'])
-    //         ->findOrFail($id);
+    public function show($id)
+    {
+        // Récupérer le magasin avec ses relations
+        $store = Store::with(['schedules', 'exceptions', 'holidays', 'products', 'staff'])
+            ->findOrFail($id);
         
-    //     // Ajouter les informations d'horaires
-    //     $this->addScheduleInfo($store);
+        // Ajouter les informations d'horaires
+        $this->addScheduleInfo($store);
         
-    //     // Récupérer les avis (à implémenter selon votre modèle de données)
-    //     // $reviews = Review::where('store_id', $id)->get();
+        // Récupérer les avis (à implémenter selon votre modèle de données)
+        // $reviews = Review::where('store_id', $id)->get();
         
-    //     // Récupérer les magasins similaires (même service dans la même ville)
-    //     $similarStores = Store::where('id', '!=', $id)
-    //         ->where('ville', $store->ville)
-    //         ->whereJsonContains('services', $store->services[0] ?? null)
-    //         ->limit(3)
-    //         ->get();
+        // Récupérer les magasins similaires (même service dans la même ville)
+        $similarStores = Store::where('id', '!=', $id)
+            ->where('ville', $store->ville)
+            ->whereJsonContains('services', $store->services[0] ?? null)
+            ->limit(3)
+            ->get();
             
-    //     foreach ($similarStores as $similarStore) {
-    //         $this->addScheduleInfo($similarStore);
-    //     }
+        foreach ($similarStores as $similarStore) {
+            $this->addScheduleInfo($similarStore);
+        }
         
-    //     return view('admin.stores.show', compact('store', 'similarStores'));
-    // }
+        return view('user.stores.show', compact('store', 'similarStores'));
+    }
     
     
 

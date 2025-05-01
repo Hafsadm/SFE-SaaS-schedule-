@@ -28,6 +28,19 @@
         </div>
     @endif
 
+    @if(session('success') || session('error'))
+    <script>
+        setTimeout(function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500); // supprime complètement du DOM après fondu
+            });
+        }, 3000); // 3000ms = 3 secondes
+    </script>
+    @endif
+
     <div class="schedules-grid">
         <!-- Horaires réguliers -->
         <div class="schedule-section">
@@ -39,21 +52,21 @@
             @else
                 <div class="schedule-cards">
                     @foreach($regularSchedules as $schedule)
-                        <div class="schedule-card">
+                        <div class="schedule-card {{ $schedule->day_of_week === 'sunday' ? 'sunday' : '' }}">
                             <div class="card-header">
                                 <h3>{{ $schedule->getDayName() }}</h3>
                                 @if($schedule->is_closed)
-                                    <span class="status-badge closed">Fermé</span>
+                                    <span class="status-badge closed1">Fermé</span>
                                 @endif
                                 <div class="card-actions">
-                                    <a href="{{ route('admin.stores.schedules.edit', [$store, $schedule]) }}" class="edit-button">
-                                        <i data-lucide="edit"></i>
+                                    <a href="{{ route('admin.stores.schedules.edit', [$store, $schedule]) }}" class="edit-button" title="Modifier">
+                                        <i data-lucide="edit"> Modifier </i>
                                     </a>
                                     <form action="{{ route('admin.stores.schedules.destroy', [$store, $schedule]) }}" method="POST" class="delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="delete-button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet horaire ?')">
-                                            <i data-lucide="trash-2"></i>
+                                        <button type="submit" class="delete-button" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet horaire ?')">
+                                            <i data-lucide="trash-2">Supprimer</i>
                                         </button>
                                     </form>
                                 </div>
@@ -84,31 +97,31 @@
                 </div>
             @else
                 <div class="schedule-cards">
-                    @foreach($exceptionSchedules as $schedule)
+                    @foreach($exceptionSchedules as $exception)
                         <div class="schedule-card">
                             <div class="card-header">
-                                <h3>{{ $schedule->exception_date->format('d/m/Y') }}</h3>
-                                <span class="reason">{{ $schedule->exception_reason }}</span>
-                                @if($schedule->is_closed)
+                                <h3>{{ $exception->exception_date->format('d/m/Y') }}</h3>
+                                <span class="reason">{{ $exception->exception_raison }}</span>
+                                @if($exception->is_closed)
                                     <span class="status-badge closed">Fermé</span>
                                 @endif
                                 <div class="card-actions">
-                                    <a href="{{ route('admin.stores.schedules.edit', [$store, $schedule]) }}" class="edit-button">
-                                        <i data-lucide="edit"></i>
+                                    <a href="{{ route('admin.stores.exceptions.edit', [$store, $exception]) }}" class="edit-button" title="Modifier">
+                                        <i data-lucide="edit"> Modifier </i>
                                     </a>
-                                    <form action="{{ route('admin.stores.schedules.destroy', [$store, $schedule]) }}" method="POST" class="delete-form">
+                                    <form action="{{ route('admin.stores.exceptions.destroy', [$store, $exception]) }}" method="POST" class="delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="delete-button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette exception ?')">
-                                            <i data-lucide="trash-2"></i>
+                                        <button type="submit" class="delete-button" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette exception ?')">
+                                            <i data-lucide="trash-2"> Supprimer </i>
                                         </button>
                                     </form>
                                 </div>
                             </div>
                             <div class="card-content">
-                                @if(!$schedule->is_closed)
+                                @if(!$exception->is_closed)
                                     <div class="time-slots">
-                                        @foreach($schedule->time_slots as $slot)
+                                        @foreach($exception->time_slots as $slot)
                                             <div class="time-slot">
                                                 {{ $slot['start'] }} - {{ $slot['end'] }}
                                             </div>
@@ -131,37 +144,24 @@
                 </div>
             @else
                 <div class="schedule-cards">
-                    @foreach($holidaySchedules as $schedule)
-                        <div class="schedule-card">
+                    @foreach($holidaySchedules as $holiday)
+                        <div class="schedule-card holiday">
                             <div class="card-header">
-                                <h3>{{ $schedule->exception_date->format('d/m/Y') }}</h3>
-                                <span class="reason">{{ $schedule->exception_reason }}</span>
-                                @if($schedule->is_closed)
-                                    <span class="status-badge closed">Fermé</span>
-                                @endif
+                                <h3>{{ $holiday->holiday_date->format('d/m/Y') }}</h3>
+                                <span class="reason">{{ $holiday->holiday_name }}</span>
+                                <span class="status-badge closed">Fermé</span>
                                 <div class="card-actions">
-                                    <a href="{{ route('admin.stores.schedules.edit', [$store, $schedule]) }}" class="edit-button">
-                                        <i data-lucide="edit"></i>
+                                    <a href="{{ route('admin.stores.holidays.edit', [$store, $holiday]) }}" class="edit-button" title="Modifier">
+                                        <i data-lucide="edit"> Modifier</i> 
                                     </a>
-                                    <form action="{{ route('admin.stores.schedules.destroy', [$store, $schedule]) }}" method="POST" class="delete-form">
+                                    <form action="{{ route('admin.stores.holidays.destroy', [$store, $holiday]) }}" method="POST" class="delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="delete-button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce jour férié ?')">
-                                            <i data-lucide="trash-2"></i>
+                                        <button type="submit" class="delete-button" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce jour férié ?')">
+                                            <i data-lucide="trash-2"> Supprimer </i>
                                         </button>
                                     </form>
                                 </div>
-                            </div>
-                            <div class="card-content">
-                                @if(!$schedule->is_closed)
-                                    <div class="time-slots">
-                                        @foreach($schedule->time_slots as $slot)
-                                            <div class="time-slot">
-                                                {{ $slot['start'] }} - {{ $slot['end'] }}
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
                             </div>
                         </div>
                     @endforeach
@@ -179,6 +179,8 @@
         --border-color: #D2B48C;
         --success-color: #4CAF50;
         --error-color: #F44336;
+        --sunday-color: #FFF3E0;
+        --holiday-color: #FFEBEE;
     }
 
     .schedules-container {
@@ -288,6 +290,16 @@
         position: relative;
     }
 
+    .schedule-card.sunday {
+        background-color: var(--sunday-color);
+        border-color: #FFE0B2;
+    }
+
+    .schedule-card.holiday {
+        background-color: var(--holiday-color);
+        border-color: #FFCDD2;
+    }
+
     .card-header {
         display: flex;
         justify-content: space-between;
@@ -303,14 +315,24 @@
     }
 
     .status-badge {
-        padding: 0.25rem 0.5rem;
+        padding: 1.25rem 0.5rem;
         border-radius: 4px;
         font-size: 0.875rem;
         margin-left: auto;
+        margin-bottom: auto;
     }
 
     .status-badge.closed {
         background-color: #FFEBEE;
+        color: var(--error-color);
+    }
+
+    .status-badge.closed1 {
+        padding: 1.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        margin-bottom: auto;
+        margin-right: auto 0;
         color: var(--error-color);
     }
 
@@ -334,7 +356,7 @@
         border: none;
         cursor: pointer;
         padding: 0.25rem;
-        color: #666;
+        color: #633e1b;
         transition: color 0.2s;
     }
 

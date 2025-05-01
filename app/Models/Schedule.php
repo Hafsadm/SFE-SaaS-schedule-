@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class Schedule extends Model
 {
@@ -14,17 +13,12 @@ class Schedule extends Model
         'store_id',
         'day_of_week',
         'is_closed',
-        'is_holiday',
-        'time_slots',
-        'exception_date',
-        'exception_reason'
+        'time_slots'
     ];
 
     protected $casts = [
         'time_slots' => 'array',
         'is_closed' => 'boolean',
-        'is_holiday' => 'boolean',
-        'exception_date' => 'date',
     ];
 
     public function store()
@@ -32,18 +26,21 @@ class Schedule extends Model
         return $this->belongsTo(Store::class);
     }
 
+    /**
+     * Retourne le nom français du jour de la semaine
+     */
     public function getDayName()
     {
-        $days = [
+        $frenchDays = [
             'monday' => 'Lundi',
             'tuesday' => 'Mardi',
             'wednesday' => 'Mercredi',
             'thursday' => 'Jeudi',
             'friday' => 'Vendredi',
             'saturday' => 'Samedi',
-            'sunday' => 'Dimanche',
+            'sunday' => 'Dimanche'
         ];
-
-        return $days[$this->day_of_week] ?? $this->day_of_week;
+        
+        return $frenchDays[$this->day_of_week] ?? $this->day_of_week;
     }
 }

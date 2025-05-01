@@ -13,7 +13,7 @@
                 <div class="nav-links">
                     <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="fas fa-home"></i>
-                        Dashboard
+                        Home
                     </a>
                     <a href="{{ route('admin.stores.index') }}" class="nav-link {{ request()->routeIs('admin.stores.*') ? 'active' : '' }}">
                         <i class="fas fa-store"></i>
@@ -26,6 +26,7 @@
                         <i class="fas fa-user"></i>
                         {{ Auth::user()->name }}
                     </button>
+                    
                     <div class="dropdown-menu">
                         <a href="{{ route('profile.edit') }}" class="dropdown-item">
                             <i class="fas fa-user-circle"></i>
