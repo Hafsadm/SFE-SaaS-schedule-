@@ -1395,7 +1395,7 @@
         
         // Initialiser les icônes Lucide
         document.addEventListener('DOMContentLoaded', function() {
-            lucide.createIcons();
+            // lucide.createIcons();
         });
     </script>
     
@@ -1527,7 +1527,7 @@
 <script>
     // Le script JavaScript reste identique à celui que vous avez fourni
     // Il est déjà bien optimisé et fonctionnel
-    const stores = @json($stores);
+    // const stores = @json($stores);
     let map;
     let markers = [];
     let infoWindow;
@@ -1718,19 +1718,19 @@
 </script>
 @endpush
 
-<Script>
+<script>
     // Variables globales
-let map
-let markers = []
-let infoWindow
-let userMarker = null
-let userCircle = null
-let debounceTimer
+let map;
+let markers = [];
+let infoWindow;
+let userMarker = null;
+let userCircle = null;
+let debounceTimer;
 
 // Déclaration des variables globales manquantes
-let lucide
-let google
-let stores
+let lucide;
+let google;
+let stores;
 
 // Initialisation au chargement du document
 document.addEventListener("DOMContentLoaded", () => {
@@ -2052,7 +2052,7 @@ function initMap() {
   })
 
   // Créer une fenêtre d'info
-  infoWindow = new google.maps.InfoWindow()
+  infoWindow = new google.maps.InfoWindow();
 
   // Ajouter les marqueurs pour chaque boutique
   if (typeof stores !== "undefined") {
@@ -2339,10 +2339,6 @@ window.toggleHours = toggleHours
 window.centerMapOnStore = centerMapOnStore
 window.initMap = initMap
 
-</Script>
-
-@push('scripts')
-<script>
     document.addEventListener('DOMContentLoaded', function() {
     // Éléments DOM
     const searchInput = document.getElementById('storeSearch');
@@ -2785,4 +2781,4 @@ document.addEventListener('click', function(event) {
     }
 });
 </script>
-@endpush
+

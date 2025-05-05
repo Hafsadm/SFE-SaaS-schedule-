@@ -209,15 +209,122 @@ class HomeController extends Controller
             });
         }
 
-        if ($request->has('horaire')&& !empty($request->horaire)) {
-            $query->where(function ($q) use ($request) { 
-                foreach ($request->horaire as $horaire) {
-                    $q->orWhereJsonContains('horaire', $horaire);
-                }
-            });
 
+        if ($request->has('horaire') && !empty($request->horaire)) {
+            $now = Carbon::now();
+            $currentDay = strtolower($now->englishDayOfWeek); // "monday", "tuesday", etc.
+            $currentTime = $now->format('H:i:s');
+            
+            Log::info('Filtre horaire', [
+                'horaire' => $request->horaire,
+                'currentDay' => $currentDay,
+                'currentTime' => $currentTime
+            ]);
+
+            switch ($request->horaire) {
+                case 'open_now':
+                    // Approche simplifiée pour les magasins ouverts maintenant
+                    $query->where(function($q) use ($currentDay, $currentTime, $now) {
+                        // Magasins avec ouvert_jusqua défini et dans le futur
+                        $q->where(function($subQ) use ($now) {
+                            $subQ->whereNotNull('ouvert_jusqua')
+                                ->whereRaw('TIME(ouvert_jusqua) > ?', [$now->format('H:i:s')]);
+                        });
+                        
+                        // OU magasins avec des horaires pour aujourd'hui
+                        $q->orWhereHas('schedules', function($scheduleQ) use ($currentDay, $currentTime) {
+                            $scheduleQ->where('day_of_week', $currentDay)
+                                ->where('is_closed', false);
+                        });
+                    })
+
+                    // Exclure les magasins avec des exceptions aujourd'hui
+                    ->whereDoesntHave('exceptions', function ($q) use ($now) {
+                        $q->whereDate('exception_date', $now->toDateString())
+                          ->where('is_closed', true);
+                    })
+                    // Exclure les magasins avec des jours fériés aujourd'hui
+                    ->whereDoesntHave('holidays', function ($q) use ($now) {
+                        $q->whereDate('holiday_date', $now->toDateString());
+                    });
+                    break;
+
+                case 'morning': // 6h - 12h
+                    $query->whereHas('schedules', function ($q) use ($currentDay) {
+                        $q->where('day_of_week', $currentDay)
+                          ->where('is_closed', false)
+                          ->whereRaw('JSON_EXTRACT(time_slots, "$[0].start") <= ?', ['12:00:00']);
+                    });
+                    break;
+
+                case 'afternoon': // 12h - 18h
+                    $query->whereHas('schedules', function ($q) use ($currentDay) {
+                        $q->where('day_of_week', $currentDay)
+                          ->where('is_closed', false)
+                          ->whereRaw('JSON_EXTRACT(time_slots, "$[0].start") <= ?', ['18:00:00'])
+                          ->whereRaw('JSON_EXTRACT(time_slots, "$[0].end") >= ?', ['12:00:00']);
+                    });
+                    break;
+
+                case 'evening': // 18h - 23h
+                    $query->whereHas('schedules', function ($q) use ($currentDay) {
+                        $q->where('day_of_week', $currentDay)
+                          ->where('is_closed', false)
+                          ->whereRaw('JSON_EXTRACT(time_slots, "$[0].end") >= ?', ['18:00:00']);
+                    });
+                    break;
+
+                case 'weekend': // Samedi/Dimanche
+                    $query->whereHas('schedules', function ($q) {
+                        $q->whereIn('day_of_week', ['saturday', 'sunday'])
+                          ->where('is_closed', false);
+                    });
+                    break;
+            }
         }
-    
+
+
+        // 3. Filtre par RECHERCHE TEXTE (ville, pays)
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            Log::info('Terme de recherche', ['search' => $searchTerm]);
+            
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('ville', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('pays', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('adresse', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('nom', 'LIKE', "%{$searchTerm}%");
+            });
+        }
+
+
+        // 4. Filtre "AUTOUR DE MOI" (géolocalisation)
+
+        if ($request->has(['latitude', 'longitude'])) {
+            
+      
+            $userLat = $request->latitude;
+            $userLng = $request->longitude;
+            $radius = 10; // les resultat s seront dans un rayon de 10 km
+            
+            Log::info('Géolocalisation', [
+                'latitude' => $userLat,
+                'longitude' => $userLng,
+                'radius' => $radius
+            ]);
+            
+
+            $query->selectRaw(
+                "*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * 
+                cos(radians(longitude) - radians(?)) + sin(radians(?)) * 
+                sin(radians(latitude)))) AS distance",
+                [$userLat, $userLng, $userLat]
+            )
+            ->having('distance', '<', $radius)
+            ->orderBy('distance');
+        }
+
+
         // Exécute la requête
         $stores = $query->get();
         
@@ -232,58 +339,59 @@ class HomeController extends Controller
         return response()->json($stores);
     }
 
-    // public function nearbyStores(Request $request)
-    // {
-    //     // Validation des données d'entrée
-    //     $request->validate([
-    //         'latitude' => 'required|numeric',
-    //         'longitude' => 'required|numeric'
-    //     ]);
+
+    public function nearbyStores(Request $request)
+    {
+        // Validation des données d'entrée
+        $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric'
+        ]);
     
-    //     $userLat = $request->latitude;
-    //     $userLng = $request->longitude;
-    //     $radius = 10; // Rayon en kilomètres
+        $userLat = $request->latitude;
+        $userLng = $request->longitude;
+        $radius = 10; // Rayon en kilomètres
     
-    //     // Log pour le débogage
-    //     Log::info('Recherche de magasins à proximité', [
-    //         'latitude' => $userLat,
-    //         'longitude' => $userLng,
-    //         'radius' => $radius
-    //     ]);
+        // Log pour le débogage
+        Log::info('Recherche de magasins à proximité', [
+            'latitude' => $userLat,
+            'longitude' => $userLng,
+            'radius' => $radius
+        ]);
     
-    //     try {
-    //         $stores = Store::with(['schedules', 'exceptions', 'holidays'])
-    //             ->selectRaw(
-    //                 "*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * 
-    //                 cos(radians(longitude) - radians(?)) + sin(radians(?)) * 
-    //                 sin(radians(latitude)))) AS distance",
-    //                 [$userLat, $userLng, $userLat]
-    //             )
-    //             ->having('distance', '<', $radius)
-    //             ->orderBy('distance')
-    //             ->get();
+        try {
+            $stores = Store::with(['schedules', 'exceptions', 'holidays'])
+                ->selectRaw(
+                    "*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * 
+                    cos(radians(longitude) - radians(?)) + sin(radians(?)) * 
+                    sin(radians(latitude)))) AS distance",
+                    [$userLat, $userLng, $userLat]
+                )
+                ->having('distance', '<', $radius)
+                ->orderBy('distance')
+                ->get();
                 
-    //         // Ajouter les informations d'horaires pour chaque magasin
-    //         foreach ($stores as $store) {
-    //             $this->addScheduleInfo($store);
-    //         }
+            // Ajouter les informations d'horaires pour chaque magasin
+            foreach ($stores as $store) {
+                $this->addScheduleInfo($store);
+            }
     
-    //         // Log pour le débogage
-    //         Log::info('Magasins trouvés', ['count' => $stores->count()]);
+            // Log pour le débogage
+            Log::info('Magasins trouvés', ['count' => $stores->count()]);
     
-    //         return response()->json($stores);
-    //     } catch (\Exception $e) {
-    //         // Log l'erreur
-    //         Log::error('Erreur lors de la recherche de magasins à proximité', [
-    //             'error' => $e->getMessage(),
-    //             'trace' => $e->getTraceAsString()
-    //         ]);
+            return response()->json($stores);
+        } catch (\Exception $e) {
+            // Log l'erreur
+            Log::error('Erreur lors de la recherche de magasins à proximité', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             
             
-    //         return response()->json([
-    //             'error' => 'Une erreur est survenue lors de la recherche de magasins à proximité',
-    //             'message' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
+            return response()->json([
+                'error' => 'Une erreur est survenue lors de la recherche de magasins à proximité',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

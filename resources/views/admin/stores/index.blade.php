@@ -604,8 +604,7 @@
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8"></script>
 <script>
-    // Le script JavaScript reste identique à celui que vous avez fourni
-    // Il est déjà bien optimisé et fonctionnel
+
     const stores = @json($stores);
     let map;
     let markers = [];
