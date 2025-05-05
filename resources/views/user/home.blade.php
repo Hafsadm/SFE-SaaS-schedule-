@@ -25,6 +25,84 @@
     --border: #E6D8C3; 
 }
 
+/* Loader */
+#loader {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    padding: 1.5rem 2rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--primary);
+    border: 1px solid rgba(66, 145, 130, 0.2);
+    animation: fadeIn 0.3s ease-out;
+}
+
+#loader::after {
+    content: "";
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    margin-left: 0.75rem;
+    border: 2px solid rgba(66, 145, 130, 0.3);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Animation du loader */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -45%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+/* Message d'erreur */
+#error-message {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    padding: 0.75rem 1.5rem;
+    background-color: #fff1f1;
+    border: 1px solid #fee2e2;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem;
+    color: #dc2626;
+    text-align: center;
+    max-width: 90%;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Version mobile */
+@media (max-width: 768px) {
+    #loader {
+        width: 90%;
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    #error-message {
+        width: 90%;
+        padding: 0.75rem;
+    }
+}
 
 * {
     margin: 0;
@@ -179,6 +257,31 @@ body {
         background-color: var(--secondary);
     }
 
+    /* Bouton de réinitialisation */
+    .reset-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f8f8;
+        color: var(--text-dark);
+        border: 1px solid var(--border);
+        border-radius: 30px 0;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: 46px;
+    }
+
+    .reset-button:hover {
+        background-color: #e8e8e8;
+    }
+
+    .reset-button i {
+        margin-right: 0.5rem;
+    }
+
     /* Contenu principal */
     .content {
         display: grid;
@@ -240,6 +343,39 @@ body {
         padding-right: 0.5rem;
         color: #000000;
 
+    }
+
+    /* Message "Aucun résultat trouvé" */
+    .no-results {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1rem;
+        text-align: center;
+        background-color: #f8f9fa;
+        border: 1px dashed var(--border);
+        border-radius: 8px;
+        color: #6c757d;
+    }
+
+    .no-results i {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        opacity: 0.7;
+    }
+
+    .no-results h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-dark);
+    }
+
+    .no-results p {
+        font-size: 1rem;
+        max-width: 80%;
+        margin: 0 auto;
     }
 
     /* Scrollbar personnalisée */
@@ -488,6 +624,16 @@ body {
         background-color: #8C5E3B;
     }
 
+    /* Animation des marqueurs */
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+
+    .bounce {
+        animation: bounce 0.8s ease infinite;
+    }
+
     /* Responsive */
     @media (max-width: 1024px) {
         .content-container {
@@ -707,6 +853,26 @@ body {
     .dropdown-icon.rotated {
         transform: rotate(180deg);
     }
+
+    .reset-button {
+        background-color: #2a2a2a;
+        color: #ffffff;
+        border-color: #505050;
+    }
+
+    .reset-button:hover {
+        background-color: #3a3a3a;
+    }
+
+    .no-results {
+        background-color: #2a2a2a;
+        border-color: #505050;
+        color: #aaaaaa;
+    }
+
+    .no-results h3 {
+        color: #ffffff;
+    }
     }
 
 </style>
@@ -794,6 +960,15 @@ body {
                 <button class="ok-button" id="searchButton">OK</button>
             </div>
     
+            <!-- Bouton de réinitialisation -->
+            <button class="reset-button" id="resetButton">
+                <i data-lucide="refresh-cw"></i>
+                Réinitialiser
+            </button>
+
+            <div id="loader" style="display: none;">Chargement en cours...</div>
+            <div id="error-message" style="display: none; color: red; padding: 10px;"></div>
+
         </div>
 
         <script>
@@ -838,42 +1013,85 @@ body {
             });
 
             function filterStores() {
-    // Récupérer les services sélectionnés
-    const selectedServices = [];
-    document.querySelectorAll('input[name="specialite[]"]:checked').forEach((checkbox) => {
-        selectedServices.push(checkbox.value);
-    });
+                // Récupérer les services sélectionnés
+                const selectedServices = [];
+                document.querySelectorAll('input[name="specialite"]:checked').forEach((checkbox) => {
+                    selectedServices.push(checkbox.value);
+                });
 
-    // Envoyer la requête via Fetch
-    // fetch('/filter-stores', {
-    //     method: 'GET',  // ou POST si tu préfères
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({ specialite: selectedServices }),
-    // })
-    // .then(response => response.json() )
-    // .then(data => {
-    //     // Mettre à jour la liste des magasins
-    //     const storesList = document.getElementById('stores-list');
-    //     storesList.innerHTML = '';  // Vider la liste avant de la remplir
+                // Envoyer la requête via Fetch
+                // fetch('/filter-stores', {
+                //     method: 'GET',  // ou POST si tu préfères
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify({ specialite: selectedServices }),
+                // })
+                // .then(response => response.json() )
+                // .then(data => {
+                //     // Mettre à jour la liste des magasins
+                //     const storesList = document.getElementById('stores-list');
+                //     storesList.innerHTML = '';  // Vider la liste avant de la remplir
 
-    //     data.stores.forEach(store => {
-    //         const storeElement = document.createElement('div');
-    //         storeElement.innerHTML = `
-    //             <h3>${store.nom}</h3>
-    //             <p>${store.adresse}, ${store.ville}</p>
-    //             <p>Services: ${store.services.join(', ')}</p>
-    //         `;
-    //         storesList.appendChild(storeElement);
-    //     });
-    // })
-    // .catch(error => {
-    //     console.error('Erreur lors du filtrage des magasins', error);
-    // });
-}
+                //     data.stores.forEach(store => {
+                //         const storeElement = document.createElement('div');
+                //         storeElement.innerHTML = `
+                //             <h3>${store.nom}</h3>
+                //             <p>${store.adresse}, ${store.ville}</p>
+                //             <p>Services: ${store.services.join(', ')}</p>
+                //         `;
+                //         storesList.appendChild(storeElement);
+                //     });
+                // })
+                // .catch(error => {
+                //     console.error('Erreur lors du filtrage des magasins', error);
+                // });
+            }
 
+            // Fonction de réinitialisation
+            function resetFilters() {
+                // Réinitialiser les checkboxes et radios
+                document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(input => {
+                    input.checked = false;
+                });
+                
+                // Réinitialiser le champ de recherche
+                document.getElementById('storeSearch').value = '';
+                
+                // Désactiver le bouton "Autour de moi"
+                document.querySelector('.location-search').classList.remove('active');
+                
+                // Réinitialiser la carte et les marqueurs
+                if (window.map) {
+                    // Recharger tous les magasins
+                    loadAllStores();
+                }
+            }
 
+            // Fonction pour charger tous les magasins
+            function loadAllStores() {
+                showLoading(true);
+                
+                fetch('/stores', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(stores => {
+                    updateStoresList(stores);
+                    updateMap(stores);
+                })
+                .catch(error => {
+                    console.error("Fetch error:", error);
+                    showError("Erreur lors du chargement des résultats");
+                })
+                .finally(() => showLoading(false));
+            }
         </script>
         
     
@@ -965,8 +1183,6 @@ body {
     </div>
     
     <script>
-
-
         // Fonction pour afficher/masquer les horaires
         function toggleHours(element) {
             const dropdown = element.querySelector('.hours-dropdown');
@@ -984,26 +1200,396 @@ body {
         }
              // Faire défiler jusqu'à la carte de boutique correspondante
 
-           
-
         document.addEventListener('click', function(event) {
-        if (!event.target.closest('.store-hours-toggle')) {
-            document.querySelectorAll('.hours-dropdown').forEach(el => {
-                el.style.display = 'none';
-            });
-        }
-    });
+            if (!event.target.closest('.store-hours-toggle')) {
+                document.querySelectorAll('.hours-dropdown').forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
+        });
 
-
+        // Ajouter un écouteur d'événement pour le bouton de réinitialisation
+        document.getElementById('resetButton').addEventListener('click', function() {
+            resetFilters();
+        });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8&callback=initMap" async defer></script>
+
     <script>
-        // Le script JavaScript reste identique à celui que vous avez fourni
-        // Il est déjà bien optimisé et fonctionnel
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('storeSearch');
+            const searchButton = document.getElementById('searchButton');
+            const locationButton = document.querySelector('.location-search');
+            const storesContainer = document.getElementById('stores-container');
+            const serviceCheckboxes = document.querySelectorAll('input[name="specialite"]');
+            const horaireRadios = document.querySelectorAll('input[name="horaire"]');
+            const resetButton = document.getElementById('resetButton');
+            
+            // Écouteurs d'événements
+            if (searchButton) {
+                searchButton.addEventListener('click', performSearch);
+            }
+            
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        performSearch();
+                    }
+                });
+            }
+            
+            if (locationButton) {
+                locationButton.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    performSearch();
+                });
+            }
+            
+            if (resetButton) {
+                resetButton.addEventListener('click', resetFilters);
+            }
+            
+            // Ajouter des écouteurs pour les filtres de service et d'horaire
+            serviceCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', performSearch);
+            });
+            
+            horaireRadios.forEach(radio => {
+                radio.addEventListener('change', performSearch);
+            });
+            
+            // Fonction principale de recherche
+            function performSearch() {
+                // 1. Récupérer les valeurs des filtres
+                const selectedServices = Array.from(document.querySelectorAll('input[name="specialite"]:checked')).map(el => el.value);
+                const selectedHoraire = document.querySelector('input[name="horaire"]:checked')?.value;
+                const searchTerm = document.getElementById('storeSearch')?.value.trim() || '';
+                const aroundMeChecked = document.querySelector('.location-search').classList.contains('active');
+    
+                // 2. Préparer les paramètres pour l'URL
+                const params = new URLSearchParams();
+    
+                // Ajouter les services
+                selectedServices.forEach(service => {
+                    params.append('specialite[]', service);
+                });
+    
+                // Ajouter les autres filtres
+                if (selectedHoraire) params.append('horaire', selectedHoraire);
+                if (searchTerm) params.append('search', searchTerm);
+    
+                // 3. Gestion de la géolocalisation
+                const handleFetch = (location = null) => {
+                    // Si "Autour de moi" est coché et qu'on a une position
+                    if (aroundMeChecked && location) {
+                        params.append('latitude', location.latitude);
+                        params.append('longitude', location.longitude);
+                        console.log("Recherche géolocalisée:", location);
+                    }
+    
+                    // Envoyer la requête
+                    sendFetchRequest(params);
+                };
+    
+                // Logique de géolocalisation
+                if (aroundMeChecked) {
+                    if (navigator.geolocation) {
+                        showLoading(true);
+                        
+                        navigator.geolocation.getCurrentPosition(
+                            position => {
+                                handleFetch({
+                                    latitude: position.coords.latitude,
+                                    longitude: position.coords.longitude
+                                });
+                                showLoading(false);
+                            },
+                            error => {
+                                console.error("Erreur de géolocalisation:", error);
+                                showError("Géolocalisation impossible - Affichage de tous les résultats");
+                                handleFetch(); // Continuer sans géolocalisation
+                                showLoading(false);
+                            },
+                            { 
+                                enableHighAccuracy: true, 
+                                timeout: 10000,
+                                maximumAge: 60000
+                            }
+                        );
+                    } else {
+                        showError("Votre navigateur ne supporte pas la géolocalisation");
+                        handleFetch();
+                    }
+                } else {
+                    console.log("Recherche standard sans géolocalisation");
+                    handleFetch();
+                }
+            }
+    
+            // Fonction de réinitialisation
+            function resetFilters() {
+                // Réinitialiser les checkboxes et radios
+                document.querySelectorAll('input[name="specialite"]:checked').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                document.querySelectorAll('input[name="horaire"]:checked').forEach(radio => {
+                    radio.checked = false;
+                });
+                
+                // Réinitialiser le champ de recherche
+                document.getElementById('storeSearch').value = '';
+                
+                // Désactiver le bouton "Autour de moi"
+                document.querySelector('.location-search').classList.remove('active');
+                
+                // Utiliser les données initiales des magasins au lieu de faire une nouvelle requête
+                // Cela évite l'erreur "Erreur lors du chargement des résultats"
+                const initialStores = window.stores || [];
+                updateStoresList(initialStores);
+                updateMap(initialStores);
+                
+                // Afficher un message de confirmation
+                showMessage("Filtres réinitialisés avec succès");
+            }
+    
+            // Fonction pour afficher un message de succès
+            function showMessage(message) {
+                const messageElement = document.createElement('div');
+                messageElement.style.position = 'fixed';
+                messageElement.style.top = '1rem';
+                messageElement.style.left = '50%';
+                messageElement.style.transform = 'translateX(-50%)';
+                messageElement.style.zIndex = '1000';
+                messageElement.style.padding = '0.75rem 1.5rem';
+                messageElement.style.backgroundColor = '#f0fff4';
+                messageElement.style.border = '1px solid #c6f6d5';
+                messageElement.style.borderRadius = '0.5rem';
+                messageElement.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+                messageElement.style.fontSize = '0.9rem';
+                messageElement.style.color = '#38a169';
+                messageElement.style.textAlign = 'center';
+                messageElement.style.maxWidth = '90%';
+                messageElement.style.animation = 'slideDown 0.3s ease-out';
+                
+                messageElement.textContent = message;
+                document.body.appendChild(messageElement);
+                
+                setTimeout(() => {
+                    messageElement.style.opacity = '0';
+                    messageElement.style.transition = 'opacity 0.3s ease-out';
+                    setTimeout(() => {
+                        document.body.removeChild(messageElement);
+                    }, 300);
+                }, 3000);
+            }
+    
+            // Fonctions helpers
+            function showLoading(show) {
+                const loader = document.getElementById('loader');
+                if (loader) loader.style.display = show ? 'block' : 'none';
+            }
+    
+            function showError(message) {
+                const errorElement = document.getElementById('error-message');
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                    setTimeout(() => errorElement.style.display = 'none', 5000);
+                }
+            }
+    
+            function sendFetchRequest(params) {
+                showLoading(true);
+    
+                // Pour le développement et les tests, utilisez cette approche
+                // qui simule une réponse si la requête échoue
+                fetch(`/filter?${params.toString()}`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(stores => {
+                    if (!Array.isArray(stores)) {
+                        console.error("Réponse inattendue:", stores);
+                        throw new Error("Format de données invalide");
+                    }
+                    updateStoresList(stores);
+                    updateMap(stores);
+                })
+                .catch(error => {
+                    console.error("Fetch error:", error);
+                    showError("Erreur lors du chargement des résultats");
+                    
+                    // En cas d'erreur, utiliser les données initiales
+                    const initialStores = window.stores || [];
+                    updateStoresList(initialStores);
+                    updateMap(initialStores);
+                })
+                .finally(() => showLoading(false));
+            }
+            
+            // Mettre à jour la liste des magasins
+            function updateStoresList(stores) {
+                if (!storesContainer) return;
+                
+                // Vider le conteneur
+                storesContainer.innerHTML = '';
+                
+                if (!stores || stores.length === 0) {
+                    // Afficher un message amélioré quand aucun résultat n'est trouvé
+                    storesContainer.innerHTML = `
+                        <div class="no-results">
+                            <i data-lucide="search-x"></i>
+                            <h3>Aucun résultat trouvé</h3>
+                            <p>Essayez de modifier vos critères de recherche ou utilisez le bouton "Réinitialiser" pour afficher toutes les boutiques.</p>
+                        </div>`;
+                    
+                    // Réinitialiser les icônes Lucide
+                    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                        lucide.createIcons();
+                    }
+                    
+                    return;
+                }
+                
+                // Ajouter chaque magasin
+                stores.forEach(store => {
+                    const storeCard = createStoreCard(store);
+                    storesContainer.appendChild(storeCard);
+                });
+                
+                // Réinitialiser les icônes Lucide
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                }
+            }
+            
+            // Créer une carte de magasin
+            function createStoreCard(store) {
+                const card = document.createElement('div');
+                card.className = 'store-card';
+                card.setAttribute('data-lat', store.latitude);
+                card.setAttribute('data-lng', store.longitude);
+                card.setAttribute('id', `store-${store.id}`);
+                
+                // Déterminer le statut d'ouverture
+                // Vérifier explicitement si is_open est true
+                const isOpen = store.is_open === true || 
+                            (store.today_status && store.today_status.toLowerCase().includes('ouvert'));
+                const statusClass = isOpen ? 'open' : 'closed';
+                
+                // Formater les services
+                let services = '';
+                if (store.services) {
+                    if (Array.isArray(store.services)) {
+                        services = store.services.join(', ');
+                    } else if (typeof store.services === 'object') {
+                        services = Object.values(store.services).join(', ');
+                    } else {
+                        services = store.services;
+                    }
+                }
+                
+                card.innerHTML = `
+                    <div class="store-header">
+                        <span class="store-badge">
+                            ${escapeHtml(services || 'Service non défini')}
+                        </span>
+                        <span class="store-status ${statusClass}">
+                            ${escapeHtml(isOpen ? 'Ouvert' : 'Fermé')}
+                        </span>
+                    </div>
+                    
+                    ${store.ouvert_jusqua && !store.is_closed ? `
+                    <div class="store-hours">
+                        <i data-lucide="clock" class="hours-icon"></i>
+                        <span>Ouvert jusqu'à ${formatTime(store.ouvert_jusqua)}</span>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="store-info">
+                        <div class="store-details">
+                            <div class="store-location">${escapeHtml(store.nom.toUpperCase())}-${escapeHtml(store.ville || '')}</div>
+                            <div class="store-address">${escapeHtml(store.adresse || '')}</div>
+                        </div>
+                        
+                    
+                    </div>
+                    
+                    <div class="store-contact">
+                        ${store.phone ? `<div class="store-phone">${escapeHtml(store.phone)}</div>` : ''}
+                        
+                        <div class="store-locate" onclick="centerMapOnStore(${store.latitude}, ${store.longitude})">
+                            <i data-lucide="map-pin"></i>
+                            Localiser sur la carte
+                        </div>
+                        
+                        <div class="store-hours-toggle" onclick="toggleHours(this)">
+                            HORAIRES <i data-lucide="chevron-down"></i>
+                            <div class="hours-dropdown">
+                                ${store.formatted_weekly_hours || 'Horaires non disponibles'}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="store-actions">
+                        ${store.lien_rdv ? `
+                            <a href="${escapeHtml(store.lien_rdv)}" target="_blank" class="appointment-button">
+                                PRENDRE RENDEZ-VOUS
+                            </a>
+                        ` : `
+                            <button class="appointment-button" disabled>
+                                PRENDRE RENDEZ-VOUS
+                            </button>
+                        `}
+                        
+                        <a href="/stores/${store.id}" class="details-button">
+                            VOIR LA FICHE DU POINT DE VENTE
+                        </a>
+                    </div>
+                `;
+                
+                return card;
+            }
+            
+            function formatTime(timeString) {
+                try {
+                    const date = new Date(`2000-01-01T${timeString}`);
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                } catch (e) {
+                    return timeString;
+                }
+            }
+            
+            function escapeHtml(unsafe) {
+                if (!unsafe) return '';
+                return String(unsafe)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+        });
+    </script>
+    
+    <script>
+        // Variables globales pour la carte
         const stores = @json($stores);
         let map;
         let markers = [];
         let infoWindow;
+        let markerCluster;
+        
+        // Stocker les données initiales pour la réinitialisation
+        window.stores = stores;
         
         function initMap() {
             // Coordonnées par défaut (Paris, France)
@@ -1012,7 +1598,7 @@ body {
             // Initialiser la carte
             map = new google.maps.Map(document.getElementById('map'), {
                 center: defaultLocation,
-                zoom: 12,
+                zoom: 4,
                 mapTypeControl: true,
                 streetViewControl: false,
                 fullscreenControl: true,
@@ -1063,9 +1649,35 @@ body {
             // Créer une fenêtre d'info
             infoWindow = new google.maps.InfoWindow();
             
+            // Rendre les variables accessibles globalement
+            window.map = map;
+            window.infoWindow = infoWindow;
+            
             // Ajouter les marqueurs pour chaque boutique
+            addMarkersToMap(stores);
+            
+            // Ajuster la vue pour inclure tous les marqueurs
+            if (markers.length > 0) {
+                const bounds = new google.maps.LatLngBounds();
+                markers.forEach(marker => bounds.extend(marker.getPosition()));
+                map.fitBounds(bounds);
+            }
+        }
+        
+        // Fonction pour ajouter des marqueurs à la carte avec clustering
+        function addMarkersToMap(stores) {
+            // Effacer les marqueurs existants
+            clearMarkers();
+            
+            // Vérifier si stores est un tableau
+            if (!Array.isArray(stores)) {
+                console.error('Les données des boutiques ne sont pas un tableau:', stores);
+                return;
+            }
+            
+            // Ajouter les nouveaux marqueurs
             stores.forEach(store => {
-                if (store.latitude && store.longitude) {
+                if (store && store.latitude && store.longitude) {
                     const position = {
                         lat: parseFloat(store.latitude),
                         lng: parseFloat(store.longitude)
@@ -1075,17 +1687,29 @@ body {
                         position: position,
                         map: map,
                         title: store.nom,
-                        animation: google.maps.Animation.DROP
+                        animation: google.maps.Animation.DROP,
+                        storeId: store.id
                     });
                     
                     markers.push(marker);
                     
                     // Ajouter un événement de clic sur le marqueur
                     marker.addListener('click', () => {
+                        // Arrêter l'animation de tous les marqueurs
+                        markers.forEach(m => {
+                            m.setAnimation(null);
+                        });
+                        
+                        // Animer le marqueur cliqué
+                        marker.setAnimation(google.maps.Animation.BOUNCE);
+                        setTimeout(() => {
+                            marker.setAnimation(null);
+                        }, 1500);
+                        
                         const content = `
                             <div style="padding: 10px; max-width: 200px;">
-                                <h3 style="margin-bottom: 5px; color: #000">${store.nom}</h3>
-                                <p style="margin-bottom: 10px; color: #000">${store.adresse}</p>
+                                <h3 style="margin-bottom: 5px; color: #000">${store.nom || ''}</h3>
+                                <p style="margin-bottom: 10px; color: #000">${store.adresse || ''}</p>
                                 <a href="#store-${store.id}" style="color: #000; text-decoration: underline;">
                                     Voir détails
                                 </a>
@@ -1096,417 +1720,75 @@ body {
                         infoWindow.open(map, marker);
                         
                         // Faire défiler jusqu'à la carte de boutique correspondante
-                        document.querySelector(`[data-lat="${store.latitude}"][data-lng="${store.longitude}"]`)
-                            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        const storeElement = document.getElementById(`store-${store.id}`);
+                        if (storeElement) {
+                            storeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
                     });
                 }
             });
             
-            // Ajuster la vue pour inclure tous les marqueurs
+            // Charger la bibliothèque MarkerClusterer si elle n'est pas déjà chargée
             if (markers.length > 0) {
-                const bounds = new google.maps.LatLngBounds();
-                markers.forEach(marker => bounds.extend(marker.getPosition()));
-                // map.fitBounds(bounds);
+                if (typeof MarkerClusterer !== 'undefined') {
+                    createMarkerCluster();
+                } else {
+                    loadMarkerClusterer();
+                }
             }
         }
         
-        // Initialiser la carte au chargement de la page
-        window.addEventListener('load', initMap);
+        // Fonction pour créer le cluster de marqueurs
+        function createMarkerCluster() {
+            if (markerCluster) {
+                markerCluster.clearMarkers();
+            }
+            
+            markerCluster = new MarkerClusterer(map, markers, {
+                imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m',
+                gridSize: 50,
+                minimumClusterSize: 3
+            });
+        }
         
-        // Géolocalisation
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const pos = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    
-                    map.setCenter(pos);
-                    map.setZoom(14);
-                    
-                    // Ajouter un marqueur pour la position actuelle
-                    new google.maps.Marker({
-                        position: pos,
-                        map: map,
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 10,
-                            fillColor: "#4285F4",
-                            fillOpacity: 1,
-                            strokeColor: "#FFFFFF",
-                            strokeWeight: 2,
-                        },
-                        zIndex: 999
+        // Fonction pour charger la bibliothèque MarkerClusterer
+        function loadMarkerClusterer() {
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js';
+            script.onload = function() {
+                if (typeof markerClusterer !== 'undefined') {
+                    markerCluster = new markerClusterer.MarkerClusterer({
+                        map,
+                        markers,
+                        algorithm: new markerClusterer.GridAlgorithm({
+                            gridSize: 50,
+                            minimumClusterSize: 3
+                        })
                     });
-                }, function() {
-                    alert("Impossible d'obtenir votre position. Veuillez vérifier vos paramètres de localisation.");
-                });
-            } else {
-                alert("La géolocalisation n'est pas prise en charge par votre navigateur.");
-            }
+                } else {
+                    console.warn('La bibliothèque MarkerClusterer n\'a pas pu être chargée correctement');
+                }
+            };
+            document.head.appendChild(script);
         }
         
-        // Centrer la carte sur une boutique
-        function centerMapOnStore(lat, lng) {
-            if (map) {
-                const position = new google.maps.LatLng(lat, lng);
-                map.setCenter(position);
-                map.setZoom(16);
-                
-                // Trouver et ouvrir l'infoWindow du marqueur correspondant
-                for (let i = 0; i < markers.length; i++) {
-                    if (markers[i].getPosition().equals(position)) {
-                        google.maps.event.trigger(markers[i], 'click');
-                        break;
-                    }
+        // Fonction pour effacer tous les marqueurs
+        function clearMarkers() {
+            // Supprimer le cluster s'il existe
+            if (markerCluster) {
+                if (typeof markerCluster.clearMarkers === 'function') {
+                    markerCluster.clearMarkers();
+                } else if (typeof markerCluster.setMap === 'function') {
+                    markerCluster.setMap(null);
                 }
             }
+            
+            // Supprimer les marqueurs individuels
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
         }
         
-        // Afficher/masquer les horaires
-        function toggleHours(element) {
-            const dropdown = element.querySelector('.hours-dropdown');
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-            
-            // Fermer les autres dropdowns
-            document.querySelectorAll('.hours-dropdown').forEach(el => {
-                if (el !== dropdown) {
-                    el.style.display = 'none';
-                }
-            });
-            
-            // Empêcher la propagation du clic
-            event.stopPropagation();
-        }
-
-
-        
-        
-        // Fermer les dropdowns lors d'un clic ailleurs sur la page
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.store-hours-toggle')) {
-                document.querySelectorAll('.hours-dropdown').forEach(el => {
-                    el.style.display = 'none';
-                });
-            }
-        });
-    </script>
-    
-    
-
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('storeSearch');
-        const searchButton = document.getElementById('searchButton');
-        const locationButton = document.querySelector('.location-search');
-        const storesContainer = document.getElementById('stores-container');
-        const serviceCheckboxes = document.querySelectorAll('input[name="specialite"]');
-        const horaireRadios = document.querySelectorAll('input[name="horaire"]');
-        
-        // Écouteurs d'événements
-        if (searchButton) {
-            searchButton.addEventListener('click', performSearch);
-        }
-        
-        if (searchInput) {
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    performSearch();
-                }
-            });
-        }
-        
-        if (locationButton) {
-            locationButton.addEventListener('click',  performSearch);
-        }
-        
-        // Ajouter des écouteurs pour les filtres de service et d'horaire
-        serviceCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', performSearch);
-        });
-        
-        horaireRadios.forEach(radio => {
-            radio.addEventListener('change', performSearch);
-        });
-        
-        // Fonction principale de recherche
-        function performSearch() {
-    // 1. Récupérer les valeurs des filtres
-    const selectedServices = Array.from(document.querySelectorAll('input[name="specialite"]:checked')).map(el => el.value);
-    const selectedHoraire = document.querySelector('input[name="horaire"]:checked')?.value;
-    const searchTerm = searchInput ? searchInput.value.trim() : '';
-    const aroundMeChecked = document.querySelector('input[name="around_me"]:checked') !== null;
-
-    // 2. Préparer les paramètres pour l'URL
-    const params = new URLSearchParams();
-
-    if (selectedServices.length > 0) {
-        selectedServices.forEach(service => {
-            params.append('specialite[]', service); // Notez les crochets []
-        });
-    }
-
-    // Ajouter les autres filtres
-    if (selectedHoraire) params.append('horaire', selectedHoraire);
-    if (searchTerm) params.append('search', searchTerm);
-
-    // 3. Gestion de la géolocalisation
-    const handleFetch = (locationParams = {}) => {
-        // Si "Autour de moi" est coché, ajouter les coordonnées
-        if (aroundMeChecked && locationParams.latitude) {
-            params.append('latitude', locationParams.latitude);
-            params.append('longitude', locationParams.longitude);
-        }
-
-        // Envoyer la requête
-        sendFetchRequest(params);
-    };
-
-    if (aroundMeChecked) {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                position => handleFetch({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude
-                }),
-                error => {
-                    console.error("Erreur de géolocalisation:", error);
-                    showError("Géolocalisation impossible - Affichage de tous les résultats");
-                    handleFetch(); // Continuer sans géolocalisation
-                },
-                { enableHighAccuracy: true, timeout: 5000 }
-            );
-        } else {
-            showError("Votre navigateur ne supporte pas la géolocalisation");
-            handleFetch();
-        }
-    } else {
-        handleFetch();
-    }
-}
-
-function sendFetchRequest(params) {
-    showLoading(true);
-
-    fetch(`/filter?${params.toString()}`, {
-        headers: {
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return response.json();
-    })
-    .then(stores => {
-        if (!Array.isArray(stores)) {
-            console.error("Réponse inattendue:", stores);
-            throw new Error("Format de données invalide");
-        }
-        updateStoresList(stores);
-        updateMap(stores);
-    })
-    .catch(error => {
-        console.error("Fetch error:", error);
-        // showError("Erreur lors du chargement des résultats");
-    })
-    .finally(() => showLoading(false));
-}
-
-
-        // function handleGeolocation() {
-        //     if (!navigator.geolocation) {
-        //         showError("La géolocalisation n'est pas prise en charge par votre navigateur.");
-        //         return;
-        //     }
-            
-        //     showLoading(true);
-            
-        //     navigator.geolocation.getCurrentPosition(
-        //         // Succès
-        //         function(position) {
-        //             const latitude = position.coords.latitude;
-        //             const longitude = position.coords.longitude;
-
-                    
-        //             console.log("Position actuelle:", latitude, longitude);
-
-
-                    
-        //             // Envoyer les coordonnées au serveur
-        //         //   fetch('/nearby', {
-        //             fetch(`/filter?latitude=${latitude}&longitude=${longitude}`, {
-        //                 method: 'GET',
-        //                 headers: {
-        //                     'Content-Type': 'application/json',
-        //                    // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        //                 }
-        //                 // body: JSON.stringify({
-        //                 //     latitude: latitude,
-        //                 //     longitude: longitude
-        //                 // })
-        //             })
-        //             // .then(response => {
-        //             //     if (!response.ok) {
-        //             //         throw new Error('Erreur réseau');
-        //             //     }
-        //             //     return response.json();
-        //             // })
-        //             .then(stores => {
-        //                 // Traiter et afficher les résultats
-        //                 updateStoresList(stores);
-        //                 updateMap(stores, { lat: latitude, lng: longitude });
-        //             })
-        //             .catch(error => {
-        //                 console.error('Erreur lors de la recherche par géolocalisation:', error);
-        //                 // showError("Une erreur est survenue lors de la recherche par géolocalisation");
-        //             })
-        //             .finally(() => {
-        //                 showLoading(false);
-        //             });
-        //         },
-        //         // Erreur
-        //         function(error) {
-        //             showLoading(false);
-                    
-        //             switch(error.code) {
-        //                 case error.PERMISSION_DENIED:
-        //                     showError("Vous avez refusé la demande de géolocalisation.");
-        //                     break;
-        //                 case error.POSITION_UNAVAILABLE:
-        //                     showError("Les informations de localisation ne sont pas disponibles.");
-        //                     break;
-        //                 case error.TIMEOUT:
-        //                     showError("La demande de géolocalisation a expiré.");
-        //                     break;
-        //                 default:
-        //                     showError("Une erreur inconnue s'est produite lors de la géolocalisation.");
-        //                     break;
-        //             }
-        //         },
-        //         // Options
-        //         {
-        //             enableHighAccuracy: true,
-        //             timeout: 5000,
-        //             maximumAge: 0
-        //         }
-        //     );
-        // }
-        
-        // // Mettre à jour la liste des magasins
-        function updateStoresList(stores) {
-            if (!storesContainer) return;
-            
-            // Vider le conteneur
-            // storesContainer.innerHTML = '';
-            
-            if (!stores || stores.length === 0) {
-                storesContainer.innerHTML = '<div class="no-results">Aucun résultat trouvé</div>';
-                return;
-            }
-            
-            // Ajouter chaque magasin
-            stores.forEach(store => {
-                const storeCard = createStoreCard(store);
-                storesContainer.appendChild(storeCard);
-            });
-            
-            // Réinitialiser les icônes Lucide
-            if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                lucide.createIcons();
-            }
-        }
-        
-        // Créer une carte de magasin
-        function createStoreCard(store) {
-        const card = document.createElement('div');
-        card.className = 'store-card';
-        
-        // Déterminer le statut d'ouverture
-        // Vérifier explicitement si is_open est true
-        const isOpen = store.is_open === true || 
-                      (store.today_status && store.today_status.toLowerCase().includes('ouvert'));
-        const statusClass = isOpen ? 'open' : 'closed';
-        
-        // Formater les services
-        let services = '';
-        if (store.services) {
-            if (Array.isArray(store.services)) {
-                services = store.services.join(', ');
-            } else if (typeof store.services === 'object') {
-                services = Object.values(store.services).join(', ');
-            } else {
-                services = store.services;
-            }
-        }
-        
-        // Afficher le statut d'ouverture pour le débogage
-        console.log(`Store ${store.nom}: is_open=${store.is_open}, today_status=${store.today_status}`);
-        
-        card.innerHTML = `
-            <div class="store-header">
-                <span class="store-badge">
-                    ${escapeHtml(services || 'Service non défini')}
-                </span>
-                <span class="store-status ${statusClass}">
-                    ${escapeHtml(isOpen ? 'Ouvert' : 'Fermé')}
-                </span>
-            </div>
-            
-            ${store.ouvert_jusqua && !store.is_closed ? `
-            <div class="store-hours">
-                <i data-lucide="clock" class="hours-icon"></i>
-                <span>Ouvert jusqu'à ${formatTime(store.ouvert_jusqua)}</span>
-            </div>
-            ` : ''}
-            
-            <div class="store-info">
-                <div class="store-details">
-                    <div class="store-location">${escapeHtml(store.nom.toUpperCase())}-${escapeHtml(store.ville)}</div>
-                    <div class="store-address">${escapeHtml(store.adresse)}</div>
-                </div>
-                
-                <button class="locate-button" onclick="centerMapOnStore(${store.latitude}, ${store.longitude})">
-                    <i data-lucide="map-pin"></i>
-                    Localiser
-                </button>
-            </div>
-            
-            <div class="store-contact">
-                ${store.phone ? `<div class="store-phone">${escapeHtml(store.phone)}</div>` : ''}
-                
-                <div class="store-hours-toggle" onclick="toggleHours(this)">
-                    HORAIRES <i data-lucide="chevron-down"></i>
-                    <div class="hours-dropdown">
-                        ${store.formatted_weekly_hours || 'Horaires non disponibles'}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="store-actions">
-                ${store.lien_rdv ? `
-                    <a href="${escapeHtml(store.lien_rdv)}" target="_blank" class="appointment-button">
-                        PRENDRE RENDEZ-VOUS
-                    </a>
-                ` : `
-                    <button class="appointment-button" disabled>
-                        PRENDRE RENDEZ-VOUS
-                    </button>
-                `}
-                
-                <a href="/stores/${store.id}" class="details-button">
-                    VOIR LA FICHE DU POINT DE VENTE
-                </a>
-            </div>
-        `;
-        
-        return card;
-    }
-        
-        // Mettre à jour la carte
+        // Fonction pour mettre à jour la carte
         function updateMap(stores, userLocation = null) {
             if (typeof google === 'undefined' || !google.maps) {
                 console.warn('Google Maps n\'est pas chargé');
@@ -1514,23 +1796,25 @@ function sendFetchRequest(params) {
             }
             
             // Récupérer l'instance de carte
-            const map = window.map;
             if (!map) {
                 console.warn('L\'instance de carte n\'est pas disponible');
                 return;
             }
             
             // Effacer les marqueurs existants
-            if (window.markers && window.markers.length) {
-                window.markers.forEach(marker => marker.setMap(null));
+            clearMarkers();
+            
+            // Si aucun résultat, afficher un message mais ne pas recharger tous les magasins
+            if (!stores || stores.length === 0) {
+                console.log('Aucun magasin trouvé');
+                return;
             }
-            window.markers = [];
             
             // Ajouter les nouveaux marqueurs
             const bounds = new google.maps.LatLngBounds();
             
             stores.forEach(store => {
-                if (store.latitude && store.longitude) {
+                if (store && store.latitude && store.longitude) {
                     const position = {
                         lat: parseFloat(store.latitude),
                         lng: parseFloat(store.longitude)
@@ -1540,27 +1824,43 @@ function sendFetchRequest(params) {
                         position: position,
                         map: map,
                         title: store.nom,
-                        animation: google.maps.Animation.DROP
+                        animation: google.maps.Animation.DROP,
+                        storeId: store.id
                     });
                     
-                    window.markers.push(marker);
+                    markers.push(marker);
                     bounds.extend(position);
                     
                     // Ajouter un événement de clic sur le marqueur
                     marker.addListener('click', () => {
-                        if (window.infoWindow) {
-                            const content = `
-                                <div style="padding: 10px; max-width: 200px;">
-                                    <h3 style="margin-bottom: 5px; color: #000">${escapeHtml(store.nom)}</h3>
-                                    <p style="margin-bottom: 10px; color: #000">${escapeHtml(store.adresse)}</p>
-                                    <a href="/admin/stores/${store.id}" style="color: #000; text-decoration: underline;">
-                                        Voir détails
-                                    </a>
-                                </div>
-                            `;
-                            
-                            window.infoWindow.setContent(content);
-                            window.infoWindow.open(map, marker);
+                        // Arrêter l'animation de tous les marqueurs
+                        markers.forEach(m => {
+                            m.setAnimation(null);
+                        });
+                        
+                        // Animer le marqueur cliqué
+                        marker.setAnimation(google.maps.Animation.BOUNCE);
+                        setTimeout(() => {
+                            marker.setAnimation(null);
+                        }, 1500);
+                        
+                        const content = `
+                            <div style="padding: 10px; max-width: 200px;">
+                                <h3 style="margin-bottom: 5px; color: #000">${store.nom || ''}</h3>
+                                <p style="margin-bottom: 10px; color: #000">${store.adresse || ''}</p>
+                                <a href="#store-${store.id}" style="color: #000; text-decoration: underline;">
+                                    Voir détails
+                                </a>
+                            </div>
+                        `;
+                        
+                        infoWindow.setContent(content);
+                        infoWindow.open(map, marker);
+                        
+                        // Faire défiler jusqu'à la carte de boutique correspondante
+                        const storeElement = document.getElementById(`store-${store.id}`);
+                        if (storeElement) {
+                            storeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
                     });
                 }
@@ -1586,13 +1886,22 @@ function sendFetchRequest(params) {
                 bounds.extend(userLocation);
             }
             
+            // Créer un MarkerClusterer si la bibliothèque est disponible
+            if (markers.length > 0) {
+                if (typeof MarkerClusterer !== 'undefined') {
+                    createMarkerCluster();
+                } else {
+                    loadMarkerClusterer();
+                }
+            }
+            
             // Ajuster la vue pour inclure tous les marqueurs
-            if (window.markers.length > 0 || userLocation) {
-                // map.fitBounds(bounds);
+            if (markers.length > 0 || userLocation) {
+                map.fitBounds(bounds);
                 
                 // Zoom out un peu si un seul point
-                if ((window.markers.length === 1 && !userLocation) || 
-                    (window.markers.length === 0 && userLocation)) {
+                if ((markers.length === 1 && !userLocation) || 
+                    (markers.length === 0 && userLocation)) {
                     google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
                         map.setZoom(Math.min(14, map.getZoom()));
                     });
@@ -1600,108 +1909,96 @@ function sendFetchRequest(params) {
             }
         }
         
-        // Fonctions utilitaires
-        function showLoading(show) {
-            // Vous pouvez implémenter un indicateur de chargement ici
-            const loadingElement = document.getElementById('loading-indicator');
-            if (loadingElement) {
-                loadingElement.style.display = show ? 'block' : 'none';
+        // Centrer la carte sur une boutique avec animation améliorée
+        function centerMapOnStore(lat, lng) {
+            if (!map) {
+                console.warn('La carte n\'est pas initialisée');
+                return;
             }
-        }
-        
-        function showError(message) {
-            alert(message);
-        }
-        
-        function formatTime(timeString) {
-            try {
-                const date = new Date(`2000-01-01T${timeString}`);
-                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            } catch (e) {
-                return timeString;
+            
+            if (!lat || !lng) {
+                console.warn('Coordonnées invalides:', lat, lng);
+                return;
             }
-        }
-        
-        function escapeHtml(unsafe) {
-            if (!unsafe) return '';
-            return String(unsafe)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-    });
-    
-
-      // Centrer la carte sur une boutique
-      function centerMapOnStore(lat, lng) {
-        if (map) {
+            
             const position = new google.maps.LatLng(lat, lng);
             map.setCenter(position);
             map.setZoom(16);
             
-            // Trouver et ouvrir l'infoWindow du marqueur correspondant
+            // Trouver et animer le marqueur correspondant
+            let foundMarker = null;
             for (let i = 0; i < markers.length; i++) {
-                if (markers[i].getPosition().equals(position)) {
-                    google.maps.event.trigger(markers[i], 'click');
+                const markerPos = markers[i].getPosition();
+                if (markerPos && markerPos.lat() === position.lat() && markerPos.lng() === position.lng()) {
+                    foundMarker = markers[i];
                     break;
                 }
             }
+            
+            if (foundMarker) {
+                // Arrêter l'animation de tous les marqueurs
+                markers.forEach(marker => {
+                    marker.setAnimation(null);
+                });
+                
+                // Animer le marqueur sélectionné
+                foundMarker.setAnimation(google.maps.Animation.BOUNCE);
+                setTimeout(() => {
+                    foundMarker.setAnimation(null);
+                }, 1500);
+                
+                // Ouvrir l'infoWindow
+                google.maps.event.trigger(foundMarker, 'click');
+            } else {
+                console.warn('Aucun marqueur trouvé pour ces coordonnées:', lat, lng);
+                
+                // Créer un marqueur temporaire si aucun n'est trouvé
+                const tempMarker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    animation: google.maps.Animation.BOUNCE
+                });
+                
+                setTimeout(() => {
+                    tempMarker.setAnimation(null);
+                    setTimeout(() => {
+                        tempMarker.setMap(null);
+                    }, 500);
+                }, 1500);
+            }
         }
-    }
-   
-
-    // Fonction globale pour centrer la carte sur un magasin
-    // function centerMapOnStore(lat, lng) {
-    //     if (typeof google === 'undefined' || !google.maps || !window.map) {
-    //         console.warn('Google Maps n\'est pas disponible');
-    //         return;
-    //     }
         
-    //     const position = new google.maps.LatLng(lat, lng);
-    //     window.map.setCenter(position);
-    //     window.map.setZoom(16);
+        // Initialiser la carte au chargement de la page
+        window.addEventListener('load', initMap);
         
-    //     // Trouver et ouvrir l'infoWindow du marqueur correspondant
-    //     if (window.markers && window.infoWindow) {
-    //         for (let i = 0; i < window.markers.length; i++) {
-    //             if (window.markers[i].getPosition().equals(position)) {
-    //                 google.maps.event.trigger(window.markers[i], 'click');
-    //                 break;
-    //             }
-    //         }
-    //     }
-    // }
-    
-    // Fonction globale pour afficher/masquer les horaires
-    function toggleHours(element) {
-        const dropdown = element.querySelector('.hours-dropdown');
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        // Fonction pour afficher/masquer les horaires
+        function toggleHours(element) {
+            const dropdown = element.querySelector('.hours-dropdown');
+            if (!dropdown) return;
+            
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            
+            // Fermer les autres dropdowns
+            document.querySelectorAll('.hours-dropdown').forEach(el => {
+                if (el !== dropdown) {
+                    el.style.display = 'none';
+                }
+            });
+            
+            // Empêcher la propagation du clic
+            event.stopPropagation();
+        }
         
-        // Fermer les autres dropdowns
-        document.querySelectorAll('.hours-dropdown').forEach(el => {
-            if (el !== dropdown) {
-                el.style.display = 'none';
+        // Fermer les dropdowns lors d'un clic ailleurs sur la page
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.store-hours-toggle')) {
+                document.querySelectorAll('.hours-dropdown').forEach(el => {
+                    el.style.display = 'none';
+                });
             }
         });
-        
-        // Empêcher la propagation du clic
-        event.stopPropagation();
-    }
-    
-    // Fermer les dropdowns lors d'un clic ailleurs sur la page
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.store-hours-toggle')) {
-            document.querySelectorAll('.hours-dropdown').forEach(el => {
-                el.style.display = 'none';
-            });
-        }
-    });
     </script>
-    
-    
+
 
 </body>
 </html>
-

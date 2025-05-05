@@ -686,6 +686,7 @@ background-color: rgb(29, 105, 131)
   gap: 0.25rem;
   font-size: 0.875rem;
   margin-bottom: 1rem;
+  margin:0   0.5rem ;
 }
 
 .similar-store-status.open {
@@ -704,7 +705,19 @@ background-color: rgb(29, 105, 131)
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+  margin: 0.5rem 0 0 0 ;
+
+
 }
+
+/* .similar-store-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Ligne de séparation subtile */
+} */
 
 .similar-store-link:hover {
   text-decoration: underline;
@@ -1067,6 +1080,32 @@ background-color: rgb(29, 105, 131)
                         </div>
                     </div>
                 </div>
+
+
+                  <!-- Magasins similaires -->
+        @if(count($similarStores) > 0)
+        <div class="similar-stores">
+            <h2 class="similar-stores-title">Autres points de vente à {{ $store->ville }}</h2>
+            <div class="similar-stores-grid">
+                @foreach($similarStores as $similarStore)
+                <div class="similar-store-card">
+                    <h3 class="similar-store-name">{{ $similarStore->nom }}</h3>
+                    <p class="similar-store-address">{{ $similarStore->adresse }}</p>
+                    <div class ="similar-store-footer" >
+                        <p class="similar-store-status {{ $similarStore->is_open ? 'open' : 'closed' }}">
+                            <i data-lucide="{{ $similarStore->is_open ? 'check-circle' : 'x-circle' }}" class="w-4 h-4"></i>
+                            {{ $similarStore->today_status }}
+                        </p>
+                        <a href="{{ route('stores.show', $similarStore->id) }}" class="similar-store-link">
+                            Voir les détails
+                        </a>
+                    </div>
+
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
             </div>
             
             <!-- Colonne latérale -->
@@ -1196,29 +1235,11 @@ background-color: rgb(29, 105, 131)
                     </div>
                 </div>
             </div>
+
+
         </div>
         
-        <!-- Magasins similaires -->
-        @if(count($similarStores) > 0)
-        <div class="similar-stores">
-            <h2 class="similar-stores-title">Autres points de vente à {{ $store->ville }}</h2>
-            <div class="similar-stores-grid">
-                @foreach($similarStores as $similarStore)
-                <div class="similar-store-card">
-                    <h3 class="similar-store-name">{{ $similarStore->nom }}</h3>
-                    <p class="similar-store-address">{{ $similarStore->adresse }}</p>
-                    <p class="similar-store-status {{ $similarStore->is_open ? 'open' : 'closed' }}">
-                        <i data-lucide="{{ $similarStore->is_open ? 'check-circle' : 'x-circle' }}" class="w-4 h-4"></i>
-                        {{ $similarStore->today_status }}
-                    </p>
-                    <a href="{{ route('stores.show', $similarStore->id) }}" class="similar-store-link">
-                        Voir les détails
-                    </a>
-                </div>
-                @endforeach
-            </div>
-        </div>
-        @endif
+      
  
 </div>
 

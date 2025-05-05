@@ -13,9 +13,6 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
 
-Route::post('/filter', [HomeController::class, 'filterStores']);
-Route::post('/nearby', [HomeController::class, 'nearbyStores']);
-
 
 
 // Routes d'authentification
