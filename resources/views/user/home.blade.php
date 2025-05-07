@@ -215,6 +215,8 @@ body {
 
     }
 
+
+
     .location-search-text {
         font-weight: 500;
         font-size: 0.9rem;
@@ -516,10 +518,11 @@ body {
         font-weight: 500;
         transition: all 0.3s ease;
         padding: 0.25rem 0;
+        margin: 1rem 0;
     }
 
     .store-hours-toggle:hover {
-        color: var(--primary);
+        color:#000000;
     }
 
 
@@ -875,6 +878,59 @@ body {
     }
     }
 
+
+
+    .phone-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.phone-link:hover {
+    background-color: rgba(188, 207, 204, 0.1);
+    text-decoration: underline;
+}
+
+.phone-link:active {
+    transform: scale(0.98);
+}
+
+.phone-icon {
+    width: 1rem;
+    height: 1rem;
+    color: var(--primary);
+}
+
+/* Style pour les appareils mobiles */
+@media (max-width: 768px) {
+    .phone-link {
+        padding: 0.75rem 1rem;
+        background-color: var(--primary);
+        color: white;
+        justify-content: center;
+    }
+    
+    .phone-link:hover {
+        background-color: #000000;
+    }
+    
+    .phone-icon {
+        color: white;
+    }
+}
+
+/* Accessibilité - Focus visible */
+.phone-link:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
 </style>
 </head>
 <body>
@@ -956,7 +1012,7 @@ body {
 
             
             <div class="search-bar">
-                <input type="text" id="storeSearch" placeholder="ville ou pays" class="search-input">
+                <input type="text" id="storeSearch" placeholder="Nom,Ville ou Pays" class="search-input">
                 <button class="ok-button" id="searchButton">OK</button>
             </div>
     
@@ -1145,8 +1201,17 @@ body {
                     </div>
     
                     <div class="store-contact">
-                        @if($store->phone)
+                        {{-- @if($store->phone)
                         <div class="store-phone">{{ $store->phone }}</div>
+                        @endif --}}
+
+                       @if($store->phone)
+                        <div class="store-phone">
+                            <a href="tel:{{ preg_replace('/\s+/', '', $store->phone) }}" class="phone-link">
+                                {{-- <i data-lucide="phone" class="phone-icon"></i> --}}
+                                {{ $store->phone }}
+                            </a>
+                        </div>
                         @endif
 
                         <div class="store-locate" onclick="centerMapOnStore({{ $store->latitude }}, {{ $store->longitude }})">
@@ -1524,8 +1589,13 @@ body {
                     </div>
                     
                     <div class="store-contact">
-                        ${store.phone ? `<div class="store-phone">${escapeHtml(store.phone)}</div>` : ''}
-                        
+                        ${store.phone ? `
+                            <div class="store-phone">
+                                <a href="tel:${store.phone.replace(/\s+/g, '')}" class="phone-link">
+                                    ${escapeHtml(store.phone)}
+                                </a>
+                            </div>
+                        ` : ''}                        
                         <div class="store-locate" onclick="centerMapOnStore(${store.latitude}, ${store.longitude})">
                             <i data-lucide="map-pin"></i>
                             Localiser sur la carte
@@ -1618,6 +1688,7 @@ body {
                 elementType: "all",
                 stylers: [{ visibility: "off" }],
               },
+              
               {
                 featureType: "road",
                 elementType: "all",
@@ -1643,8 +1714,11 @@ body {
                 elementType: "all",
                 stylers: [{ color: "#429182" }, { visibility: "on" }],
               },
+              
             ],
             });
+
+            
             
             // Créer une fenêtre d'info
             infoWindow = new google.maps.InfoWindow();

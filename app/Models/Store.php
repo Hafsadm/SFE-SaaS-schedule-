@@ -20,13 +20,21 @@ class Store extends Model
         'lien_rdv',
         'latitude',
         'longitude',
-        'services'
+        'services' ,
+        'image', // ancienne colonne image (vous pourriez la renommer si nécessaire)
+        'exterior_image', // nouvelle colonne
+        'interior_image', // nouvelle colonne
+        'equipment_image', // nouvelle colonne
+        'email',
+        'annee_ouverture',
+        'site_web',
     ];
 
     protected $casts = [
         'services' => 'array',
         'latitude' => 'float',
         'longitude' => 'float',
+        'annee_ouverture' => 'integer',
     ];
 
     public function schedules()

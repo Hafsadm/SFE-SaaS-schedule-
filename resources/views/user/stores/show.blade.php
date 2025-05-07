@@ -485,7 +485,7 @@ background-color: rgb(29, 105, 131)
 
 /* Carte */
 .map-container {
-  height: 200px;
+  height: 360px;
   background-color: var(--light-gray);
   border-radius: 0.5rem;
   margin-bottom: 1rem;
@@ -824,7 +824,7 @@ background-color: rgb(29, 105, 131)
             <!-- Colonne principale -->
             <div class="main-column">
                 <!-- Galerie d'images -->
-                <div class="section">
+                {{-- <div class="section">
                     <h2 class="section-title">
                         <i data-lucide="image" class="w-5 h-5"></i>
                         Galerie
@@ -848,7 +848,21 @@ background-color: rgb(29, 105, 131)
                             <div class="swiper-button-prev"></div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
+
+                    <!-- Carte -->
+                    <div class="section">
+                      <h2 class="section-title">
+                          <i data-lucide="map-pin" class="w-5 h-5"></i>
+                          Localisation
+                      </h2>
+                      <div class="map-container" id="map"></div>
+                      <div class="info-item">
+                          <span class="info-label">Adresse</span>
+                          <span class="info-value">{{ $store->adresse }}, {{ $store->ville }}</span>
+                      </div>
+                  </div>
+                  
                 
                 <!-- Informations générales -->
                 <div class="section">
@@ -902,6 +916,9 @@ background-color: rgb(29, 105, 131)
                     </div>
                 </div>
                  --}}
+
+                 
+
                 <!-- Produits disponibles -->
                 <div class="section">
                     <h2 class="section-title">
@@ -1120,7 +1137,7 @@ background-color: rgb(29, 105, 131)
                 </div>
              </div>
                 <!-- Carte -->
-                <div class="section">
+                {{-- <div class="section">
                     <h2 class="section-title">
                         <i data-lucide="map-pin" class="w-5 h-5"></i>
                         Localisation
@@ -1130,7 +1147,34 @@ background-color: rgb(29, 105, 131)
                         <span class="info-label">Adresse</span>
                         <span class="info-value">{{ $store->adresse }}, {{ $store->ville }}</span>
                     </div>
-                </div>
+                </div> --}}
+
+                  <!-- Galerie d'images -->
+         <div class="section">
+                    <h2 class="section-title">
+                        <i data-lucide="image" class="w-5 h-5"></i>
+                        Galerie
+                    </h2>
+                    <div class="gallery-container">
+                        <div class="swiper">
+                            <div class="swiper-wrapper">
+                                <!-- Images de la boutique -->
+                                <div class="swiper-slide">
+                                    <img src="https://via.placeholder.com/800x400?text=Extérieur+{{ urlencode($store->nom) }}" alt="Extérieur de la boutique">
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="https://via.placeholder.com/800x400?text=Intérieur+{{ urlencode($store->nom) }}" alt="Intérieur de la boutique">
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="https://via.placeholder.com/800x400?text=Équipement+{{ urlencode($store->nom) }}" alt="Équipement de la boutique">
+                                </div>
+                            </div>
+                            <div class="swiper-pagination"></div>
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                        </div>
+                    </div>
+                </div> 
                 
                 <!-- Avis -->
                 <div class="section">
