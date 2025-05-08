@@ -2,10 +2,13 @@
     <style>
         /* Header Styles */
         .app-header {
-            background-color: #F5F5DC; /* Beige clair */
+            background-color: #F5F5DC; 
             padding: 1rem 2rem;
             box-shadow: 0 2px 4px rgba(92, 64, 51, 0.1);
-            border-bottom: 1px solid #D2B48C; /* Bordure beige foncé */
+            border-bottom: 1px solid #37696b; 
+            margin-top: 10px;   
+            border-radius: 60px  30px ;
+
         }
 
         .header-container {
@@ -13,13 +16,13 @@
             justify-content: space-between;
             align-items: center;
             max-width: 1200px;
-            margin: 0 auto;
+            border-radius: 30px 60px ;
         }
 
         .logo {
             font-size: 1.5rem;
             font-weight: 600;
-            color: #5C4033; /* Marron foncé */
+            color: #37696b; /* Marron foncé */
             text-decoration: none;
         }
 
@@ -29,7 +32,7 @@
         }
 
         .nav-link {
-            color: #5C4033; /* Marron foncé */
+            color: #335c59; /* Marron foncé */
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease;
@@ -38,11 +41,11 @@
         }
 
         .nav-link:hover {
-            color: #A67C52; /* Marron clair */
+            color: #496662; /* Marron clair */
         }
 
         .nav-link.active {
-            color: #A67C52; /* Marron clair */
+            color: #52a698; /* Marron clair */
         }
 
         .nav-link.active::after {
@@ -52,7 +55,7 @@
             left: 0;
             width: 100%;
             height: 2px;
-            background-color: #A67C52; /* Marron clair */
+            background-color: #52a698; /* Marron clair */
         }
 
         /* Existing login styles */
@@ -79,7 +82,7 @@
         .login-title {
             margin-bottom: 1rem;
             font-size: 1.25rem;
-            color: #5C4033; /* Marron foncé */
+            color: #335c57; /* Marron foncé */
             font-weight: 600;
             text-align: center;
         }
@@ -92,22 +95,22 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
-            color: #5C4033; /* Marron foncé */
+            color: #335c59; /* Marron foncé */
         }
 
         .form-input {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #D2B48C; /* Beige foncé */
-            border-radius: 0.375rem;
+            border: 1px solid #285852; /* Beige foncé */
+            border-radius: 30px 60px ;
             background-color: #FFFDF8; /* Beige très pâle */
-            color: #5C4033; /* Marron foncé */
+            color: #335c53; /* Marron foncé */
             transition: all 0.3s ease;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: #A67C52; /* Marron clair */
+            border-color: #52a6a2; /* Marron clair */
             box-shadow: 0 0 0 2px rgba(166, 124, 82, 0.2);
         }
 
@@ -121,12 +124,12 @@
             display: flex;
             align-items: center;
             margin-top: 1rem;
-            color: #5C4033; /* Marron foncé */
+            color: #33545c; /* Marron foncé */
         }
 
         .remember-me input {
             margin-right: 0.5rem;
-            accent-color: #A67C52; /* Marron clair */
+            accent-color: #365358; /* Marron clair */
         }
 
         .form-footer {
@@ -137,37 +140,39 @@
         }
 
         .forgot-password {
-            color: #A67C52; /* Marron clair */
+            color: #447a7a; /* Marron clair */
             text-decoration: none;
             font-size: 0.875rem;
             transition: color 0.3s ease;
         }
 
         .forgot-password:hover {
-            color: #5C4033; /* Marron foncé */
+            color: #33545c; /* Marron foncé */
             text-decoration: underline;
         }
 
         .login-button {
             padding: 0.75rem 1.5rem;
-            background-color: #A67C52; /* Marron clair */
+            background-color: #185f64; /* Marron clair */
             color: white;
             border: none;
-            border-radius: 0.375rem;
+            border-radius: 30px 60px ;
             cursor: pointer;
-            font-weight: 500;
+            width: 100%;
             transition: background-color 0.3s ease;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .login-button:hover {
-            background-color: #8C5E3B; /* Marron plus foncé */
+            background-color: #245a57; /* Marron plus foncé */
         }
 
         /* Dark mode styles */
         @media (prefers-color-scheme: dark) {
             .app-header {
-                background-color: #3E2D1F; /* Marron foncé */
-                border-bottom-color: #5C4033;
+                background-color: #1f3d3e; /* Marron foncé */
+                border-bottom-color: #1f7a7a;
             }
             
             .logo, .nav-link {
@@ -183,12 +188,12 @@
             }
 
             .login-container {
-                background-color: #2A2118; /* Fond marron très foncé */
+                background-color: #ffffff; /* Fond marron très foncé */
             }
 
             .login-box {
-                background-color: #3E2D1F; /* Marron foncé */
-                border-color: #5C4033;
+                background-color: #22463f; /* Marron foncé */
+                border-color: #37696b;
             }
 
             .login-title,
@@ -198,8 +203,8 @@
             }
 
             .form-input {
-                background-color: #4A3A2D;
-                border-color: #5C4033;
+                background-color: #37696b;
+                border-color: #294d4e;
                 color: #F0E0D0;
             }
 
@@ -212,11 +217,11 @@
             }
 
             .login-button {
-                background-color: #8C5E3B;
+                background-color: #37696b;
             }
 
             .login-button:hover {
-                background-color: #A67C52;
+                background-color: #22463f;
             }
         }
     </style>

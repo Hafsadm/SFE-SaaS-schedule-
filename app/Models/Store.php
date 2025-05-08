@@ -21,10 +21,10 @@ class Store extends Model
         'latitude',
         'longitude',
         'services' ,
-        'image', // ancienne colonne image (vous pourriez la renommer si nécessaire)
-        'exterior_image', // nouvelle colonne
-        'interior_image', // nouvelle colonne
-        'equipment_image', // nouvelle colonne
+        'image', 
+        'exterior_image', 
+        'interior_image', 
+        'equipment_image', 
         'email',
         'annee_ouverture',
         'site_web',

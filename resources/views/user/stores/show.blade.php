@@ -1157,18 +1157,38 @@ background-color: rgb(29, 105, 131)
                     </h2>
                     <div class="gallery-container">
                         <div class="swiper">
-                            <div class="swiper-wrapper">
-                                <!-- Images de la boutique -->
+                          <div class="swiper-wrapper">
+                            <!-- Images de la boutique -->
+                            @if(isset($store->exterior_image) && !empty($store->exterior_image))
+                                <div class="swiper-slide">
+                                    <img src="{{ asset('Pic Stores/' . $store->exterior_image) }}" alt="Extérieur de {{ $store->nom }}" onerror="this.src='https://via.placeholder.com/800x400?text=Extérieur+{{ urlencode($store->nom) }}'">
+                                </div>
+                            @else
                                 <div class="swiper-slide">
                                     <img src="https://via.placeholder.com/800x400?text=Extérieur+{{ urlencode($store->nom) }}" alt="Extérieur de la boutique">
                                 </div>
+                            @endif
+                            
+                            @if(isset($store->interior_image) && !empty($store->interior_image))
+                                <div class="swiper-slide">
+                                    <img src="{{ asset('Pic Stores/' . $store->interior_image) }}" alt="Intérieur de {{ $store->nom }}" onerror="this.src='https://via.placeholder.com/800x400?text=Intérieur+{{ urlencode($store->nom) }}'">
+                                </div>
+                            @else
                                 <div class="swiper-slide">
                                     <img src="https://via.placeholder.com/800x400?text=Intérieur+{{ urlencode($store->nom) }}" alt="Intérieur de la boutique">
                                 </div>
+                            @endif
+                            
+                            @if(isset($store->equipment_image) && !empty($store->equipment_image))
+                                <div class="swiper-slide">
+                                    <img src="{{ asset('Pic Stores/' . $store->equipment_image) }}" alt="Équipement de {{ $store->nom }}" onerror="this.src='https://via.placeholder.com/800x400?text=Équipement+{{ urlencode($store->nom) }}'">
+                                </div>
+                            @else
                                 <div class="swiper-slide">
                                     <img src="https://via.placeholder.com/800x400?text=Équipement+{{ urlencode($store->nom) }}" alt="Équipement de la boutique">
                                 </div>
-                            </div>
+                            @endif
+                        </div>
                             <div class="swiper-pagination"></div>
                             <div class="swiper-button-next"></div>
                             <div class="swiper-button-prev"></div>
@@ -1401,7 +1421,75 @@ background-color: rgb(29, 105, 131)
         const shareButtons = document.getElementById('shareButtons');
         shareButtons.style.display = shareButtons.style.display === 'none' ? 'flex' : 'none';
     }
+
+    let currentImageIndex = 0;
+    const galleryImages = [
+        @if(isset($store->exterior_image) && !empty($store->exterior_image))
+            {
+                src: "{{ asset('Pic Stores/' . $store->exterior_image) }}",
+                caption: "Extérieur de {{ $store->nom }}"
+            },
+        @endif
+        @if(isset($store->interior_image) && !empty($store->interior_image))
+            {
+                src: "{{ asset('Pic Stores/' . $store->interior_image) }}",
+                caption: "Intérieur de {{ $store->nom }}"
+            },
+        @endif
+        @if(isset($store->equipment_image) && !empty($store->equipment_image))
+            {
+                src: "{{ asset('Pic Stores/' . $store->equipment_image) }}",
+                caption: "Équipement de {{ $store->nom }}"
+            },
+        @endif
+    ];
+    
+    // Fonction pour ouvrir la galerie modale
+    function openGalleryModal(imageSrc, caption) {
+        const modal = document.getElementById('galleryModal');
+        const modalImg = document.getElementById('galleryModalImage');
+        const modalCaption = document.getElementById('galleryModalCaption');
+        
+        modal.style.display = 'flex';
+        modalImg.src = imageSrc;
+        modalCaption.innerHTML = caption;
+        
+        // Trouver l'index de l'image actuelle
+        currentImageIndex = galleryImages.findIndex(img => img.src === imageSrc);
+    }
+    
+    // Fonction pour fermer la galerie modale
+    function closeGalleryModal() {
+        document.getElementById('galleryModal').style.display = 'none';
+    }
+    
+    // Fonction pour changer d'image dans la galerie modale
+    function changeGalleryImage(direction) {
+        currentImageIndex += direction;
+        
+        // Boucler si nécessaire
+        if (currentImageIndex >= galleryImages.length) {
+            currentImageIndex = 0;
+        } else if (currentImageIndex < 0) {
+            currentImageIndex = galleryImages.length - 1;
+        }
+        
+        const modalImg = document.getElementById('galleryModalImage');
+        const modalCaption = document.getElementById('galleryModalCaption');
+        
+        modalImg.src = galleryImages[currentImageIndex].src;
+        modalCaption.innerHTML = galleryImages[currentImageIndex].caption;
+    }
+    
+    // Fermer la modale si on clique en dehors de l'image
+    window.onclick = function(event) {
+        const modal = document.getElementById('galleryModal');
+        if (event.target === modal) {
+            closeGalleryModal();
+        }
+    }
 </script>
+
 
 </body>
 </html>

@@ -23,7 +23,7 @@
             margin: 0;
             padding: 0;
             line-height: 1.6;
-            color: #8d8575;
+            color: #4a615e;
         }
 
         h1, h2, h3, h4, h5, h6 {
@@ -55,7 +55,7 @@
         }
 
         .header {
-            background-color: #fef3c7;
+            background-color: #376b64;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
             margin-top: 70px;
         }
@@ -125,7 +125,7 @@
         }
 
         .nav-logo .logo-link:hover {
-            color: #a1804f;
+            color: #4fa18f;
         }
 
         .nav-links {
@@ -135,7 +135,7 @@
 
         .nav-link {
             text-decoration: none;
-            color: #50371f;
+            color: #22463f;
             font-weight: 500;
             padding: 0.5rem 1rem;
             border-radius: 5px;
@@ -147,7 +147,7 @@
 
         .nav-link:hover, .nav-link.active {
             background-color: rgba(128, 72, 21, 0.1);
-            color: #a1804f;
+            color: #429182;
             transform: translateY(-2px);
         }
 
@@ -162,7 +162,7 @@
         .user-button {
             background: none;
             border: none;
-            color: #bd844f;
+            color: #429182;
             font-weight: 500;
             cursor: pointer;
             padding: 0.5rem 1rem;
@@ -175,7 +175,7 @@
 
         .user-button:hover {
             background-color: rgba(52, 152, 219, 0.1);
-            color: #ce9f5a;
+            color: #22463f;
         }
 
         .dropdown-menu {
@@ -205,14 +205,14 @@
             gap: 0.75rem;
             padding: 0.75rem 1rem;
             text-decoration: none;
-            color: #a1804f;
+            color: #429182;
             border-radius: 5px;
             transition: all 0.3s ease;
         }
 
         .dropdown-item:hover {
             background-color: rgba(52, 152, 219, 0.1);
-            color: #796134;
+            color: #347976;
         }
 
         .dropdown-item i {
@@ -235,7 +235,7 @@
 
         .auth-link {
             text-decoration: none;
-            color: #6d4f18;
+            color: #39695f;
             padding: 0.5rem 1rem;
             border-radius: 5px;
             transition: all 0.3s ease;
@@ -246,16 +246,16 @@
 
         .auth-link:hover {
             background-color: rgba(52, 152, 219, 0.1);
-            color: #a1804f;
+            color: #4f9ea1;
         }
 
         .auth-link.register {
-            background-color: #a1804f;
+            background-color: #22463f;
             color: white;
         }
 
         .auth-link.register:hover {
-            background-color: #a1804f;
+            background-color: #429182;
         }
 
         @media (max-width: 768px) {

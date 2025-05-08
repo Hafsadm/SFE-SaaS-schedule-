@@ -423,7 +423,8 @@ body {
     
     .store-status {
         display: inline-block;
-        margin-left: 205px;
+        margin-left: 70px;
+        margin-right: auto;
         font-weight: 600;
         font-size: 1.2rem;
     }
@@ -1278,6 +1279,9 @@ body {
             resetFilters();
         });
     </script>
+
+
+
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8&callback=initMap" async defer></script>
 
     <script>
@@ -1650,6 +1654,7 @@ body {
         });
     </script>
     
+    {{-- THIS IS THE MAP PART --}}
     <script>
         // Variables globales pour la carte
         const stores = @json($stores);

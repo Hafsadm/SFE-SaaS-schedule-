@@ -2,12 +2,104 @@
 
 @section('title', 'Points de vente')
    
+
 <style>
+    :root {
+        --primary: #429182;
+        --secondary: #337b8d;
+        --light-beige: #F9F5EF;
+        --dark-beige: #1b5858;
+        --text-dark: #000000;
+        --text-light: #FFFFFF;
+        --success: #5DBB63;
+        --border: #E6D8C3;
+        --error: #E74C3C;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .stores-list-container {
+        width: 100%;
+        height: auto;
+        border-radius: 4px  30px ;
+        overflow-y: auto;
+       
+        padding: 10px;
+        background-color: var(--light-beige);
+    }
+    
+    .store-card {
+        width: 100%;
+        margin-bottom: 20px;
+        background: var(--light-beige);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        box-shadow: var(--card-shadow);
+        padding: 15px;
+        box-sizing: border-box;
+    }
+    
+    .store-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    
+    .store-badge {
+        background: var(--secondary);
+        color: var(--text-light);
+        padding: 3px 8px;
+        border-radius: 4px  30px ;
+        font-size: 12px;
+    }
+    
+    .store-status {
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .store-status.open {
+        color: var(--success);
+    }
+    
+    .store-status.closed {
+        color: var(--error);
+    }
+    
+    .store-info {
+        margin-bottom: 10px;
+    }
+    
+    .store-location {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: var(--dark-beige);
+        
+    }
+    
+    .store-address {
+        color: var(--text-dark);
+    }
+    
+    .store-contact {
+        margin-bottom: 10px;
+    }
+    
+    .store-phone {
+        color: var(--text-dark);
+    }
+    
+    .store-hours-toggle {
+        cursor: pointer;
+        color: var(--primary);
+        margin-top: 5px;
+        font-weight: 500;
+    }
+    
     /* Styles pour les horaires hebdomadaires */
     .hours-dropdown {
         display: none;
         position: absolute;
-        background: white;
+        background: var(--light-beige);
         border: 1px solid var(--border);
         border-radius: 6px;
         padding: 1rem;
@@ -29,7 +121,7 @@
     }
     
     .day-schedule.today {
-        background-color: rgba(163, 163, 163, 0.1);
+        background-color: rgba(66, 145, 130, 0.1);
         margin: 0 -1rem;
         padding: 0.75rem 1rem;
         border-radius: 4px;
@@ -94,39 +186,102 @@
     .exception-date {
         font-weight: 500;
         margin-bottom: 0.25rem;
+        color: var(--dark-beige);
+    }
+    
+    .store-locate {
+        cursor: pointer;
+        color: var(--primary);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 500;
+    }
+    
+    .store-actions {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .btn-primary, .btn-secondary {
+        padding: 8px 12px;
+        border-radius: 4px;
+        text-align: center;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: var(--primary);
+        color: var(--text-light);
+        border: 1px solid var(--primary);
+    }
+    
+    .btn-primary:hover {
+        background: var(--dark-beige);
+        border-color: var(--dark-beige);
+    }
+    
+    .btn-secondary {
+        background: var(--light-beige);
+        color: var(--dark-beige);
+        border: 1px solid var(--dark-beige);
+        display: block;
+    }
+    
+    .btn-secondary:hover {
+        background: var(--dark-beige);
+        color: var(--text-light);
     }
     
     /* Dark mode */
     @media (prefers-color-scheme: dark) {
+        .stores-list-container {
+            background-color: var(--dark-beige);
+        }
+        
+        .store-card {
+            background-color: #1a3a3a;
+            border-color: #2a4a4a;
+        }
+        
+        .store-address, .store-phone, .time-slot, .exception-reason {
+            color: var(--light-beige);
+        }
+        
         .hours-dropdown {
-            background-color: #3E2D1F;
-            border-color: #5C4033;  {
-        .hours-dropdown {
-            background-color: #3E2D1F;
-            border-color: #5C4033;
+            background-color: #1a3a3a;
+            border-color: #2a4a4a;
         }
         
         .day-schedule.today {
-            background-color: rgba(145, 102, 45, 0.1);
+            background-color: rgba(66, 145, 130, 0.2);
         }
         
         .day-schedule {
-            border-bottom-color: #a3866e;
+            border-bottom-color: #2a4a4a;
         }
         
         .exceptions-section {
-            border-top-color: #5C4033;
+            border-top-color: #2a4a4a;
         }
         
         .exception-item {
-            border-bottom-color: #5C4033;
+            border-bottom-color: #2a4a4a;
         }
         
-        .time-slot, .exception-date {
+        .btn-secondary {
+            background-color: #1a3a3a;
             color: var(--light-beige);
+            border-color: var(--light-beige);
         }
     }
 </style>
+
+
 @section('content')
 <div class="stores-container">
     <div class="stores-header">
@@ -143,19 +298,20 @@
         </div>
         
 
-        <div class="stores-list" id="store-list">
+        <div class="stores-list-container" id="store-list">
             @foreach($stores as $store)
-            <div class="store-card" >
+            <div class="store-card">
                 <div class="store-header">
                     <span class="store-badge">
                         {{ is_array($store->services) ? implode(', ', $store->services) : ($store->services ?? 'Service non défini') }}
-                    </span>                    <span class="store-status {{ $store->is_closed ? 'closed' : 'open' }}">
+                    </span>
+                    <span class="store-status {{ $store->is_closed ? 'closed' : 'open' }}">
                         {{ $store->is_closed ? 'Fermé' : 'Ouvert' }}
                     </span>
                 </div>
                 
                 <div class="store-info">
-                    <div class="store-location"> {{ strtoupper($store->nom) }}</div>
+                    <div class="store-location">{{ strtoupper($store->nom) }}</div>
                     <div class="store-address">{{ $store->adresse }}</div>
                 </div>
                 
@@ -169,7 +325,7 @@
                         </div>
                     </div>
                 </div>
-
+        
                 <div class="store-locate" onclick="centerMapOnStore({{ $store->latitude }}, {{ $store->longitude }})">
                     <i class="fas fa-map-pin"></i>
                     Localiser sur la carte
@@ -185,28 +341,240 @@
                 </div>
                 
                 <a href="{{ route('admin.stores.manage', $store) }}" class="btn-secondary">
-                     GÉRER L'AFFICHE DES DETAILS
+                    GÉRER L'AFFICHE DES DETAILS
                 </a>
             </div>
-            </DIV>
             @endforeach
         </div>
+        
+        <style>
+            :root {
+                --primary: #429182;
+                --secondary: #337b8d;
+                --light-beige: #F9F5EF;
+                --dark-beige: #1b5858;
+                --text-dark: #000000;
+                --text-light: #FFFFFF;
+                --success: #5DBB63;
+                --error: #E74C3C;
+                --border: #E6D8C3;
+                --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+        
+            .stores-list-container {
+                width: 100%;
+                overflow-y: auto;
+                max-height: 80vh;
+                padding: 10px;
+                background-color: var(--light-beige);
+            }
+            
+            .store-card {
+                width: 100%;
+                margin-bottom: 20px;
+                background: var(--light-beige);
+                border-radius: 8px;
+                box-shadow: var(--card-shadow);
+                border: 1px solid var(--border);
+                padding: 15px;
+                box-sizing: border-box;
+            }
+            
+            .store-header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+            }
+            
+            .store-badge {
+                background: var(--secondary);
+                color: var(--text-light);
+                padding: 3px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 500;
+            }
+            
+            .store-status {
+                font-size: 12px;
+                font-weight: bold;
+            }
+            
+            .store-status.open {
+                color: var(--success);
+            }
+            
+            .store-status.closed {
+                color: var(--error);
+            }
+            
+            .store-info {
+                margin-bottom: 10px;
+            }
+            
+            .store-location {
+                font-weight: bold;
+                margin-bottom: 5px;
+                color: var(--dark-beige);
+                font-size: 1.1rem;
+            }
+            
+            .store-address {
+                color: var(--text-dark);
+                font-size: 0.9rem;
+            }
+            
+            .store-contact {
+                margin-bottom: 10px;
+            }
+            
+            .store-phone {
+                color: var(--text-dark);
+                font-size: 0.9rem;
+            }
+            
+            .store-hours-toggle {
+                cursor: pointer;
+                color: var(--primary);
+                margin-top: 5px;
+                font-weight: 500;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            
+            .hours-dropdown {
+                display: none;
+                margin-top: 10px;
+                padding: 12px;
+                background: var(--light-beige);
+                border-radius: 6px;
+                border: 1px solid var(--border);
+                box-shadow: var(--card-shadow);
+            }
+            
+            .store-locate {
+                cursor: pointer;
+                color: var(--primary);
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-weight: 500;
+                font-size: 0.9rem;
+            }
+            
+            .store-actions {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .btn-primary, .btn-secondary {
+                padding: 8px 16px;
+                border-radius: 6px;
+                text-align: center;
+                font-size: 0.9rem;
+                text-decoration: none;
+                font-weight: 500;
+                transition: all 0.2s ease;
+                flex: 1;
+            }
+            
+            .btn-primary {
+                background: var(--primary);
+                color: var(--text-light);
+                border: 1px solid var(--primary);
+            }
+            
+            .btn-primary:hover {
+                background: var(--dark-beige);
+                border-color: var(--dark-beige);
+                transform: translateY(-1px);
+            }
+            
+            .btn-secondary {
+                background: transparent;
+                color: var(--primary);
+                border: 1px solid var(--primary);
+                display: block;
+            }
+            
+            .btn-secondary:hover {
+                background: rgba(66, 145, 130, 0.1);
+                transform: translateY(-1px);
+            }
+        
+            /* Dark mode */
+            @media (prefers-color-scheme: dark) {
+                .stores-list-container {
+                    background-color: var(--dark-beige);
+                }
+                
+                .store-card {
+                    background-color: #1a3a3a;
+                    border-color: #2a4a4a;
+                }
+                
+                .store-address, .store-phone {
+                    color: var(--light-beige);
+                }
+                
+                .hours-dropdown {
+                    background-color: #1a3a3a;
+                    border-color: #2a4a4a;
+                }
+                
+                .btn-secondary {
+                    color: var(--light-beige);
+                    border-color: var(--light-beige);
+                }
+                
+                .btn-secondary:hover {
+                    background: rgba(249, 245, 239, 0.1);
+                }
+            }
+        </style>
+        
+        <script>
+            function toggleHours(element) {
+                const dropdown = element.querySelector('.hours-dropdown');
+                const icon = element.querySelector('i');
+                
+                if (dropdown.style.display === 'block') {
+                    dropdown.style.display = 'none';
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                } else {
+                    dropdown.style.display = 'block';
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                }
+            }
+            
+            function centerMapOnStore(latitude, longitude) {
+                // Votre code existant pour centrer la carte
+                console.log('Centering map on:', latitude, longitude);
+            }
+        </script>
+  
     </div>
 </div>
 
 <style>
     /* Variables */
     :root {
-        --primary: #A67C52; /* Marron doré */
-        --secondary: #D2B48C; /* Beige doré */
-        --light-beige: #F5F5DC;
-        --dark-beige: #E0C9B4;
-        --text-dark: #000000; /* Marron foncé */
-        --text-light: #F8F4E6;
-        --success: #82B183; /* Vert doux */
-        --error: #C17C74; /* Rouge doux */
-        --border: #E0C9B4;
-        --card-shadow: 0 4px 12px rgba(92, 64, 51, 0.1);
+        --primary: #429182;
+        --secondary: #337b8d;
+        --light-beige: #F9F5EF;
+        --dark-beige: #1b5858;
+        --text-dark: #000000;
+        --text-light: #FFFFFF;
+        --success: #5DBB63;
+        --error: #E74C3C;
+        --border: #E6D8C3;
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     /* Base */
@@ -214,6 +582,8 @@
         font-family: 'Inter', sans-serif;
         color: var(--text-dark);
         background-color: var(--light-beige);
+        margin: 0;
+        padding: 0;
     }
 
     /* Container principal */
@@ -235,9 +605,10 @@
 
     .stores-header h1 {
         font-size: 1.8rem;
-        color: #ffffff;
+        color: var(--dark-beige);
         font-weight: 700;
         position: relative;
+        margin: 0;
     }
 
     .stores-header h1::after {
@@ -255,8 +626,8 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: linear-gradient(135deg, var(--primary) 0%, #8C5E3B 100%);
-        color: white;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: var(--text-light);
         padding: 0.8rem 1.5rem;
         border-radius: 8px;
         text-decoration: none;
@@ -270,8 +641,8 @@
 
     .add-store-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(166, 124, 82, 0.3);
-        background: linear-gradient(135deg, #B58E6A 0%, #6D4B2C 100%);
+        box-shadow: 0 6px 20px rgba(66, 145, 130, 0.3);
+        background: linear-gradient(135deg, #4BA793 0%, #2A5F6F 100%);
     }
 
     /* Conteneur principal */
@@ -283,11 +654,12 @@
 
     /* Carte */
     .map-container {
-        height: 600px;
-        border-radius: 8px;
+        height: auto;
+        border-radius: 4px  30px ;
         overflow: hidden;
         box-shadow: var(--card-shadow);
         border: 1px solid var(--border);
+        background-color: var(--light-beige);
     }
 
     #map {
@@ -316,23 +688,24 @@
     }
 
     .stores-list::-webkit-scrollbar-thumb {
-        background: var(--dark-beige);
+        background: var(--primary);
         border-radius: 3px;
     }
 
     /* Carte de boutique */
-     .store-card {
-        background: white;
-        border-radius: 8px;
-        padding: 0.25rem;
+    .store-card {
+        background: var(--light-beige);
+        height: auto;
+        border-radius: 4px  30px ;
+        padding: 1.25rem;
         box-shadow: var(--card-shadow);
         transition: all 0.3s ease;
-        border: 1px solid var(--border); 
-    } 
+        border: 1px solid var(--border);
+    }
 
     .store-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(92, 64, 51, 0.15);
+        box-shadow: 0 8px 20px rgba(66, 145, 130, 0.15);
     }
 
     .store-header {
@@ -343,8 +716,8 @@
     }
 
     .store-badge {
-        background-color: var(--primary);
-        color: white;
+        background-color: var(--secondary);
+        color: var(--text-light);
         padding: 0.25rem 0.75rem;
         border-radius: 4px;
         font-size: 0.8rem;
@@ -371,7 +744,7 @@
     .store-location {
         font-size: 1.1rem;
         font-weight: 600;
-        color: var(--text-dark);
+        color: var(--dark-beige);
         margin-bottom: 0.5rem;
     }
 
@@ -406,13 +779,13 @@
     }
 
     .store-hours-toggle:hover {
-        color: var(--text-dark);
+        color: var(--dark-beige);
     }
 
     .hours-dropdown {
         display: none;
         position: absolute;
-        background: white;
+        background: var(--light-beige);
         border: 1px solid var(--border);
         border-radius: 6px;
         padding: 1rem;
@@ -456,7 +829,7 @@
     }
 
     .store-locate:hover {
-        color: var(--text-dark);
+        color: var(--dark-beige);
     }
 
     .store-locate i {
@@ -472,7 +845,7 @@
 
     .btn-primary {
         padding: 0.75rem;
-        background-color: white;
+        background-color: var(--light-beige);
         color: var(--primary);
         border: 1px solid var(--primary);
         border-radius: 6px;
@@ -485,28 +858,27 @@
     }
 
     .btn-primary:hover {
-        background-color: rgba(166, 124, 82, 0.1);
+        background-color: rgba(66, 145, 130, 0.1);
     }
 
     .btn-secondary {
         display: block;
-        width: 50%;
-        margin: 0 auto;
         padding: 0.75rem;
         background-color: var(--primary);
-        color: white;
+        color: var(--text-light);
         border: none;
-        border-radius: 6px;
+        border-radius: 6px 30px;
         font-weight: 600;
         font-size: 0.85rem;
         text-align: center;
         text-decoration: none;
         cursor: pointer;
         transition: background-color 0.3s ease;
+        width: 93%;
     }
 
     .btn-secondary:hover {
-        background-color: #8C5E3B;
+        background-color: var(--dark-beige);
     }
 
     /* Responsive */
@@ -516,7 +888,7 @@
         }
         
         .map-container {
-            height: 400px;
+            height: 300px;
         }
         
         .stores-list {
@@ -542,21 +914,32 @@
 
     /* Dark mode */
     @media (prefers-color-scheme: dark) {
+        :root {
+            --text-dark: #F9F5EF;
+            --light-beige: #1a3a3a;
+            --border: #2a4a4a;
+        }
+
         body {
-            background-color: #2A2118;
+            background-color: #ffffff;
         }
         
         .stores-header {
-            border-bottom-color: #5C4033;
+            border-bottom-color: #122725;
         }
         
         .store-card {
-            background-color: #8f7659;
-            border-color: #5C4033;
+            background-color: #1a3a3a;
+            border-color: var(--border);
         }
         
-        .store-location, .store-address, .store-phone {
-            color: var(--light-beige);
+        .store-location {
+            color: var(--text-light);
+        }
+        
+        .store-address, .store-phone {
+            color: #F9F5EF;
+            opacity: 0.9;
         }
         
         .store-hours-toggle, .store-locate {
@@ -564,17 +947,32 @@
         }
         
         .btn-primary {
-            background-color: #3E2D1F;
+            background-color: #1a3a3a;
             color: var(--secondary);
             border-color: var(--secondary);
         }
         
         .hours-dropdown {
-            background-color: #ffffff;
-            border-color: #080807;
+            background-color: #1a3a3a;
+            border-color: var(--border);
+        }
+
+        .map-container {
+            background-color: #1a3a3a;
+            border-color: var(--border);
+        }
+
+        .stores-list::-webkit-scrollbar-track {
+            background: #1a3a3a;
+        }
+
+        .stores-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
         }
     }
 </style>
+
+
 <script>
     // Fonction pour afficher/masquer les horaires
     function toggleHours(element) {

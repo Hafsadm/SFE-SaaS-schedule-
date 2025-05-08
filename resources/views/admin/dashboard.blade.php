@@ -7,16 +7,17 @@
 <style>
     /* Variables de couleur */
     :root {
-        --primary: #A67C52; /* Marron doré */
-        --secondary: #D2B48C; /* Beige doré */
-        --light-beige: #F5F5DC;
-        --dark-beige: #E0C9B4;
-        --text-dark: #333333;
-        --text-light: #F8F4E6;
-        --success: #82B183; /* Vert doux */
-        --error: #C17C74; /* Rouge doux */
-        --border: #E0C9B4;
-        --card-shadow: 0 4px 12px rgba(92, 64, 51, 0.1);
+        --primary: #429182; 
+        --secondary: #337b8d; 
+        --light-beige: #F9F5EF;
+        --dark-beige: #1b5858; 
+        --text-dark: #000000; 
+        --text-light: #FFFFFF; 
+        --success: #5DBB63;
+        --border: #E6D8C3; 
+        --danger: #dc3545;
+        --shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
     }
 
     /* Reset et base */
@@ -37,7 +38,7 @@
     .dashboard-header {
         text-align: center;
         padding: 2rem 0;
-        background-color: var(--light-beige);
+        background-color:#429182;
         border-bottom: 1px solid var(--border);
         margin-bottom: 2rem;
     }
@@ -216,6 +217,11 @@
     .map-type-button:not(.active):hover {
         background-color: var(--light-beige);
     }
+
+</style>
+
+<style>
+
   /* Scrollbar personnalisée */
   .stores-list::-webkit-scrollbar {
         width: 6px;
@@ -418,6 +424,12 @@
     .btn-secondary:hover {
         background-color: #8C5E3B;
     }
+ 
+
+    
+</style>
+
+<style>
 
     /* Responsive */
     @media (max-width: 1024px) {
@@ -475,7 +487,7 @@
 
 /* Prendre rendez-vous */
 .appointment-button {
-    background: #fff;
+    background: #429182
     color: var(--primary);
     border: 1px solid var(--primary);
 }
@@ -611,6 +623,11 @@
         margin-bottom: 0.25rem;
     }
 
+    
+</style>
+
+<style>
+
     /* Responsive */
     @media (max-width: 1200px) {
         .content {
@@ -742,20 +759,24 @@
         }
     }
 </style>
-@endpush
+
+
 
 <style>
     /* Variables de couleur */
     :root {
-        --primary: #A67C52; /* Marron foncé */
-        --secondary: #ccbbb3; /* Marron clair */
-        --light-beige: #F5F5DC;
-        --dark-beige: #D2B48C;
-        --text-dark: #333333;
-        --text-light: #F8F4E6;
-        --success: #82b183;
-        --border: #E0C9B4;
-    }
+            --color-primary: #298675;;
+            --color-primary-light: #337b8d;
+            --color-secondary: #D2B48C;
+            --color-background: #F9F5EF;
+            --color-card: #FFFFFF;
+            --color-text: #1b5858;
+            --color-text-light: #1c3131;
+            --color-border: #D7CCC8;
+            --color-danger: #dc3545;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
 
     /* Reset et base */
     * {
@@ -1126,6 +1147,11 @@
         background-color: var(--secondary);
     }
 
+    
+</style>
+
+<style>
+
     /* Bouton désactivé */
     .appointment-button:disabled {
         opacity: 0.6;
@@ -1199,13 +1225,13 @@
     /* Dark mode */
     @media (prefers-color-scheme: dark) {
         body {
-            background-color: #6b5035;
+            background-color: #f7f7f7;
             color: var(--text-light);
         }
         
         .dashboard-header {
-            background-color: #634d3b;
-            border-bottom-color: #5C4033;
+            background-color: #294943;
+            border-bottom-color: #476b65;
         }
         
         .title {
@@ -1213,28 +1239,28 @@
         }
         
         .filter-button {
-            background-color: #634d3b;
-            border-color: #5C4033;
+            background-color: #3b6361;
+            border-color: #335b5c;
             color: var(--text-light);
         }
         
         .search-input {
-            background-color: #3E2D1F;
-            border-color: #5C4033;
+            background-color: #22463f;
+            border-color: #429182;
             color: var(--text-light);
         }
         
         .store-card {
-            background-color: #3E2D1F;
-            border-color: #5C4033;
+            background-color: #22463f;
+            border-color: #429182;
         }
         
         .store-address, .store-hours-toggle {
-            color: var(--dark-beige);
+            color: #ffffff;
         }
         
         .appointment-button {
-            background-color: #3E2D1F;
+            background-color: #17302b;
             border-color: var(--dark-beige);
             color: var(--dark-beige);
         }
@@ -1243,8 +1269,8 @@
         position: absolute;
         top: 100%;
         left: 0;
-        background:#a1804f;
-        border: 1px solid #5f4b2e;
+        background:#22463f;
+        border: 1px solid #429182;
         border-radius: 8px;
         padding: 10px;
         margin-top: 5px;
@@ -1267,9 +1293,11 @@
     .dropdown-icon.rotated {
         transform: rotate(180deg);
     }
+    }
 
+</style>
 
-    }</style>
+@endpush
 
 @section('content')
 <div class="dashboard-header">
@@ -1523,7 +1551,7 @@
         }
     });
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&callback=initMap" async defer></script>
 <script>
     // Le script JavaScript reste identique à celui que vous avez fourni
     // Il est déjà bien optimisé et fonctionnel
@@ -1717,6 +1745,7 @@
     });
 </script>
 @endpush
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8"></script>
 
 <script>
     // Variables globales
