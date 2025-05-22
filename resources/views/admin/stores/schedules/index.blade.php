@@ -101,10 +101,11 @@
                         <div class="schedule-card">
                             <div class="card-header">
                                 <h3>{{ $exception->exception_date->format('d/m/Y') }}</h3>
-                                <span class="reason">{{ $exception->exception_raison }}</span>
                                 @if($exception->is_closed)
-                                    <span class="status-badge closed">Fermé</span>
-                                @endif
+                                <span class="status-badge closed">Fermé</span>
+                            @endif
+                                <span class="reason">{{ $exception->exception_raison }}</span>
+                              
                                 <div class="card-actions">
                                     <a href="{{ route('admin.stores.exceptions.edit', [$store, $exception]) }}" class="edit-button" title="Modifier">
                                         <i data-lucide="edit"> Modifier </i>
@@ -148,17 +149,18 @@
                         <div class="schedule-card holiday">
                             <div class="card-header">
                                 <h3>{{ $holiday->holiday_date->format('d/m/Y') }}</h3>
-                                <span class="reason">{{ $holiday->holiday_name }}</span>
                                 <span class="status-badge closed">Fermé</span>
+                                <span class="reason">{{ $holiday->holiday_name }}</span>
+                              
                                 <div class="card-actions">
                                     <a href="{{ route('admin.stores.holidays.edit', [$store, $holiday]) }}" class="edit-button" title="Modifier">
-                                        <i data-lucide="edit"> Modifier</i> 
+                                        <i data-lucide="edit">  Modifier </i>  
                                     </a>
                                     <form action="{{ route('admin.stores.holidays.destroy', [$store, $holiday]) }}" method="POST" class="delete-form">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="delete-button" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce jour férié ?')">
-                                            <i data-lucide="trash-2"> Supprimer </i>
+                                            <i data-lucide="trash-2">  Supprimer </i>
                                         </button>
                                     </form>
                                 </div>
@@ -173,14 +175,18 @@
 
 <style>
     :root {
-        --primary-color: #8B4513;
-        --secondary-color: #F5F5DC;
-        --text-color: #333;
-        --border-color: #D2B48C;
-        --success-color: #4CAF50;
-        --error-color: #F44336;
-        --sunday-color: #FFF3E0;
-        --holiday-color: #FFEBEE;
+        --primary: #429182;
+        --secondary: #337b8d;
+        --light-beige: #F9F5EF;
+        --dark-beige: #1b5858;
+        --text-dark: #000000;
+        --text-light: #FFFFFF;
+        --success: #5DBB63;
+        --error: #dc3545;
+        --border: #E6D8C3;
+        --card-shadow: 0 4px 12px rgba(27, 88, 88, 0.1);
+        --sunday-bg: rgba(255, 243, 224, 0.7);
+        --holiday-bg: rgba(255, 235, 238, 0.7);
     }
 
     .schedules-container {
@@ -194,17 +200,32 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 2rem;
-        padding: 1rem;
-        background-color: var(--secondary-color);
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        background-color: var(--light-beige);
+        border-radius: 30px 0;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border);
     }
 
     .schedules-title {
         font-size: 1.5rem;
         font-weight: 600;
-        color: var(--primary-color);
+        color: var(--primary);
         margin: 0;
+        position: relative;
+        padding-left: 1rem;
+    }
+
+    .schedules-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 70%;
+        background-color: var(--primary);
+        border-radius: 2px;
     }
 
     .header-actions {
@@ -216,36 +237,39 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background-color: var(--primary-color);
-        color: white;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--dark-beige) 100%);
+        color: var(--text-light);
         border: none;
-        border-radius: 4px;
+        border-radius: 30px 0;
         text-decoration: none;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        box-shadow: var(--card-shadow);
     }
 
     .add-button:hover, .back-button:hover {
-        background-color: #6B2B00;
-        transform: translateY(-1px);
+        background: linear-gradient(135deg, #4BA793 0%, #2A5F6F 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(66, 145, 130, 0.3);
     }
 
     .alert {
         padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 4px;
+        margin-bottom: 1.5rem;
+        border-radius: 30px 0;
+        border-left: 4px solid;
     }
 
     .alert-success {
-        background-color: #E8F5E9;
-        color: var(--success-color);
-        border: 1px solid var(--success-color);
+        background-color: rgba(93, 187, 99, 0.1);
+        border-color: var(--success);
+        color: var(--success);
     }
 
     .alert-error {
-        background-color: #FFEBEE;
-        color: var(--error-color);
-        border: 1px solid var(--error-color);
+        background-color: rgba(220, 53, 69, 0.1);
+        border-color: var(--error);
+        color: var(--error);
     }
 
     .schedules-grid {
@@ -254,131 +278,162 @@
     }
 
     .schedule-section {
-        background: white;
+        background: var(--text-light);
         padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        border: 1px solid var(--border-color);
+        border-radius: 30px 0;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border);
     }
 
     .schedule-section h2 {
-        color: var(--primary-color);
-        margin-bottom: 1rem;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
         font-size: 1.25rem;
+        position: relative;
+        padding-left: 0.75rem;
+    }
+
+    .schedule-section h2::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        background-color: var(--primary);
+        border-radius: 2px;
     }
 
     .empty-state {
         padding: 2rem;
         text-align: center;
         color: #666;
-        background-color: #f9f9f9;
-        border-radius: 4px;
-        border: 1px dashed #ccc;
+        background-color: rgba(249, 245, 239, 0.5);
+        border-radius: 30px 0;
+        border: 1px dashed var(--border);
     }
 
     .schedule-cards {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1rem;
+        gap: 1.5rem;
     }
 
     .schedule-card {
-        background: var(--secondary-color);
-        padding: 1rem;
-        border-radius: 4px;
-        border: 1px solid var(--border-color);
+        background: var(--text-light);
+        padding: 1.5rem;
+        border-radius: 20px 0;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border);
+        transition: all 0.3s ease;
         position: relative;
     }
 
+    .schedule-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(66, 145, 130, 0.2);
+    }
+
+    .schedule-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        border-radius: 20px 0 0 0;
+    }
+
     .schedule-card.sunday {
-        background-color: var(--sunday-color);
-        border-color: #FFE0B2;
+        background-color: var(--sunday-bg);
     }
 
     .schedule-card.holiday {
-        background-color: var(--holiday-color);
-        border-color: #FFCDD2;
+        background-color: var(--holiday-bg);
     }
 
     .card-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 0.5rem;
+        margin-bottom: 1rem;
         flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
     .card-header h3 {
         margin: 0;
-        color: var(--primary-color);
+        color: var(--primary);
         font-size: 1.1rem;
     }
 
     .status-badge {
-        padding: 1.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.875rem;
-        margin-left: auto;
-        margin-bottom: auto;
+        border-radius: 30px 0;
+        font-size: 0.75rem;
+        font-weight: 900;
     }
 
-    .status-badge.closed {
-        background-color: #FFEBEE;
-        color: var(--error-color);
-    }
+    .status-badge.closed, .status-badge.closed1 {
 
-    .status-badge.closed1 {
-        padding: 1.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 1rem;
-        margin-bottom: auto;
-        margin-right: auto 0;
-        color: var(--error-color);
+        background-color: rgba(170, 22, 37, 0.1);
+        color: var(--error);
     }
 
     .reason {
         color: #666;
         font-size: 0.875rem;
         width: 100%;
-        margin-top: 0.25rem;
+        margin-top: 0.5rem;
     }
 
     .card-actions {
         display: flex;
         gap: 0.5rem;
-        position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
     }
 
-    .edit-button, .delete-button {
-        background: none;
-        border: none;
+    .edit-button {
+       background: #1d4b4b;
+        color:#ffffff;
+        transition: all 0.2s;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        font-size: 0.9rem;
+    }
+
+
+    .delete-button{
+        background: #143636;
         cursor: pointer;
-        padding: 0.25rem;
-        color: #633e1b;
-        transition: color 0.2s;
+        color:#ffffff;
+        transition: all 0.2s;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        font-size: 0.9rem;
+
     }
 
     .edit-button:hover {
-        color: var(--primary-color);
+        color: var(--secondary);
+        background-color: rgba(66, 145, 130, 0.1);
     }
 
     .delete-button:hover {
-        color: var(--error-color);
+        color: var(--error);
+        background-color: rgba(220, 53, 69, 0.1);
     }
 
     .time-slots {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.75rem;
     }
 
     .time-slot {
-        padding: 0.5rem;
-        background: white;
-        border-radius: 4px;
-        border: 1px solid var(--border-color);
+        padding: 0.75rem;
+        background: rgba(249, 245, 239, 0.5);
+        border-radius: 10px 0;
+        border: 1px solid var(--border);
+        font-size: 0.9rem;
     }
 
     @media (max-width: 768px) {
@@ -386,6 +441,10 @@
             flex-direction: column;
             gap: 1rem;
             text-align: center;
+        }
+
+        .schedules-title::before {
+            display: none;
         }
 
         .header-actions {
@@ -397,7 +456,99 @@
             width: 100%;
             justify-content: center;
         }
+
+        .schedule-cards {
+            grid-template-columns: 1fr;
+        }
     }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+    /* Container principal */
+    /* .schedules-container {
+        background-color: #121f1f;
+    } */
+
+    /* En-tête */
+    .schedules-header {
+        background-color: #0a2e2e;
+        border-color: #2a6363;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Cartes d'horaire */
+    .schedule-card {
+        background-color: #0a2e2e;
+        border-color: #2a6363;
+        color: #e0e0e0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Cartes spéciales */
+    .schedule-card.sunday {
+        background-color: rgba(27, 88, 88, 0.4);
+        border-color: #429182;
+    }
+
+    .schedule-card.holiday {
+        background-color: #154444d8;
+        border-color: #1d4b4b;
+    }
+
+    /* Textes et éléments */
+    .schedule-card h3,
+    .schedule-card .reason {
+        color: #ffffff;
+    }
+
+    .status-badge.closed,
+    .status-badge.closed1 {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #ff6b6b;
+    }
+
+    /* Créneaux horaires */
+    .time-slot {
+        background-color: #121f1f;
+        border-color: #2a6363;
+        color: #e0e0e0;
+    }
+
+    /* Boutons */
+    .add-button,
+    .back-button {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Sections */
+    .schedule-section {
+        background-color: #0a2e2e;
+        border-color: #2a6363;
+    }
+
+    /* Titres */
+    .schedules-title,
+    .schedule-section h2 {
+        color: #429182;
+    }
+
+    /* Éléments de formulaire */
+    .form-control,
+    .time-input {
+        background-color: #121f1f;
+        color: #ffffff;
+        border-color: #2a6363;
+    }
+
+    /* Boutons d'action */
+    .edit-button:hover {
+        background-color: rgba(66, 145, 130, 0.2);
+    }
+
+    .delete-button:hover {
+        background-color: rgba(220, 53, 69, 0.2);
+    }
+}
 </style>
 
 <script>

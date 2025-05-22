@@ -1,665 +1,266 @@
 @extends('layouts.app')
 
 @section('title', 'Points de vente')
-   
 
-<style>
-    :root {
-        --primary: #429182;
-        --secondary: #337b8d;
-        --light-beige: #F9F5EF;
-        --dark-beige: #1b5858;
-        --text-dark: #000000;
-        --text-light: #FFFFFF;
-        --success: #5DBB63;
-        --border: #E6D8C3;
-        --error: #E74C3C;
-        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .stores-list-container {
-        width: 100%;
-        height: auto;
-        border-radius: 4px  30px ;
-        overflow-y: auto;
-       
-        padding: 10px;
-        background-color: var(--light-beige);
-    }
-    
-    .store-card {
-        width: 100%;
-        margin-bottom: 20px;
-        background: var(--light-beige);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        box-shadow: var(--card-shadow);
-        padding: 15px;
-        box-sizing: border-box;
-    }
-    
-    .store-header {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-    }
-    
-    .store-badge {
-        background: var(--secondary);
-        color: var(--text-light);
-        padding: 3px 8px;
-        border-radius: 4px  30px ;
-        font-size: 12px;
-    }
-    
-    .store-status {
-        font-size: 12px;
-        font-weight: bold;
-    }
-    
-    .store-status.open {
-        color: var(--success);
-    }
-    
-    .store-status.closed {
-        color: var(--error);
-    }
-    
-    .store-info {
-        margin-bottom: 10px;
-    }
-    
-    .store-location {
-        font-weight: bold;
-        margin-bottom: 5px;
-        color: var(--dark-beige);
-        
-    }
-    
-    .store-address {
-        color: var(--text-dark);
-    }
-    
-    .store-contact {
-        margin-bottom: 10px;
-    }
-    
-    .store-phone {
-        color: var(--text-dark);
-    }
-    
-    .store-hours-toggle {
-        cursor: pointer;
-        color: var(--primary);
-        margin-top: 5px;
-        font-weight: 500;
-    }
-    
-    /* Styles pour les horaires hebdomadaires */
-    .hours-dropdown {
-        display: none;
-        position: absolute;
-        background: var(--light-beige);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        padding: 1rem;
-        margin-top: 0.5rem;
-        z-index: 10;
-        box-shadow: var(--card-shadow);
-        width: calc(100% - 3rem);
-        max-height: 400px;
-        overflow-y: auto;
-    }
-    
-    .day-schedule {
-        padding: 0.75rem 0;
-        border-bottom: 1px solid var(--border);
-    }
-    
-    .day-schedule:last-child {
-        border-bottom: none;
-    }
-    
-    .day-schedule.today {
-        background-color: rgba(66, 145, 130, 0.1);
-        margin: 0 -1rem;
-        padding: 0.75rem 1rem;
-        border-radius: 4px;
-    }
-    
-    .day-name {
-        font-weight: 600;
-        color: var(--primary);
-        margin-bottom: 0.5rem;
-    }
-    
-    .time-slot {
-        padding: 0.25rem 0;
-        color: var(--text-dark);
-    }
-    
-    .closed-text {
-        color: var(--error);
-        font-weight: 500;
-    }
-    
-    .holiday-text {
-        color: var(--primary);
-        font-weight: 500;
-    }
-    
-    .no-hours {
-        color: var(--text-dark);
-        opacity: 0.6;
-        font-style: italic;
-    }
-    
-    .exception-reason {
-        font-size: 0.85rem;
-        color: var(--text-dark);
-        opacity: 0.8;
-        margin-top: 0.25rem;
-        font-style: italic;
-    }
-    
-    .exceptions-section {
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px dashed var(--border);
-    }
-    
-    .exceptions-title {
-        font-weight: 600;
-        color: var(--primary);
-        margin-bottom: 0.75rem;
-    }
-    
-    .exception-item {
-        padding: 0.5rem 0;
-        border-bottom: 1px dotted var(--border);
-    }
-    
-    .exception-item:last-child {
-        border-bottom: none;
-    }
-    
-    .exception-date {
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-        color: var(--dark-beige);
-    }
-    
-    .store-locate {
-        cursor: pointer;
-        color: var(--primary);
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-weight: 500;
-    }
-    
-    .store-actions {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .btn-primary, .btn-secondary {
-        padding: 8px 12px;
-        border-radius: 4px;
-        text-align: center;
-        font-size: 14px;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-primary {
-        background: var(--primary);
-        color: var(--text-light);
-        border: 1px solid var(--primary);
-    }
-    
-    .btn-primary:hover {
-        background: var(--dark-beige);
-        border-color: var(--dark-beige);
-    }
-    
-    .btn-secondary {
-        background: var(--light-beige);
-        color: var(--dark-beige);
-        border: 1px solid var(--dark-beige);
-        display: block;
-    }
-    
-    .btn-secondary:hover {
-        background: var(--dark-beige);
-        color: var(--text-light);
-    }
-    
-    /* Dark mode */
-    @media (prefers-color-scheme: dark) {
-        .stores-list-container {
-            background-color: var(--dark-beige);
-        }
-        
-        .store-card {
-            background-color: #1a3a3a;
-            border-color: #2a4a4a;
-        }
-        
-        .store-address, .store-phone, .time-slot, .exception-reason {
-            color: var(--light-beige);
-        }
-        
-        .hours-dropdown {
-            background-color: #1a3a3a;
-            border-color: #2a4a4a;
-        }
-        
-        .day-schedule.today {
-            background-color: rgba(66, 145, 130, 0.2);
-        }
-        
-        .day-schedule {
-            border-bottom-color: #2a4a4a;
-        }
-        
-        .exceptions-section {
-            border-top-color: #2a4a4a;
-        }
-        
-        .exception-item {
-            border-bottom-color: #2a4a4a;
-        }
-        
-        .btn-secondary {
-            background-color: #1a3a3a;
-            color: var(--light-beige);
-            border-color: var(--light-beige);
-        }
-    }
-</style>
-
-
-@section('content')
-<div class="stores-container">
-    <div class="stores-header">
-        <h1>Points de vente</h1>
-        <a href="{{ route('admin.stores.create') }}" class="add-store-button">
-            <i class="fas fa-plus-circle"></i>
-            Ajouter un point de vente
-        </a>
-    </div>
-
-    <div class="content-container">
-        <div class="map-container">
-            <div id="map"></div>
-        </div>
-        
-
-        <div class="stores-list-container" id="store-list">
-            @foreach($stores as $store)
-            <div class="store-card">
-                <div class="store-header">
-                    <span class="store-badge">
-                        {{ is_array($store->services) ? implode(', ', $store->services) : ($store->services ?? 'Service non défini') }}
-                    </span>
-                    <span class="store-status {{ $store->is_closed ? 'closed' : 'open' }}">
-                        {{ $store->is_closed ? 'Fermé' : 'Ouvert' }}
-                    </span>
-                </div>
-                
-                <div class="store-info">
-                    <div class="store-location">{{ strtoupper($store->nom) }}</div>
-                    <div class="store-address">{{ $store->adresse }}</div>
-                </div>
-                
-                
-                <div class="store-contact">
-                    <div class="store-phone">{{ $store->phone ?? 'Aucun téléphone' }}</div>
-                    <div class="store-hours-toggle" onclick="toggleHours(this)">
-                        HORAIRES <i class="fas fa-chevron-down"></i>
-                        <div class="hours-dropdown">
-                            {!! $store->formatted_weekly_hours !!}
-                        </div>
-                    </div>
-                </div>
-        
-                <div class="store-locate" onclick="centerMapOnStore({{ $store->latitude }}, {{ $store->longitude }})">
-                    <i class="fas fa-map-pin"></i>
-                    Localiser sur la carte
-                </div>
-                
-                <div class="store-actions">
-                    <a href="{{ route('admin.stores.schedules.select-type', $store) }}" class="btn-primary">
-                        GÉRER LES HORAIRES
-                    </a>
-                    <a href="{{ route('admin.stores.edit', $store) }}" class="btn-primary">
-                        MODIFIER
-                    </a>
-                </div>
-                
-                <a href="{{ route('admin.stores.manage', $store) }}" class="btn-secondary">
-                    GÉRER L'AFFICHE DES DETAILS
-                </a>
-            </div>
-            @endforeach
-        </div>
-        
-        <style>
-            :root {
-                --primary: #429182;
-                --secondary: #337b8d;
-                --light-beige: #F9F5EF;
-                --dark-beige: #1b5858;
-                --text-dark: #000000;
-                --text-light: #FFFFFF;
-                --success: #5DBB63;
-                --error: #E74C3C;
-                --border: #E6D8C3;
-                --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            }
-        
-            .stores-list-container {
-                width: 100%;
-                overflow-y: auto;
-                max-height: 80vh;
-                padding: 10px;
-                background-color: var(--light-beige);
-            }
-            
-            .store-card {
-                width: 100%;
-                margin-bottom: 20px;
-                background: var(--light-beige);
-                border-radius: 8px;
-                box-shadow: var(--card-shadow);
-                border: 1px solid var(--border);
-                padding: 15px;
-                box-sizing: border-box;
-            }
-            
-            .store-header {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 10px;
-            }
-            
-            .store-badge {
-                background: var(--secondary);
-                color: var(--text-light);
-                padding: 3px 8px;
-                border-radius: 4px;
-                font-size: 12px;
-                font-weight: 500;
-            }
-            
-            .store-status {
-                font-size: 12px;
-                font-weight: bold;
-            }
-            
-            .store-status.open {
-                color: var(--success);
-            }
-            
-            .store-status.closed {
-                color: var(--error);
-            }
-            
-            .store-info {
-                margin-bottom: 10px;
-            }
-            
-            .store-location {
-                font-weight: bold;
-                margin-bottom: 5px;
-                color: var(--dark-beige);
-                font-size: 1.1rem;
-            }
-            
-            .store-address {
-                color: var(--text-dark);
-                font-size: 0.9rem;
-            }
-            
-            .store-contact {
-                margin-bottom: 10px;
-            }
-            
-            .store-phone {
-                color: var(--text-dark);
-                font-size: 0.9rem;
-            }
-            
-            .store-hours-toggle {
-                cursor: pointer;
-                color: var(--primary);
-                margin-top: 5px;
-                font-weight: 500;
-                font-size: 0.9rem;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-            }
-            
-            .hours-dropdown {
-                display: none;
-                margin-top: 10px;
-                padding: 12px;
-                background: var(--light-beige);
-                border-radius: 6px;
-                border: 1px solid var(--border);
-                box-shadow: var(--card-shadow);
-            }
-            
-            .store-locate {
-                cursor: pointer;
-                color: var(--primary);
-                margin-bottom: 15px;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                font-weight: 500;
-                font-size: 0.9rem;
-            }
-            
-            .store-actions {
-                display: flex;
-                gap: 10px;
-                margin-bottom: 15px;
-            }
-            
-            .btn-primary, .btn-secondary {
-                padding: 8px 16px;
-                border-radius: 6px;
-                text-align: center;
-                font-size: 0.9rem;
-                text-decoration: none;
-                font-weight: 500;
-                transition: all 0.2s ease;
-                flex: 1;
-            }
-            
-            .btn-primary {
-                background: var(--primary);
-                color: var(--text-light);
-                border: 1px solid var(--primary);
-            }
-            
-            .btn-primary:hover {
-                background: var(--dark-beige);
-                border-color: var(--dark-beige);
-                transform: translateY(-1px);
-            }
-            
-            .btn-secondary {
-                background: transparent;
-                color: var(--primary);
-                border: 1px solid var(--primary);
-                display: block;
-            }
-            
-            .btn-secondary:hover {
-                background: rgba(66, 145, 130, 0.1);
-                transform: translateY(-1px);
-            }
-        
-            /* Dark mode */
-            @media (prefers-color-scheme: dark) {
-                .stores-list-container {
-                    background-color: var(--dark-beige);
-                }
-                
-                .store-card {
-                    background-color: #1a3a3a;
-                    border-color: #2a4a4a;
-                }
-                
-                .store-address, .store-phone {
-                    color: var(--light-beige);
-                }
-                
-                .hours-dropdown {
-                    background-color: #1a3a3a;
-                    border-color: #2a4a4a;
-                }
-                
-                .btn-secondary {
-                    color: var(--light-beige);
-                    border-color: var(--light-beige);
-                }
-                
-                .btn-secondary:hover {
-                    background: rgba(249, 245, 239, 0.1);
-                }
-            }
-        </style>
-        
-        <script>
-            function toggleHours(element) {
-                const dropdown = element.querySelector('.hours-dropdown');
-                const icon = element.querySelector('i');
-                
-                if (dropdown.style.display === 'block') {
-                    dropdown.style.display = 'none';
-                    icon.classList.remove('fa-chevron-up');
-                    icon.classList.add('fa-chevron-down');
-                } else {
-                    dropdown.style.display = 'block';
-                    icon.classList.remove('fa-chevron-down');
-                    icon.classList.add('fa-chevron-up');
-                }
-            }
-            
-            function centerMapOnStore(latitude, longitude) {
-                // Votre code existant pour centrer la carte
-                console.log('Centering map on:', latitude, longitude);
-            }
-        </script>
-  
-    </div>
-</div>
 
 <style>
     /* Variables */
     :root {
-        --primary: #429182;
-        --secondary: #337b8d;
-        --light-beige: #F9F5EF;
-        --dark-beige: #1b5858;
-        --text-dark: #000000;
-        --text-light: #FFFFFF;
+        --primary: #0A2E2E; 
+        --secondary: #2A6363; 
+        --tertiary: #8E6E53;
+        --light: #C69C72; 
+        --text-dark: #000000; 
+        --text-light: #FFFFFF; 
         --success: #5DBB63;
-        --error: #E74C3C;
-        --border: #E6D8C3;
-        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --error: #dc3545;
+        --border: #E6D8C3; 
+        --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
     }
 
     /* Base */
     body {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Georgia', sans-serif;
         color: var(--text-dark);
-        background-color: var(--light-beige);
+        background-color: #FFFFFF;
         margin: 0;
         padding: 0;
     }
 
     /* Container principal */
-    .stores-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 2rem;
+    .admin-container {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+        background-color: #FFFFFF;
     }
 
-    /* En-tête */
-    .stores-header {
+    /* Sidebar */
+    .sidebar {
+        width: 300px;
+        flex-shrink: 0;
+        background-color: var(--text-light);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        border-radius: 30px 0;
+    }
+
+    .sidebar-header {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: var(--text-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .sidebar-header h2 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .add-store-button, .add-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: var(--text-light);
+        padding: 0.5rem 1rem;
+        border-radius: 30px 20px   ;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .add-button {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        padding: 0.8rem 1.5rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .add-store-button:hover, .add-button:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .add-button:hover {
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+        box-shadow: 0 6px 20px rgba(10, 46, 46, 0.3);
+    }
+
+    .sidebar-search {
+        padding: 1rem;
+        position: relative;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary);
+    }
+
+    #sidebar-search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid var(--border);
+        border-radius: 30px ;
+        font-size: 0.9rem;
+        background-color: var(--text-light);
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    #sidebar-search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(10, 46, 46, 0.2);
+    }
+
+    .stores-list {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .stores-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .stores-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 30px;
+    }
+
+    .stores-list::-webkit-scrollbar-thumb {
+        background-color: var(--secondary);
+        border-radius: 10px;
+    }
+
+    .store-item {
+        border-bottom: 1px solid var(--border);
+        transition: all 0.3s ease;
+        display: flex;
+    }
+
+    .store-item:last-child {
+        border-bottom: none;
+    }
+
+    .store-item a {
+        display: block;
+        padding: 1rem 1.5rem;
+        text-decoration: none;
+        color: var(--text-dark);
+        flex: 1;
+    }
+
+    .store-item:hover {
+        background-color: rgba(10, 46, 46, 0.05);
+    }
+
+    .store-item.active {
+        background-color: rgba(10, 46, 46, 0.1);
+        border-left: 4px solid var(--primary);
+    }
+
+    .store-item-name {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .store-item-address {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+
+    .store-item-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .store-status {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+    }
+
+    .store-status.open {
+        background-color: rgba(93, 187, 99, 0.2);
+        color: var(--success);
+    }
+
+    .store-status.closed {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: var(--error);
+    }
+
+    /* Contenu principal */
+    .main-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 2rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--border);
     }
 
-    .stores-header h1 {
+    .content-header h1 {
         font-size: 1.8rem;
-        color: var(--dark-beige);
-        font-weight: 700;
-        position: relative;
+        color: var(--primary);
         margin: 0;
+        position: relative;
+        padding-left: 1rem;
     }
 
-    .stores-header h1::after {
+    .content-header h1::before {
         content: '';
         position: absolute;
-        bottom: -0.5rem;
         left: 0;
-        width: 3rem;
-        height: 3px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 70%;
         background-color: var(--primary);
+        border-radius: 2px;
     }
 
-    /* Bouton d'ajout */
-    .add-store-button {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        color: var(--text-light);
-        padding: 0.8rem 1.5rem;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 1rem;
-        box-shadow: var(--card-shadow);
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
+    .header-actions {
+        display: flex;
+        gap: 1rem;
     }
 
-    .add-store-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(66, 145, 130, 0.3);
-        background: linear-gradient(135deg, #4BA793 0%, #2A5F6F 100%);
-    }
-
-    /* Conteneur principal */
     .content-container {
         display: grid;
-        grid-template-columns: 2fr 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 2rem;
+        flex: 1;
     }
 
     /* Carte */
     .map-container {
-        height: auto;
-        border-radius: 4px  30px ;
+        height: calc(100vh - 150px);
+        border-radius: 30px 0;
         overflow: hidden;
         box-shadow: var(--card-shadow);
         border: 1px solid var(--border);
-        background-color: var(--light-beige);
+        position: relative;
     }
 
     #map {
@@ -667,132 +268,248 @@
         width: 100%;
     }
 
-    /* Liste des boutiques */
-    .stores-list {
+    .map-controls {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 10;
+    }
+
+    .map-control-button {
+        width: 40px;
+        height: 40px;
+        background-color: var(--text-light);
+        border: 1px solid var(--border);
+        border-radius: 30px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        color: var(--primary);
+    }
+
+    .map-control-button:hover {
+        background-color: rgba(10, 46, 46, 0.05);
+    }
+
+    /* Conteneur des détails des boutiques */
+    .stores-details-container {
+        background-color: #F9F5EF;
+        border-radius: 30px 0;
+        padding: 1rem;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border);
+        height: calc(100vh - 150px);
+        overflow: hidden;
+    }
+
+    /* Liste des détails des boutiques */
+    .stores-details {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
-        max-height: 600px;
+        gap: 2rem;
+        max-height: calc(100vh - 180px);
         overflow-y: auto;
         padding-right: 0.5rem;
     }
 
+    /* Ajouter ces styles à votre section <style> existante */
+
+    .stores-details {
+        overflow-x: hidden; /* Empêcher le défilement horizontal */
+    }
+
+    .store-card {
+        max-width: 100%; /* S'assurer que la carte ne dépasse pas la largeur du conteneur */
+        box-sizing: border-box; /* Inclure padding et border dans la largeur */
+        overflow-x: hidden; /* Empêcher le défilement horizontal dans les cartes */
+    }
+
+    /* Améliorer la réactivité des grilles dans les cartes */
+    .store-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.2rem;
+        margin-bottom: 1.2rem;
+        padding: 1.2rem;
+        background-color: rgba(10, 46, 46, 0.05);
+        border-radius: 20px 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
     /* Scrollbar personnalisée */
-    .stores-list::-webkit-scrollbar {
+    .stores-details::-webkit-scrollbar {
         width: 6px;
     }
 
-    .stores-list::-webkit-scrollbar-track {
-        background: var(--light-beige);
+    .stores-details::-webkit-scrollbar-track {
+        background: #f1f1f1;
         border-radius: 3px;
     }
 
-    .stores-list::-webkit-scrollbar-thumb {
-        background: var(--primary);
+    .stores-details::-webkit-scrollbar-thumb {
+        background-color: var(--secondary);
         border-radius: 3px;
     }
 
     /* Carte de boutique */
     .store-card {
-        background: var(--light-beige);
-        height: auto;
-        border-radius: 4px  30px ;
-        padding: 1.25rem;
+        background: var(--text-light);
+        border-radius: 30px 0;
+        padding: 1.5rem;
         box-shadow: var(--card-shadow);
         transition: all 0.3s ease;
         border: 1px solid var(--border);
+        position: relative;
+        overflow-y: auto; /* Ajout du défilement vertical */
+        max-height: calc(100vh - 200px); /* Hauteur maximale pour permettre le défilement */
+        display: none; /* Caché par défaut, affiché lors de la sélection */
     }
 
-    .store-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(66, 145, 130, 0.15);
+    .store-card.active {
+        display: block;
+    }
+
+    .store-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary), var(--secondary));
     }
 
     .store-header {
         display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.2rem;
+        padding-left: 0.5rem;
+    }
+
+    .store-title {
+        display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 1rem;
+    }
+
+    .store-title h2 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--primary);
     }
 
     .store-badge {
         background-color: var(--secondary);
         color: var(--text-light);
         padding: 0.25rem 0.75rem;
-        border-radius: 4px;
+        border-radius: 30px 0;
         font-size: 0.8rem;
         font-weight: 600;
-    }
-
-    .store-status {
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .store-status.open {
-        color: var(--success);
-    }
-
-    .store-status.closed {
-        color: var(--error);
+        align-self: flex-start;
     }
 
     .store-info {
-        margin-bottom: 1rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.2rem;
+        margin-bottom: 1.2rem;
+        padding: 1.2rem;
+        background-color: rgba(10, 46, 46, 0.05);
+        border-radius: 20px 0;
     }
 
-    .store-location {
-        font-size: 1.1rem;
+    .info-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .info-label {
         font-weight: 600;
-        color: var(--dark-beige);
-        margin-bottom: 0.5rem;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
     }
 
-    .store-address {
+    .info-value {
         color: var(--text-dark);
-        opacity: 0.8;
         font-size: 0.95rem;
     }
 
-    .store-contact {
-        padding: 1rem 0;
-        border-top: 1px solid var(--border);
-        border-bottom: 1px solid var(--border);
-        margin-bottom: 1rem;
+    .store-link {
+        color: var(--secondary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
     }
 
-    .store-phone {
-        font-weight: 600;
-        color: var(--text-dark);
-        margin-bottom: 0.75rem;
+    .store-link:hover {
+        color: var(--primary);
+        text-decoration: underline;
     }
 
-    .store-hours-toggle {
+    .store-hours {
+        margin-bottom: 1.2rem;
+        border: 1px solid var(--border);
+        border-radius: 20px 0;
+        overflow: hidden;
+    }
+
+    .hours-header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        color: var(--primary);
-        font-size: 0.9rem;
-        cursor: pointer;
-        font-weight: 500;
-        transition: color 0.3s ease;
-    }
-
-    .store-hours-toggle:hover {
-        color: var(--dark-beige);
-    }
-
-    .hours-dropdown {
-        display: none;
-        position: absolute;
-        background: var(--light-beige);
-        border: 1px solid var(--border);
-        border-radius: 6px;
+        gap: 0.5rem;
         padding: 1rem;
-        margin-top: 0.5rem;
-        z-index: 10;
-        box-shadow: var(--card-shadow);
-        width: calc(100% - 3rem);
+        background-color: var(--primary);
+        color: var(--text-light);
+        font-weight: 600;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .hours-toggle-icon {
+        margin-left: auto;
+        transition: transform 0.3s ease;
+    }
+
+    .hours-content {
+        padding: 1rem;
+        display: none;
+    }
+
+    .day-schedule {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .day-schedule:last-child {
+        border-bottom: none;
+    }
+
+    .day-schedule.today {
+        background-color: rgba(10, 46, 46, 0.1);
+        margin: 0 -1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 20px 0;
+    }
+
+    .day-name {
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .time-slot {
+        padding: 0.25rem 0;
+        color: var(--text-dark);
     }
 
     .closed-text {
@@ -801,7 +518,7 @@
     }
 
     .holiday-text {
-        color: var(--primary);
+        color: var(--tertiary);
         font-weight: 500;
     }
 
@@ -811,25 +528,22 @@
         font-style: italic;
     }
 
-    .time-slot {
-        padding: 0.25rem 0;
-        color: var(--text-dark);
-    }
-
     .store-locate {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        color: var(--primary);
+        color: var(--secondary);
         font-size: 0.9rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.2rem;
         cursor: pointer;
         transition: all 0.3s ease;
         font-weight: 500;
+        padding: 0.5rem 0;
     }
 
     .store-locate:hover {
-        color: var(--dark-beige);
+        color: var(--primary);
+        transform: translateX(5px);
     }
 
     .store-locate i {
@@ -839,324 +553,1171 @@
     .store-actions {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-        margin-bottom: 0.75rem;
+        gap: 1rem;
+        margin-bottom: 1rem;
     }
 
     .btn-primary {
         padding: 0.75rem;
-        background-color: var(--light-beige);
+        background-color: var(--text-light);
         color: var(--primary);
         border: 1px solid var(--primary);
-        border-radius: 6px;
+        border-radius: 30px 0;
         font-weight: 600;
         font-size: 0.85rem;
         text-align: center;
         text-decoration: none;
         cursor: pointer;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
 
     .btn-primary:hover {
-        background-color: rgba(66, 145, 130, 0.1);
+        background-color: rgba(10, 46, 46, 0.1);
+        transform: translateY(-2px);
     }
 
     .btn-secondary {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
         padding: 0.75rem;
-        background-color: var(--primary);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         color: var(--text-light);
         border: none;
-        border-radius: 6px 30px;
+        border-radius: 30px 0;
         font-weight: 600;
         font-size: 0.85rem;
         text-align: center;
         text-decoration: none;
         cursor: pointer;
-        transition: background-color 0.3s ease;
-        width: 93%;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(10, 46, 46, 0.2);
+        width: 92%;
+        margin-bottom: 0.5rem;
     }
 
     .btn-secondary:hover {
-        background-color: var(--dark-beige);
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(10, 46, 46, 0.3);
     }
 
+    /* Styles pour le bouton de mode sélection */
+    .selection-mode-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: var(--text-light);
+        padding: 0.5rem 1rem;
+        border-radius: 30px 0;
+        border: none;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .selection-mode-btn:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .selection-mode-btn.active {
+        background-color: var(--text-light);
+        color: var(--primary);
+    }
+
+    /* Styles pour les cases à cocher dans la sidebar */
+    .store-checkbox {
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .store-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary);
+    }
+
+    /* Styles pour le bouton d'action en masse */
+    .bulk-action-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: var(--text-light);
+        padding: 0.8rem 1.5rem;
+        border-radius: 30px 0;
+        border: none;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: var(--card-shadow);
+        cursor: pointer;
+        opacity: 0.7;
+    }
+
+    .bulk-action-button:enabled {
+        opacity: 1;
+    }
+
+    .bulk-action-button:enabled:hover {
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(10, 46, 46, 0.3);
+    }
+
+    .bulk-action-button:disabled {
+        cursor: not-allowed;
+    }
+
+    /* Styles pour la modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: var(--text-light);
+        margin: 5% auto;
+        padding: 0;
+        border-radius: 30px 0;
+        box-shadow: var(--card-shadow);
+        width: 80%;
+        max-width: 900px;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: modalFadeIn 0.3s;
+    }
+
+    @keyframes modalFadeIn {
+        from {opacity: 0; transform: translateY(-20px);}
+        to {opacity: 1; transform: translateY(0);}
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: var(--text-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 30px 0 0 0;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .close-modal {
+        color: var(--text-light);
+        font-size: 1.8rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close-modal:hover {
+        color: #ddd;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        color: var(--text-dark);
+    }
+
+ 
     /* Responsive */
-    @media (max-width: 1024px) {
+    @media (max-width: 1200px) {
         .content-container {
             grid-template-columns: 1fr;
         }
         
         .map-container {
-            height: 300px;
+            height: 500px;
+        }
+        
+        .stores-details-container {
+            height: auto;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .admin-container {
+            flex-direction: column;
+            height: auto;
+            overflow: visible;
+        }
+        
+        .sidebar {
+            width: 100%;
+            height: auto;
+            border-right: none;
+            border-bottom: 1px solid var(--border);
         }
         
         .stores-list {
-            max-height: none;
+            max-height: 300px;
+        }
+        
+        .main-content {
+            padding: 1.5rem;
+        }
+        
+        .content-container {
+            gap: 1.5rem;
+        }
+        
+        .store-info {
+            grid-template-columns: 1fr;
         }
     }
 
     @media (max-width: 768px) {
-        .stores-container {
-            padding: 1.5rem;
-        }
-        
-        .stores-header {
+        .content-header {
             flex-direction: column;
             align-items: flex-start;
             gap: 1rem;
         }
         
+        .header-actions {
+            width: 100%;
+        }
+        
+        .add-button {
+            width: 100%;
+            justify-content: center;
+        }
+        
         .store-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .modal-content {
+            width: 95%;
+            margin: 5% auto;
+        }
+        
+        .form-row {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .time-slot {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .btn-remove-slot {
+            align-self: flex-end;
+        }
+        
+        .action-types {
             grid-template-columns: 1fr;
         }
     }
 
     /* Dark mode */
     @media (prefers-color-scheme: dark) {
-        :root {
-            --text-dark: #F9F5EF;
-            --light-beige: #1a3a3a;
-            --border: #2a4a4a;
-        }
-
         body {
-            background-color: #ffffff;
+            background-color: #f0f0f0;
         }
         
-        .stores-header {
-            border-bottom-color: #122725;
+        .sidebar {
+            background-color: #0A2E2E;
+            border-color: #2A6363;
         }
         
-        .store-card {
-            background-color: #1a3a3a;
-            border-color: var(--border);
+        .sidebar-search {
+            border-color: #2A6363;
         }
         
-        .store-location {
+        #sidebar-search-input {
+            background-color: #0A2E2E;
+            color: var(--text-light);
+            border-color: #2A6363;
+        }
+        
+        .store-item {
+            border-color: #2A6363;
+        }
+        
+        .store-item a {
             color: var(--text-light);
         }
         
-        .store-address, .store-phone {
-            color: #F9F5EF;
+        .store-item-address {
+            color: #aaa;
+        }
+        
+        .stores-details-container {
+            background-color: #0A2E2E;
+            border-color: #2A6363;
+        }
+        
+        .store-card {
+            background-color: #0A2E2E;
+            border-color: #2A6363;
+        }
+        
+        .store-title h2 {
+            color: var(--text-light);
+        }
+        
+        .info-label {
+            color: var(--text-light);
+        }
+        
+        .info-value {
+            color: var(--text-light);
             opacity: 0.9;
         }
         
-        .store-hours-toggle, .store-locate {
-            color: var(--secondary);
+        .store-info {
+            background-color: rgba(42, 99, 99, 0.1);
+        }
+        
+        .store-hours {
+            border-color: #2A6363;
+        }
+        
+        .day-schedule {
+            border-color: #2A6363;
+        }
+        
+        .time-slot {
+            color: var(--text-light);
         }
         
         .btn-primary {
-            background-color: #1a3a3a;
-            color: var(--secondary);
+            background-color: #0A2E2E;
+            color: var(--text-light);
             border-color: var(--secondary);
         }
         
-        .hours-dropdown {
-            background-color: #1a3a3a;
-            border-color: var(--border);
+        .map-control-button {
+            background-color: #0A2E2E;
+            color: var(--text-light);
+            border-color: #2A6363;
         }
 
-        .map-container {
-            background-color: #1a3a3a;
-            border-color: var(--border);
+        .modal-content {
+            background-color: #0A2E2E;
         }
-
-        .stores-list::-webkit-scrollbar-track {
-            background: #1a3a3a;
+        
+        .modal-body {
+            color: var(--text-light);
         }
-
-        .stores-list::-webkit-scrollbar-thumb {
-            background: var(--primary);
+        
+        .form-control {
+            background-color: #0A2E2E;
+            color: var(--text-light);
+            border-color: #2A6363;
+        }
+        
+        .form-group label {
+            color: var(--text-light);
+        }
+        
+        .action-type label {
+            background-color: rgba(42, 99, 99, 0.1);
+            color: var(--text-light);
+            border-color: #2A6363;
+        }
+        
+        .time-slot {
+            background-color: rgba(42, 99, 99, 0.1);
+            border-color: #2A6363;
+        }
+        
+        .btn-add-slot {
+            background-color: rgba(42, 99, 99, 0.1);
+            color: var(--text-light);
+            border-color: #2A6363;
+        }
+        
+        .selected-stores-list {
+            background-color: rgba(42, 99, 99, 0.1);
+            border-color: #2A6363;
+        }
+        
+        .selected-store-tag {
+            background-color: #0A2E2E;
+            color: var(--text-light);
+            border-color: #2A6363;
+        }
+        
+        .holiday-info p {
+            color: var(--text-light);
         }
     }
 </style>
 
 
-<script>
-    // Fonction pour afficher/masquer les horaires
-    function toggleHours(element) {
-        const dropdown = element.querySelector('.hours-dropdown');
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+@section('content')
+<div class="admin-container">
+    <!-- Sidebar pour la navigation entre les points de vente -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>  STORES </h2>
+            <button id="selection-mode-btn" class="selection-mode-btn">
+                <i class="fas fa-check-square"></i>
+                Sélectionner
+            </button>
+        </div>
         
-        // Fermer les autres dropdowns
-        document.querySelectorAll('.hours-dropdown').forEach(el => {
-            if (el !== dropdown) {
-                el.style.display = 'none';
-            }
-        });
+        <div class="sidebar-search">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="sidebar-search-input" placeholder="Rechercher..." onkeyup="filterSidebar()">
+        </div>
         
-        // Empêcher la propagation du clic
-        event.stopPropagation();
-    }
-    
-    // Fermer les dropdowns lors d'un clic ailleurs sur la page
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.store-hours-toggle')) {
-            document.querySelectorAll('.hours-dropdown').forEach(el => {
-                el.style.display = 'none';
-            });
-        }
-    });
-</script>
+        <div class="stores-list" id="stores-list">
+            @foreach($stores as $store)
+            <div class="store-item" data-id="{{ $store->id }}" data-lat="{{ $store->latitude }}" data-lng="{{ $store->longitude }}">
+                <div class="store-checkbox" style="display: none;">
+                    <input type="checkbox" id="select-store-{{ $store->id }}" class="store-selector" data-store-id="{{ $store->id }}">
+                </div>
+                <a href="#store-{{ $store->id }}" onclick="selectStore({{ $store->id }})">
+                    <div class="store-item-name">{{ $store->nom }}</div>
+                    <div class="store-item-address">{{ $store->ville }}</div>
+                    <div class="store-item-badge">
+                        <span class="store-status {{ $store->is_closed ? 'closed' : 'open' }}">
+                            {{ $store->is_closed ? 'Fermé' : 'Ouvert' }}
+                        </span>
+                    </div>
+                </a>
+            </div>
+            @endforeach
+        </div>
+    </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8"></script>
-<script>
+    <!-- Contenu principal -->
+    <div class="main-content">
+        <div class="content-header">
+            <h1>Gestion des points de vente</h1>
+            <div class="header-actions">
+                <button id="bulk-action-btn" class="bulk-action-button" style="display: none;" disabled>
+                    <i class="fas fa-clock"></i>
+                    Gérer les horaires sélectionnés
+                </button>
+                <a href="{{ route('admin.stores.create') }}" class="add-button">
+                    <i class="fas fa-plus-circle"></i>
+                    Ajouter
+                </a>
+            </div>
+        </div>
 
-    const stores = @json($stores);
-    let map;
-    let markers = [];
-    let infoWindow;
-    
-    function initMap() {
-        // Coordonnées par défaut (Paris, France)
-        const defaultLocation = { lat: 48.8566, lng: 2.3522 };
-        
-        // Initialiser la carte
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: defaultLocation,
-            zoom: 12,
-            mapTypeControl: true,
-            streetViewControl: false,
-            fullscreenControl: true,
-            styles: [
-                {
-                    featureType: "poi",
-                    elementType: "labels",
-                    stylers: [{ visibility: "off" }]
-                }
-            ]
-        });
-        
-        // Créer une fenêtre d'info
-        infoWindow = new google.maps.InfoWindow();
-        
-        // Ajouter les marqueurs pour chaque boutique
-        stores.forEach(store => {
-            if (store.latitude && store.longitude) {
-                const position = {
-                    lat: parseFloat(store.latitude),
-                    lng: parseFloat(store.longitude)
-                };
-                
-                const marker = new google.maps.Marker({
-                    position: position,
-                    map: map,
-                    title: store.nom,
-                    animation: google.maps.Animation.DROP
-                });
-                
-                markers.push(marker);
-                
-                // Ajouter un événement de clic sur le marqueur
-                marker.addListener('click', () => {
-                    const content = `
-                        <div style="padding: 10px; max-width: 200px;">
-                            <h3 style="margin-bottom: 5px;">${store.nom}</h3>
-                            <p style="margin-bottom: 10px;">${store.adresse}</p>
-                            <a href="#store-${store.id}" style="color: #4a90e2; text-decoration: underline;">
-                                Voir détails
+        <div class="content-container">
+            <div class="map-container" id="map-container">
+                <div class="map-controls">
+                </div>
+                <div id="map" style="width: 100%; height: 100%;"></div>
+            </div>
+
+          
+            <div class="stores-details-container">
+                <div class="stores-details" id="stores-details">
+                    @foreach($stores as $store)
+                    <div class="store-card" id="store-{{ $store->id }}" data-lat="{{ $store->latitude }}" data-lng="{{ $store->longitude }}">
+                        <div class="store-header">
+                            <div class="store-title">
+                                <h2>{{ strtoupper($store->nom) }}</h2>
+                                <span class="store-status {{ $store->is_closed ? 'closed' : 'open' }}">
+                                    {{ $store->is_closed ? 'Fermé' : 'Ouvert' }}
+                                </span>
+                            </div>
+                            <div class="store-badge">
+                                {{ is_array($store->services) ? implode(', ', $store->services) : ($store->services ?? 'Service non défini') }}
+                            </div>
+                        </div>
+                        
+                        <div class="store-info">
+                            <div class="info-section">
+                                <div class="info-label"><i class="fas fa-map-marker-alt"></i> Adresse</div>
+                                <div class="info-value">{{ $store->adresse }}, {{ $store->code_postal ?? '' }} {{ $store->ville }}</div>
+                                <div class="info-value">{{ $store->region ?? '' }}, {{ $store->pays ?? '' }}</div>
+                            </div>
+                            
+                            <div class="info-section">
+                                <div class="info-label"><i class="fas fa-phone"></i> Contact</div>
+                                <div class="info-value">{{ $store->phone ?? 'Aucun téléphone' }}</div>
+                                <div class="info-value">{{ $store->email ?? 'Aucun email' }}</div>
+                            </div>
+                            
+                            <div class="info-section">
+                                <div class="info-label"><i class="fas fa-info-circle"></i> Détails</div>
+                                <div class="info-value">Ouvert jusqu'à: {{ $store->ouvert_jusqua ?? 'Non spécifié' }}</div>
+                                <div class="info-value">Année d'ouverture: {{ $store->annee_ouverture ?? 'Non spécifié' }}</div>
+                            </div>
+                            
+                            @if($store->site_web || $store->lien_rdv)
+                            <div class="info-section">
+                                <div class="info-label"><i class="fas fa-link"></i> Liens</div>
+                                @if($store->site_web)
+                                <div class="info-value"><a href="{{ $store->site_web }}" target="_blank" class="store-link">Site web</a></div>
+                                @endif
+                                @if($store->lien_rdv)
+                                <div class="info-value"><a href="{{ $store->lien_rdv }}" target="_blank" class="store-link">Prendre rendez-vous</a></div>
+                                @endif
+                            </div>
+                            @endif
+                        </div>
+                        
+                        <div class="store-hours">
+                            <div class="hours-header" onclick="toggleHours(this)">
+                                <i class="fas fa-clock"></i> HORAIRES D'OUVERTURE
+                                <i class="fas fa-chevron-down hours-toggle-icon"></i>
+                            </div>
+                            <div class="hours-content">
+                                {!! $store->formatted_weekly_hours !!}
+                            </div>
+                        </div>
+
+                        <div class="store-locate" onclick="centerMapOnStore({{ $store->latitude }}, {{ $store->longitude }})">
+                            <i class="fas fa-map-pin"></i>
+                            Localiser sur la carte
+                        </div>
+                        
+                        <div class="store-actions">
+                            <a href="{{ route('admin.stores.schedules.select-type', $store) }}" class="btn-primary">
+                                <i class="fas fa-clock"></i>
+                                GÉRER LES HORAIRES
+                            </a>
+                            <a href="{{ route('admin.stores.edit', $store) }}" class="btn-primary">
+                                <i class="fas fa-edit"></i>
+                                MODIFIER
                             </a>
                         </div>
-                    `;
-                    
-                    infoWindow.setContent(content);
-                    infoWindow.open(map, marker);
-                    
-                    // Faire défiler jusqu'à la carte de boutique correspondante
-                    document.querySelector(`[data-lat="${store.latitude}"][data-lng="${store.longitude}"]`)
-                        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                });
-            }
-        });
-        
-        // Ajuster la vue pour inclure tous les marqueurs
-        if (markers.length > 0) {
-            const bounds = new google.maps.LatLngBounds();
-            markers.forEach(marker => bounds.extend(marker.getPosition()));
-            map.fitBounds(bounds);
-        }
-    }
-    
-    // Initialiser la carte au chargement de la page
-    window.addEventListener('load', initMap);
-    
-    // Géolocalisation
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                const pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-                
-                map.setCenter(pos);
-                map.setZoom(14);
-                
-                // Ajouter un marqueur pour la position actuelle
-                new google.maps.Marker({
-                    position: pos,
-                    map: map,
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        scale: 10,
-                        fillColor: "#4285F4",
-                        fillOpacity: 1,
-                        strokeColor: "#FFFFFF",
-                        strokeWeight: 2,
-                    },
-                    zIndex: 999
-                });
-            }, function() {
-                alert("Impossible d'obtenir votre position. Veuillez vérifier vos paramètres de localisation.");
-            });
+                        
+                        <a href="{{ route('admin.stores.manage', $store) }}" class="btn-secondary">
+                            <i class="fas fa-cog"></i>
+                            GÉRER L'AFFICHE DES DETAILS
+                        </a>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{-- Inclusion du composant de modal de gestion des horaires en masse --}}
+@include('admin.stores.bulk-schedule-modal')
+
+
+<script>
+    // Déclaration des variables globales
+let activeStoreId = null
+let map
+const markers = []
+let infoWindow
+let bounds
+let markerCluster
+let isSelectStoreRunning = false // Variable pour éviter les appels récursifs
+let debounceTimer = null // Pour le debouncing
+
+// Fonction optimisée pour sélectionner une seule boutique et afficher ses détails
+function selectStore(storeId) {
+  // Éviter les appels récursifs et les appels trop fréquents
+  if (isSelectStoreRunning || activeStoreId === storeId) return
+
+  // Debouncing pour éviter les appels multiples rapprochés
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    isSelectStoreRunning = true
+
+    try {
+      // Mettre à jour l'ID du point de vente actif
+      activeStoreId = storeId
+
+      // Optimisation: utiliser des sélecteurs plus spécifiques et limiter les opérations DOM
+      const selectedCard = document.getElementById(`store-${storeId}`)
+      const selectedItem = document.querySelector(`.store-item[data-id="${storeId}"]`)
+
+      // Masquer toutes les cartes de magasin d'abord (optimisé)
+      document.querySelectorAll(".store-card.active").forEach((card) => {
+        card.classList.remove("active")
+        card.style.display = "none"
+      })
+
+      // Réinitialiser l'élément actif dans la sidebar (optimisé)
+      const activeItem = document.querySelector(".store-item.active")
+      if (activeItem) activeItem.classList.remove("active")
+
+      // Mettre en évidence la boutique sélectionnée
+      if (selectedCard) {
+        selectedCard.classList.add("active")
+        selectedCard.style.display = "block"
+        selectedCard.scrollTop = 0
+      }
+
+      if (selectedItem) {
+        selectedItem.classList.add("active")
+        // Utiliser scrollIntoViewIfNeeded si disponible (plus performant)
+        if (selectedItem.scrollIntoViewIfNeeded) {
+          selectedItem.scrollIntoViewIfNeeded()
         } else {
-            alert("La géolocalisation n'est pas prise en charge par votre navigateur.");
+          selectedItem.scrollIntoView({ behavior: "smooth", block: "nearest" })
         }
+      }
+
+      // Centrer la carte sur le marqueur correspondant
+      const marker = markers.find((m) => m.storeId === Number(storeId))
+      if (marker) {
+        // Arrêter l'animation de tous les marqueurs (optimisé)
+        markers.forEach((m) => {
+          if (m.getAnimation()) m.setAnimation(null)
+        })
+
+        // Animer le marqueur sélectionné
+        marker.setAnimation(google.maps.Animation.BOUNCE)
+        setTimeout(() => {
+          marker.setAnimation(null)
+        }, 1500)
+
+        // Centrer la carte sur le marqueur
+        map.setCenter(marker.getPosition())
+        map.setZoom(15)
+
+        // Ouvrir l'infoWindow sans déclencher d'événements supplémentaires
+        const content = `
+          <div style="padding: 10px; max-width: 200px;">
+            <h3 style="margin-bottom: 5px; color: #000">${marker.title || ""}</h3>
+            <p style="margin-bottom: 10px; color: #000">${marker.address || ""}</p>
+            <a href="#store-${storeId}" style="color: #000; text-decoration: underline;">
+              Voir détails
+            </a>
+          </div>
+        `
+        infoWindow.setContent(content)
+        infoWindow.open(map, marker)
+      }
+    } finally {
+      // Réinitialiser le flag pour permettre de futurs appels
+      isSelectStoreRunning = false
     }
-    
-    // Centrer la carte sur une boutique
-    function centerMapOnStore(lat, lng) {
-        if (map) {
-            const position = new google.maps.LatLng(lat, lng);
-            map.setCenter(position);
-            map.setZoom(16);
-            
-            // Trouver et ouvrir l'infoWindow du marqueur correspondant
-            for (let i = 0; i < markers.length; i++) {
-                if (markers[i].getPosition().equals(position)) {
-                    google.maps.event.trigger(markers[i], 'click');
-                    break;
-                }
+  }, 100) // Délai de debounce de 100ms
+}
+
+// Fonction pour ajouter des marqueurs à la carte (optimisée)
+function addMarkersToMap() {
+  // Récupérer les données des boutiques
+  let stores
+  try {
+    stores = JSON.parse(document.getElementById("stores-data").textContent)
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données des boutiques:", error)
+    return
+  }
+
+  // Vérifier si stores est un tableau
+  if (!Array.isArray(stores)) {
+    console.error("Les données des boutiques ne sont pas un tableau:", stores)
+    return
+  }
+
+  // Créer tous les marqueurs en une seule fois
+  const validStores = stores.filter((store) => isValidCoordinate(store.latitude, store.longitude))
+
+  // Pré-calculer les positions pour éviter les calculs répétés
+  const positions = validStores.map((store) => ({
+    position: {
+      lat: Number.parseFloat(store.latitude),
+      lng: Number.parseFloat(store.longitude),
+    },
+    storeId: store.id,
+    title: store.nom,
+    address: store.adresse,
+  }))
+
+  // Ajouter les marqueurs par lots pour améliorer les performances
+  const batchSize = 20
+  for (let i = 0; i < positions.length; i += batchSize) {
+    const batch = positions.slice(i, i + batchSize)
+
+    setTimeout(
+      () => {
+        batch.forEach((data) => {
+          const marker = new google.maps.Marker({
+            position: data.position,
+            map: map,
+            title: data.title,
+            animation: google.maps.Animation.DROP,
+            storeId: data.storeId,
+            address: data.address,
+          })
+
+          markers.push(marker)
+
+          // Ajouter un événement de clic sur le marqueur
+          marker.addListener("click", () => {
+            // Utiliser directement selectStore sans déclencher d'autres événements
+            selectStore(data.storeId)
+          })
+        })
+
+        // Si c'est le dernier lot, créer le cluster et ajuster la vue
+        if (i + batchSize >= positions.length) {
+          // Ajuster la vue pour inclure tous les marqueurs
+          if (markers.length > 0) {
+            bounds = new google.maps.LatLngBounds()
+            markers.forEach((marker) => bounds.extend(marker.getPosition()))
+            map.fitBounds(bounds)
+          }
+
+          // Créer un MarkerClusterer si la bibliothèque est disponible
+          if (markers.length > 0) {
+            if (typeof MarkerClusterer !== "undefined") {
+              createMarkerCluster()
+            } else {
+              loadMarkerClusterer()
             }
+          }
         }
+      },
+      i === 0 ? 0 : 100,
+    ) // Premier lot immédiatement, les autres avec un délai
+  }
+}
+
+// Initialisation de la carte avec Google Maps (optimisée)
+function initMap() {
+  // Coordonnées par défaut (centre du Maroc)
+  const defaultLocation = { lat: 31.7917, lng: -7.0926 }
+
+  // Initialiser la carte avec les styles pour masquer les frontières du Sahara Occidental
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: defaultLocation,
+    zoom: 5,
+    mapTypeControl: true,
+    streetViewControl: false,
+    fullscreenControl: true,
+    styles: [
+      {
+        // Masquer toutes les frontières des pays
+        featureType: "administrative.country",
+        elementType: "geometry.stroke",
+        stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "administrative",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#444444" }],
+      },
+      {
+        featureType: "landscape",
+        elementType: "all",
+        stylers: [{ color: "#f2f2f2" }],
+      },
+      {
+        featureType: "poi",
+        elementType: "all",
+        stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "road",
+        elementType: "all",
+        stylers: [{ saturation: -100 }, { lightness: 45 }],
+      },
+      {
+        featureType: "road.highway",
+        elementType: "all",
+        stylers: [{ visibility: "simplified" }],
+      },
+      {
+        featureType: "road.arterial",
+        elementType: "labels.icon",
+        stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "transit",
+        elementType: "all",
+        stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "water",
+        elementType: "all",
+        stylers: [{ color: "#0A2E2E" }, { visibility: "on" }],
+      },
+    ],
+  })
+
+  // Créer une fenêtre d'info
+  infoWindow = new google.maps.InfoWindow()
+
+  // Charger les frontières des pays de manière asynchrone
+  setTimeout(() => {
+    loadCountryBorders()
+  }, 500)
+
+  // Ajouter les marqueurs pour chaque boutique
+  addMarkersToMap()
+}
+
+// Fonction pour charger les frontières des pays (optimisée)
+function loadCountryBorders() {
+  // Charger le GeoJSON des frontières mondiales
+  map.data.loadGeoJson("https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json")
+
+  // Styler chaque pays: masquer le Sahara Occidental, dessiner les autres
+  map.data.setStyle((feature) => {
+    const name = feature.getProperty("name")
+    return {
+      // pas de remplissage
+      fillOpacity: 0,
+      // style de bordure pour les "autres" pays
+      strokeColor: "#444",
+      strokeWeight: 1,
+      strokeOpacity: name === "Western Sahara" ? 0 : 1,
     }
-    
-    // Afficher/masquer les horaires
-    function toggleHours(element) {
-        const dropdown = element.querySelector('.hours-dropdown');
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        
-        // Fermer les autres dropdowns
-        document.querySelectorAll('.hours-dropdown').forEach(el => {
-            if (el !== dropdown) {
-                el.style.display = 'none';
+  })
+}
+
+// Fonction pour créer le cluster de marqueurs (inchangée)
+function createMarkerCluster() {
+  if (markerCluster) {
+    markerCluster.clearMarkers()
+  }
+
+  markerCluster = new MarkerClusterer(map, markers, {
+    imagePath: "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+    gridSize: 50,
+    minimumClusterSize: 3,
+  })
+}
+
+// Fonction pour charger la bibliothèque MarkerClusterer (inchangée)
+function loadMarkerClusterer() {
+  const script = document.createElement("script")
+  script.src = "https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"
+  script.onload = () => {
+    if (typeof markerClusterer !== "undefined") {
+      markerCluster = new markerClusterer.MarkerClusterer({
+        map,
+        markers,
+        algorithm: new markerClusterer.GridAlgorithm({
+          gridSize: 50,
+          minimumClusterSize: 3,
+        }),
+      })
+    } else {
+      console.warn("La bibliothèque MarkerClusterer n'a pas pu être chargée correctement")
+    }
+  }
+  document.head.appendChild(script)
+}
+
+// Fonction pour vérifier si les coordonnées sont valides (optimisée)
+function isValidCoordinate(lat, lng) {
+  if (!lat || !lng) return false
+
+  const latNum = Number.parseFloat(lat)
+  const lngNum = Number.parseFloat(lng)
+
+  return !isNaN(latNum) && !isNaN(lngNum) && latNum >= -90 && latNum <= 90 && lngNum >= -180 && lngNum <= 180
+}
+
+// Centrer la carte sur une boutique (optimisée)
+function centerMapOnStore(lat, lng) {
+  if (!map) return
+
+  const position = new google.maps.LatLng(lat, lng)
+  map.setCenter(position)
+  map.setZoom(16)
+
+  // Trouver le marqueur correspondant
+  const marker = markers.find((m) => {
+    const pos = m.getPosition()
+    return pos && Math.abs(pos.lat() - position.lat()) < 0.0001 && Math.abs(pos.lng() - position.lng()) < 0.0001
+  })
+
+  if (marker) {
+    // Ouvrir l'infoWindow directement sans déclencher d'événements supplémentaires
+    const content = `
+      <div style="padding: 10px; max-width: 200px;">
+        <h3 style="margin-bottom: 5px; color: #000">${marker.title || ""}</h3>
+        <p style="margin-bottom: 10px; color: #000">${marker.address || ""}</p>
+        <a href="#store-${marker.storeId}" style="color: #000; text-decoration: underline;">
+          Voir détails
+        </a>
+      </div>
+    `
+    infoWindow.setContent(content)
+    infoWindow.open(map, marker)
+
+    // Sélectionner la boutique
+    selectStore(marker.storeId)
+  }
+}
+
+// Afficher/masquer les horaires (optimisée)
+function toggleHours(element) {
+  const content = element.parentNode.querySelector(".hours-content")
+  const icon = element.querySelector(".hours-toggle-icon")
+
+  if (!content || !icon) return
+
+  const isVisible = content.style.display === "block"
+  content.style.display = isVisible ? "none" : "block"
+  icon.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)"
+}
+
+// Filtrer la sidebar (optimisée avec debounce)
+let filterTimer = null
+function filterSidebar() {
+  clearTimeout(filterTimer)
+  filterTimer = setTimeout(() => {
+    const searchText = document.getElementById("sidebar-search-input").value.toLowerCase()
+    const storeItems = document.querySelectorAll(".store-item")
+
+    storeItems.forEach((item) => {
+      const storeName = item.querySelector(".store-item-name").textContent.toLowerCase()
+      const storeAddress = item.querySelector(".store-item-address").textContent.toLowerCase()
+
+      item.style.display = storeName.includes(searchText) || storeAddress.includes(searchText) ? "flex" : "none"
+    })
+  }, 200) // Délai de debounce de 200ms
+}
+
+// Nouvelle fonction pour gérer la sélection multiple de boutiques (optimisée)
+function handleMultipleSelection() {
+  const selectionModeBtn = document.getElementById("selection-mode-btn")
+  const storeCheckboxes = document.querySelectorAll(".store-checkbox")
+  const bulkActionBtn = document.getElementById("bulk-action-btn")
+  const modal = document.getElementById("bulk-schedule-modal")
+  const closeModal = document.querySelector(".close-modal")
+  const selectedStoresList = document.getElementById("selected-stores-list")
+  const selectedStoresInputs = document.getElementById("selected-stores-inputs")
+  const selectedCount = document.getElementById("selected-count")
+
+  if (!selectionModeBtn) {
+    console.error("Le bouton de mode sélection n'a pas été trouvé")
+    return
+  }
+
+  // Fonction pour mettre à jour le bouton d'action en masse (optimisée)
+  function updateBulkActionButton() {
+    const checkedStores = document.querySelectorAll(".store-selector:checked")
+
+    if (bulkActionBtn) {
+      bulkActionBtn.disabled = checkedStores.length === 0
+    }
+
+    // Mettre à jour le compteur
+    if (selectedCount) {
+      selectedCount.textContent = checkedStores.length
+    }
+
+    // Mettre à jour la liste des magasins sélectionnés
+    if (selectedStoresList) {
+      selectedStoresList.innerHTML = ""
+    }
+
+    if (selectedStoresInputs) {
+      selectedStoresInputs.innerHTML = ""
+    }
+
+    // Créer un fragment pour améliorer les performances
+    const listFragment = document.createDocumentFragment()
+    const inputsFragment = document.createDocumentFragment()
+
+    checkedStores.forEach((checkbox) => {
+      const storeId = checkbox.dataset.storeId
+      const storeItem = checkbox.closest(".store-item")
+      if (!storeItem) return
+
+      const storeNameElement = storeItem.querySelector(".store-item-name")
+      if (!storeNameElement) return
+
+      const storeName = storeNameElement.textContent
+
+      // Ajouter un tag pour chaque magasin sélectionné
+      if (selectedStoresList) {
+        const storeTag = document.createElement("div")
+        storeTag.className = "selected-store-tag"
+        storeTag.innerHTML = `
+          <span>${storeName}</span>
+          <span class="remove-tag" data-store-id="${storeId}">&times;</span>
+        `
+
+        // Ajouter un événement pour supprimer le tag
+        const removeTag = storeTag.querySelector(".remove-tag")
+        if (removeTag) {
+          removeTag.addEventListener("click", function () {
+            const tagStoreId = this.dataset.storeId
+            const checkbox = document.querySelector(`.store-selector[data-store-id="${tagStoreId}"]`)
+            if (checkbox) {
+              checkbox.checked = false
             }
-        });
-        
-        // Empêcher la propagation du clic
-        event.stopPropagation();
-    }
-    
-    // Fermer les dropdowns lors d'un clic ailleurs sur la page
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.store-hours-toggle')) {
-            document.querySelectorAll('.hours-dropdown').forEach(el => {
-                el.style.display = 'none';
-            });
+            updateBulkActionButton()
+          })
         }
-    });
+
+        listFragment.appendChild(storeTag)
+      }
+
+      // Ajouter un input caché pour chaque magasin sélectionné
+      if (selectedStoresInputs) {
+        const storeInput = document.createElement("input")
+        storeInput.type = "hidden"
+        storeInput.name = "store_ids[]"
+        storeInput.value = storeId
+        inputsFragment.appendChild(storeInput)
+      }
+    })
+
+    // Ajouter les fragments au DOM en une seule opération
+    if (selectedStoresList) {
+      selectedStoresList.appendChild(listFragment)
+    }
+
+    if (selectedStoresInputs) {
+      selectedStoresInputs.appendChild(inputsFragment)
+    }
+  }
+
+  // Gestion du bouton de mode sélection
+  selectionModeBtn.addEventListener("click", function () {
+    const isActive = this.classList.toggle("active")
+
+    // Afficher/masquer les cases à cocher
+    storeCheckboxes.forEach((checkbox) => {
+      checkbox.style.display = isActive ? "flex" : "none"
+      const input = checkbox.querySelector("input")
+      if (input) {
+        input.checked = false // Décocher toutes les cases
+      }
+    })
+
+    // Changer le texte du bouton
+    this.innerHTML = isActive
+      ? '<i class="fas fa-times"></i> Annuler'
+      : '<i class="fas fa-check-square"></i> Sélectionner'
+
+    // Afficher/masquer le bouton d'action en masse
+    if (bulkActionBtn) {
+      bulkActionBtn.style.display = isActive ? "flex" : "none"
+      bulkActionBtn.disabled = true // Désactiver le bouton par défaut
+    }
+
+    // Mettre à jour le compteur
+    updateBulkActionButton()
+  })
+
+  // Ajouter des écouteurs d'événements pour les cases à cocher
+  document.querySelectorAll(".store-selector").forEach((checkbox) => {
+    checkbox.addEventListener("change", updateBulkActionButton)
+  })
+
+  // Ouvrir la modal lors du clic sur le bouton d'action en masse
+  if (bulkActionBtn && modal) {
+    bulkActionBtn.addEventListener("click", () => {
+      modal.style.display = "block"
+      updateBulkActionButton()
+    })
+  }
+
+  // Fermer la modal
+  if (closeModal && modal) {
+    closeModal.addEventListener("click", () => {
+      modal.style.display = "none"
+    })
+
+    // Fermer la modal en cliquant en dehors
+    window.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        modal.style.display = "none"
+      }
+    })
+  }
+}
+
+// Initialiser les fonctionnalités au chargement de la page (optimisée)
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOM chargé, initialisation des fonctionnalités")
+
+  // Initialiser la gestion de la sélection multiple
+  handleMultipleSelection()
+
+  // Initialiser la carte de manière asynchrone
+  if (typeof google !== "undefined" && google.maps) {
+    // Utiliser requestAnimationFrame pour s'assurer que le DOM est complètement rendu
+    requestAnimationFrame(() => {
+      initMap()
+    })
+  } else {
+    console.log("Google Maps n'est pas encore chargé")
+  }
+
+  // Gestion des types d'action dans la modal
+  const actionTypes = document.querySelectorAll('input[name="action_type"]')
+  const regularScheduleSection = document.getElementById("regular-schedule-section")
+  const exceptionSection = document.getElementById("exception-section")
+  const temporaryClosureSection = document.getElementById("temporary-closure-section")
+  const holidaySection = document.getElementById("holiday-section")
+
+  if (actionTypes.length > 0) {
+    actionTypes.forEach((radio) => {
+      radio.addEventListener("change", function () {
+        // Masquer toutes les sections
+        if (regularScheduleSection) regularScheduleSection.style.display = "none"
+        if (exceptionSection) exceptionSection.style.display = "none"
+        if (temporaryClosureSection) temporaryClosureSection.style.display = "none"
+        if (holidaySection) holidaySection.style.display = "none"
+
+        // Afficher la section correspondante
+        switch (this.value) {
+          case "regular_schedule":
+            if (regularScheduleSection) regularScheduleSection.style.display = "block"
+            break
+          case "exception":
+            if (exceptionSection) exceptionSection.style.display = "block"
+            break
+          case "temporary_closure":
+            if (temporaryClosureSection) temporaryClosureSection.style.display = "block"
+            break
+          case "holiday":
+            if (holidaySection) holidaySection.style.display = "block"
+            break
+        }
+      })
+    })
+  }
+
+  // Gestion de l'affichage des créneaux horaires après fermeture temporaire
+  const afterClosure = document.getElementById("after_closure")
+  const afterClosureCustom = document.getElementById("after-closure-custom")
+
+  if (afterClosure && afterClosureCustom) {
+    afterClosure.addEventListener("change", function () {
+      afterClosureCustom.style.display = this.value === "custom" ? "block" : "none"
+    })
+  }
+})
+
+
 </script>
+
+
+ <script id="stores-data" type="application/json" style="display: none;">
+    {!! json_encode($stores) !!}
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8&callback=initMap" async defer></script>
 @endsection
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM8d7x1z5l5e5c5e5e5e5e5e5e5e5e5e5e5e5" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.1.0/lucide.min.js"></script>

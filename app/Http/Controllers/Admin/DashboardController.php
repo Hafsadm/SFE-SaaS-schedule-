@@ -4,30 +4,27 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Store;
+use App\Models\Product;
+use App\Models\Staff;
+use App\Models\Schedule;
+use App\Models\Exception;
+use App\Models\Holiday;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Termwind\Components\Dd;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $stores = Store::with(['schedules', 'exceptions', 'holidays'])
-            ->select([
-                'id',
-                'nom',
-                'adresse',
-                'ville',
-                'pays',
-                'phone',
-                'ouvert_jusqua',
-                'lien_rdv',
-                'latitude',
-                'longitude',
-                'services'
-            ])
+        // Récupérer l'utilisateur connecté
+        $user = Auth::user();
+        
+        // Récupérer les points de vente de l'utilisateur
+        $stores = Store::with(['schedules', 'exceptions', 'holidays', 'products', 'staff'])
+            ->where('user_id', $user->id)
             ->get();
             
         // Pour chaque magasin, vérifier s'il est fermé aujourd'hui
@@ -35,57 +32,518 @@ class DashboardController extends Controller
             $this->addScheduleInfo($store);
         }
 
-        return view('admin.dashboard', compact('stores'));
+        // Statistiques pour les cartes
+        $statsData = $this->getStatsData($user);
+        
+        // Données pour les graphiques
+        $storesByCity = $this->getStoresByCity($user);
+        $storesByService = $this->getStoresByService($user);
+        $productsByCategory = $this->getProductsByCategory($user);
+        $staffByRole = $this->getStaffByRole($user);
+        
+        // Données pour les activités récentes
+        $recentActivities = $this->getRecentActivities($user);
+        
+        // Liste des points de vente pour le tableau
+        $storesList = $this->getStoresList($user);
+
+        return view('admin.dashboard', compact(
+            'stores', 
+            'statsData', 
+            'storesByCity', 
+            'storesByService', 
+            'productsByCategory', 
+            'staffByRole', 
+            'recentActivities', 
+            'storesList'
+        ));
     }
 
-
-    public function book()
+    /**
+     * Récupère les statistiques générales
+     */
+    private function getStatsData($user)
     {
-        $stores = Store::with(['schedules', 'exceptions', 'holidays'])
-            ->select([
-                'id',
-                'nom',
-                'adresse',
-                'ville',
-                'pays',
-                'phone',
-                'ouvert_jusqua',
-                'lien_rdv',
-                'latitude',
-                'longitude',
-                'services'
-            ])
-            ->get();
-            
-        // Pour chaque magasin, vérifier s'il est fermé aujourd'hui
-        foreach ($stores as $store) {
-            $this->addScheduleInfo($store);
-        }
-
-        return view('user.home', compact('stores'));
+        $now = Carbon::now();
+        $startOfMonth = $now->copy()->startOfMonth();
+        $startOfLastMonth = $now->copy()->subMonth()->startOfMonth();
+        $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
+        
+        // Total des points de vente
+        $totalStores = Store::where('user_id', $user->id)->count();
+        
+        // Nouvelles localisations ce mois-ci
+        $newLocationsThisMonth = Store::where('user_id', $user->id)
+            ->where('created_at', '>=', $startOfMonth)
+            ->count();
+        
+        // Total des produits
+        $totalProducts = Product::whereIn('store_id', function($query) use ($user) {
+            $query->select('id')->from('stores')->where('user_id', $user->id);
+        })->count();
+        
+        // Nouveaux produits ce mois-ci
+        $newProductsThisMonth = Product::whereIn('store_id', function($query) use ($user) {
+            $query->select('id')->from('stores')->where('user_id', $user->id);
+        })->where('created_at', '>=', $startOfMonth)->count();
+        
+        // Total du personnel
+        $totalStaff = Staff::whereIn('store_id', function($query) use ($user) {
+            $query->select('id')->from('stores')->where('user_id', $user->id);
+        })->count();
+        
+        // Nouveau personnel ce mois-ci
+        $newStaffThisMonth = Staff::whereIn('store_id', function($query) use ($user) {
+            $query->select('id')->from('stores')->where('user_id', $user->id);
+        })->where('created_at', '>=', $startOfMonth)->count();
+        
+        // Points de vente actifs/inactifs
+        $activeStores = Store::where('user_id', $user->id)
+            ->where(function($query) {
+                $query->whereNotNull('ouvert_jusqua')
+                      ->orWhereHas('schedules', function($q) {
+                          $q->where('is_closed', false);
+                      });
+            })->count();
+        
+        $activeStoresPercentage = $totalStores > 0 ? round(($activeStores / $totalStores) * 100) : 0;
+        
+        // Calcul du changement par rapport au mois dernier
+        $lastMonthActiveStores = Store::where('user_id', $user->id)
+            ->where('created_at', '<', $endOfLastMonth)
+            ->where(function($query) {
+                $query->whereNotNull('ouvert_jusqua')
+                      ->orWhereHas('schedules', function($q) {
+                          $q->where('is_closed', false);
+                      });
+            })->count();
+        
+        $lastMonthTotalStores = Store::where('user_id', $user->id)
+            ->where('created_at', '<', $endOfLastMonth)
+            ->count();
+        
+        $lastMonthPercentage = $lastMonthTotalStores > 0 ? round(($lastMonthActiveStores / $lastMonthTotalStores) * 100) : 0;
+        $activeStoresChange = $lastMonthPercentage > 0 ? $activeStoresPercentage - $lastMonthPercentage : 0;
+        
+        return [
+            'totalStores' => $totalStores,
+            'newLocationsThisMonth' => $newLocationsThisMonth,
+            'totalProducts' => $totalProducts,
+            'newProductsThisMonth' => $newProductsThisMonth,
+            'totalStaff' => $totalStaff,
+            'newStaffThisMonth' => $newStaffThisMonth,
+            'activeStoresPercentage' => $activeStoresPercentage,
+            'activeStoresChange' => $activeStoresChange,
+        ];
     }
     
-
-    public function search(Request $request)
+    /**
+     * Récupère la répartition des points de vente par ville
+     */
+    private function getStoresByCity($user)
     {
-        $query = $request->input('query');
-        
-        $stores = Store::query()
-            ->where('ville', 'LIKE', "%{$query}%")
-            ->orWhere('pays', 'LIKE', "%{$query}%")
-            ->orWhere('adresse', 'LIKE', "%{$query}%")
-            ->orWhere('nom', 'LIKE', "%{$query}%")
-            ->with(['schedules', 'exceptions', 'holidays'])
+        $cities = Store::where('user_id', $user->id)
+            ->select('ville', DB::raw('count(*) as total'))
+            ->groupBy('ville')
+            ->orderBy('total', 'desc')
+            ->limit(5)
             ->get();
-            
-        // Pour chaque magasin, ajouter les informations d'horaires
-        foreach ($stores as $store) {
-            $this->addScheduleInfo($store);
+        
+        // Formater les données pour le graphique
+        $result = [];
+        foreach ($cities as $city) {
+            $result[] = [
+                'name' => $city->ville,
+                'value' => $city->total
+            ];
         }
         
-        return response()->json($stores);
+        // Ajouter une catégorie "Autres" pour les villes restantes
+        $otherCities = Store::where('user_id', $user->id)
+            ->whereNotIn('ville', $cities->pluck('ville')->toArray())
+            ->count();
+        
+        if ($otherCities > 0) {
+            $result[] = [
+                'name' => 'Autres',
+                'value' => $otherCities
+            ];
+        }
+        
+        return $result;
     }
     
+    /**
+     * Récupère la répartition des points de vente par service
+     */
+    private function getStoresByService($user)
+    {
+        $stores = Store::where('user_id', $user->id)->get();
+        
+        $serviceCount = [
+            'Dentiste' => 0,
+            'Opticien' => 0,
+            'Audition' => 0,
+            'Autres' => 0
+        ];
+        
+        foreach ($stores as $store) {
+            if (is_array($store->services)) {
+                foreach ($store->services as $service) {
+                    if ($service == '1' || $service == 'Dentiste') {
+                        $serviceCount['Dentiste']++;
+                    } elseif ($service == '2' || $service == 'Opticien') {
+                        $serviceCount['Opticien']++;
+                    } elseif ($service == '3' || $service == 'Audition') {
+                        $serviceCount['Audition']++;
+                    } else {
+                        $serviceCount['Autres']++;
+                    }
+                }
+            } else {
+                $serviceCount['Autres']++;
+            }
+        }
+        
+        // Formater les données pour le graphique
+        $result = [];
+        foreach ($serviceCount as $service => $count) {
+            if ($count > 0) {
+                $result[] = [
+                    'name' => $service,
+                    'value' => $count
+                ];
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Récupère la répartition des produits par catégorie
+     */
+    private function getProductsByCategory($user)
+    {
+        $products = Product::whereIn('store_id', function($query) use ($user) {
+            $query->select('id')->from('stores')->where('user_id', $user->id);
+        })->get();
+        
+        $categoryCount = [];
+        
+        foreach ($products as $product) {
+            $category = $product->category;
+            if (!isset($categoryCount[$category])) {
+                $categoryCount[$category] = 0;
+            }
+            $categoryCount[$category]++;
+        }
+        
+        // Formater les données pour le graphique
+        $result = [];
+        foreach ($categoryCount as $category => $count) {
+            $result[] = [
+                'name' => $category,
+                'value' => $count
+            ];
+        }
+        
+        // Trier par nombre de produits décroissant
+        usort($result, function($a, $b) {
+            return $b['value'] - $a['value'];
+        });
+        
+        // Limiter à 5 catégories + "Autres"
+        if (count($result) > 5) {
+            $others = array_slice($result, 5);
+            $othersCount = array_sum(array_column($others, 'value'));
+            $result = array_slice($result, 0, 5);
+            $result[] = [
+                'name' => 'Autres',
+                'value' => $othersCount
+            ];
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Récupère la répartition du personnel par rôle
+     */
+    private function getStaffByRole($user)
+    {
+        $staff = Staff::whereIn('store_id', function($query) use ($user) {
+            $query->select('id')->from('stores')->where('user_id', $user->id);
+        })->get();
+        
+        $roleCount = [];
+        
+        foreach ($staff as $member) {
+            $role = $member->role;
+            if (!isset($roleCount[$role])) {
+                $roleCount[$role] = 0;
+            }
+            $roleCount[$role]++;
+        }
+        
+        // Formater les données pour le graphique
+        $result = [];
+        foreach ($roleCount as $role => $count) {
+            $result[] = [
+                'name' => $role,
+                'value' => $count
+            ];
+        }
+        
+        // Trier par nombre de membres décroissant
+        usort($result, function($a, $b) {
+            return $b['value'] - $a['value'];
+        });
+        
+        // Limiter à 5 rôles + "Autres"
+        if (count($result) > 5) {
+            $others = array_slice($result, 5);
+            $othersCount = array_sum(array_column($others, 'value'));
+            $result = array_slice($result, 0, 5);
+            $result[] = [
+                'name' => 'Autres',
+                'value' => $othersCount
+            ];
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Récupère les activités récentes
+     */
+    private function getRecentActivities($user)
+    {
+        // Récupérer les 3 derniers points de vente créés ou modifiés
+        $recentStores = Store::where('user_id', $user->id)
+            ->orderBy('updated_at', 'desc')
+            ->limit(3)
+            ->get();
+        
+        // Récupérer les 2 derniers produits ajoutés
+        $recentProducts = Product::whereIn('store_id', function($query) use ($user) {
+            $query->select('id')->from('stores')->where('user_id', $user->id);
+        })
+        ->orderBy('created_at', 'desc')
+        ->limit(2)
+        ->get();
+        
+        // Récupérer les 2 derniers membres du personnel ajoutés
+        $recentStaff = Staff::whereIn('store_id', function($query) use ($user) {
+            $query->select('id')->from('stores')->where('user_id', $user->id);
+        })
+        ->orderBy('created_at', 'desc')
+        ->limit(2)
+        ->get();
+        
+        // Récupérer les 2 derniers horaires réguliers modifiés
+        $recentSchedules = Schedule::whereIn('store_id', function($query) use ($user) {
+            $query->select('id')->from('stores')->where('user_id', $user->id);
+        })
+        ->orderBy('updated_at', 'desc')
+        ->limit(2)
+        ->get();
+        
+        // Récupérer les 2 dernières exceptions ajoutées
+        $recentExceptions = Exception::whereIn('store_id', function($query) use ($user) {
+            $query->select('id')->from('stores')->where('user_id', $user->id);
+        })
+        ->orderBy('created_at', 'desc')
+        ->limit(2)
+        ->get();
+        
+        // Récupérer les 2 derniers jours fériés ajoutés
+        $recentHolidays = Holiday::whereIn('store_id', function($query) use ($user) {
+            $query->select('id')->from('stores')->where('user_id', $user->id);
+        })
+        ->orderBy('created_at', 'desc')
+        ->limit(2)
+        ->get();
+        
+        // Combiner les activités
+        $activities = [];
+        
+        foreach ($recentStores as $store) {
+            $isNew = $store->created_at->eq($store->updated_at);
+            $activities[] = [
+                'id' => 'store_' . $store->id,
+                'type' => $isNew ? 'creation' : 'modification',
+                'storeName' => $store->nom,
+                'date' => $isNew ? $store->created_at : $store->updated_at,
+                'user' => $user->name,
+                'avatar' => $this->getInitials($user->name),
+            ];
+        }
+        
+        foreach ($recentProducts as $product) {
+            $store = Store::find($product->store_id);
+            if ($store) {
+                $activities[] = [
+                    'id' => 'product_' . $product->id,
+                    'type' => 'product_added',
+                    'storeName' => $store->nom . ' - ' . $product->name,
+                    'date' => $product->created_at,
+                    'user' => $user->name,
+                    'avatar' => $this->getInitials($user->name),
+                ];
+            }
+        }
+        
+        foreach ($recentStaff as $staff) {
+            $store = Store::find($staff->store_id);
+            if ($store) {
+                $activities[] = [
+                    'id' => 'staff_' . $staff->id,
+                    'type' => 'staff_added',
+                    'storeName' => $store->nom . ' - ' . $staff->name,
+                    'date' => $staff->created_at,
+                    'user' => $user->name,
+                    'avatar' => $this->getInitials($user->name),
+                ];
+            }
+        }
+        
+        // Ajouter les activités d'horaires réguliers
+        foreach ($recentSchedules as $schedule) {
+            $store = Store::find($schedule->store_id);
+            if ($store) {
+                $dayName = $this->getFrenchDayName($schedule->day_of_week);
+                $activities[] = [
+                    'id' => 'schedule_' . $schedule->id,
+                    'type' => 'schedule_updated',
+                    'storeName' => $store->nom . ' - Horaire ' . $dayName,
+                    'date' => $schedule->updated_at,
+                    'user' => $user->name,
+                    'avatar' => $this->getInitials($user->name),
+                    'details' => $schedule->is_closed ? 'Fermé' : 'Modifié',
+                ];
+            }
+        }
+        
+        // Ajouter les activités d'exceptions
+        foreach ($recentExceptions as $exception) {
+            $store = Store::find($exception->store_id);
+            if ($store) {
+                $activities[] = [
+                    'id' => 'exception_' . $exception->id,
+                    'type' => 'exception_added',
+                    'storeName' => $store->nom . ' - Exception le ' . $exception->exception_date->format('d/m/Y'),
+                    'date' => $exception->created_at,
+                    'user' => $user->name,
+                    'avatar' => $this->getInitials($user->name),
+                    'details' => $exception->exception_raison,
+                ];
+            }
+        }
+        
+        // Ajouter les activités de jours fériés
+        foreach ($recentHolidays as $holiday) {
+            $store = Store::find($holiday->store_id);
+            if ($store) {
+                $activities[] = [
+                    'id' => 'holiday_' . $holiday->id,
+                    'type' => 'holiday_added',
+                    'storeName' => $store->nom . ' - ' . $holiday->holiday_name,
+                    'date' => $holiday->created_at,
+                    'user' => $user->name,
+                    'avatar' => $this->getInitials($user->name),
+                    'details' => 'Jour férié le ' . $holiday->holiday_date->format('d/m/Y'),
+                ];
+            }
+        }
+        
+        // Trier par date décroissante
+        usort($activities, function($a, $b) {
+            return strtotime($b['date']) - strtotime($a['date']);
+        });
+        
+        // Limiter à 8 activités
+        return array_slice($activities, 0, 8);
+    }
+    
+    /**
+     * Récupère les initiales d'un nom
+     */
+    private function getInitials($name)
+    {
+        $words = explode(' ', $name);
+        $initials = '';
+        
+        foreach ($words as $word) {
+            $initials .= strtoupper(substr($word, 0, 1));
+        }
+        
+        return substr($initials, 0, 2);
+    }
+    
+    /**
+     * Récupère la liste des points de vente pour le tableau
+     */
+    private function getStoresList($user)
+    {
+        // Récupérer les 5 derniers points de vente modifiés
+        $stores = Store::where('user_id', $user->id)
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->get();
+        
+        $result = [];
+        foreach ($stores as $store) {
+            // Déterminer si le magasin est actif
+            $isActive = $this->isStoreActive($store);
+            
+            // Formater les services
+            $services = [];
+            if (is_array($store->services)) {
+                foreach ($store->services as $service) {
+                    if ($service == '1') {
+                        $services[] = 'Dentiste';
+                    } elseif ($service == '2') {
+                        $services[] = 'Opticien';
+                    } elseif ($service == '3') {
+                        $services[] = 'Audition';
+                    } else {
+                        $services[] = $service;
+                    }
+                }
+            } elseif (is_string($store->services)) {
+                $services[] = $store->services;
+            }
+            
+            // Compter les produits et le personnel
+            $productsCount = $store->products()->count();
+            $staffCount = $store->staff()->count();
+            
+            $result[] = [
+                'id' => $store->id,
+                'name' => $store->nom,
+                'city' => $store->ville,
+                'services' => $services,
+                'productsCount' => $productsCount,
+                'staffCount' => $staffCount,
+                'status' => $isActive ? 'active' : 'inactive',
+                'lastModified' => $store->updated_at,
+            ];
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Détermine si un magasin est actif
+     */
+    private function isStoreActive($store)
+    {
+        // Un magasin est considéré comme actif s'il a des horaires définis
+        // et s'il n'est pas fermé définitivement
+        return $store->ouvert_jusqua || 
+               $store->schedules()->where('is_closed', false)->exists();
+    }
+
     /**
      * Ajoute les informations d'horaires à un magasin
      */
@@ -198,10 +656,10 @@ class DashboardController extends Controller
             
             $html .= '</div>';
         }
+        
         return $html;
     }  
         
-    
     /**
      * Retourne le nom français d'un jour de la semaine
      */
@@ -218,199 +676,5 @@ class DashboardController extends Controller
         ];
         
         return $frenchDays[$day] ?? $day;
-    }
-
-    public function filterStores(Request $request)
-    {
-        // Log pour le débogage
-        Log::info('Filtrage des magasins', $request->all());
-        
-        $query = Store::with(['schedules', 'exceptions', 'holidays']);
-
-        // 1. Filtre par SERVICES (cases cochées Dentiste/Opticien/Audition)
-        if ($request->has('specialite') && !empty($request->specialite)) {
-            $selectedServices = (array) $request->input('specialite');
-            Log::info('Services sélectionnés', $selectedServices);
-            
-            $query->where(function ($q) use ($selectedServices) {
-                foreach ($selectedServices as $serviceId) {
-                    // Utiliser LIKE pour rechercher dans le JSON
-                    $q->orWhere('services', 'LIKE', "%$serviceId%");
-                }
-            });
-        }
-    
-
-        // 2. Filtre par HORAIRES (boutons radio)
-        if ($request->has('horaire') && !empty($request->horaire)) {
-            $now = Carbon::now();
-            $currentDay = strtolower($now->englishDayOfWeek); // "monday", "tuesday", etc.
-            $currentTime = $now->format('H:i:s');
-            
-            Log::info('Filtre horaire', [
-                'horaire' => $request->horaire,
-                'currentDay' => $currentDay,
-                'currentTime' => $currentTime
-            ]);
-
-            switch ($request->horaire) {
-                case 'open_now':
-                    // Approche simplifiée pour les magasins ouverts maintenant
-                    $query->where(function($q) use ($currentDay, $currentTime, $now) {
-                        // Magasins avec ouvert_jusqua défini et dans le futur
-                        $q->where(function($subQ) use ($now) {
-                            $subQ->whereNotNull('ouvert_jusqua')
-                                ->whereRaw('TIME(ouvert_jusqua) > ?', [$now->format('H:i:s')]);
-                        });
-                        
-                        // OU magasins avec des horaires pour aujourd'hui
-                        $q->orWhereHas('schedules', function($scheduleQ) use ($currentDay, $currentTime) {
-                            $scheduleQ->where('day_of_week', $currentDay)
-                                ->where('is_closed', false);
-                        });
-                    })
-                    // Exclure les magasins avec des exceptions aujourd'hui
-                    ->whereDoesntHave('exceptions', function ($q) use ($now) {
-                        $q->whereDate('exception_date', $now->toDateString())
-                          ->where('is_closed', true);
-                    })
-                    // Exclure les magasins avec des jours fériés aujourd'hui
-                    ->whereDoesntHave('holidays', function ($q) use ($now) {
-                        $q->whereDate('holiday_date', $now->toDateString());
-                    });
-                    break;
-
-                case 'morning': // 6h - 12h
-                    $query->whereHas('schedules', function ($q) use ($currentDay) {
-                        $q->where('day_of_week', $currentDay)
-                          ->where('is_closed', false);
-                    });
-                    break;
-
-                case 'afternoon': // 12h - 18h
-                    $query->whereHas('schedules', function ($q) use ($currentDay) {
-                        $q->where('day_of_week', $currentDay)
-                          ->where('is_closed', false);
-                    });
-                    break;
-
-                case 'evening': // 18h - 23h
-                    $query->whereHas('schedules', function ($q) use ($currentDay) {
-                        $q->where('day_of_week', $currentDay)
-                          ->where('is_closed', false);
-                    });
-                    break;
-
-                case 'weekend': // Samedi/Dimanche
-                    $query->whereHas('schedules', function ($q) {
-                        $q->whereIn('day_of_week', ['saturday', 'sunday'])
-                          ->where('is_closed', false);
-                    });
-                    break;
-            }
-        }
-
-        // 3. Filtre par RECHERCHE TEXTE (ville, pays, code postal)
-        if ($request->has('search') && !empty($request->search)) {
-            $searchTerm = $request->search;
-            Log::info('Terme de recherche', ['search' => $searchTerm]);
-            
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('ville', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('pays', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('adresse', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('nom', 'LIKE', "%{$searchTerm}%");
-            });
-        }
-
-        // 4. Filtre "AUTOUR DE MOI" (géolocalisation)
-        if ($request->has(['latitude', 'longitude'])) {
-            $userLat = $request->latitude;
-            $userLng = $request->longitude;
-            $radius = 10; // Rayon en km
-            
-            Log::info('Géolocalisation', [
-                'latitude' => $userLat,
-                'longitude' => $userLng,
-                'radius' => $radius
-            ]);
-
-            $query->selectRaw(
-                "*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * 
-                cos(radians(longitude) - radians(?)) + sin(radians(?)) * 
-                sin(radians(latitude)))) AS distance",
-                [$userLat, $userLng, $userLat]
-            )
-            ->having('distance', '<', $radius)
-            ->orderBy('distance');
-        }
-
-        // Exécute la requête
-        $stores = $query->get();
-        
-        // Log pour le débogage
-        Log::info('Résultats de la recherche', ['count' => $stores->count()]);
-        
-        // Ajouter les informations d'horaires pour chaque magasin
-        foreach ($stores as $store) {
-            $this->addScheduleInfo($store);
-        }
-
-        return response()->json($stores);
-    }
-
-    public function nearbyStores(Request $request)
-    {
-        // Validation des données d'entrée
-        $request->validate([
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric'
-        ]);
-    
-        $userLat = $request->latitude;
-        $userLng = $request->longitude;
-        $radius = 10; // Rayon en kilomètres
-    
-        // Log pour le débogage
-        Log::info('Recherche de magasins à proximité', [
-            'latitude' => $userLat,
-            'longitude' => $userLng,
-            'radius' => $radius
-        ]);
-    
-        try {
-            $stores = Store::with(['schedules', 'exceptions', 'holidays'])
-                ->selectRaw(
-                    "*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * 
-                    cos(radians(longitude) - radians(?)) + sin(radians(?)) * 
-                    sin(radians(latitude)))) AS distance",
-                    [$userLat, $userLng, $userLat]
-                )
-                ->having('distance', '<', $radius)
-                ->orderBy('distance')
-                ->get();
-                
-            // Ajouter les informations d'horaires pour chaque magasin
-            foreach ($stores as $store) {
-                $this->addScheduleInfo($store);
-            }
-    
-            // Log pour le débogage
-            Log::info('Magasins trouvés', ['count' => $stores->count()]);
-    
-            return response()->json($stores);
-        } catch (\Exception $e) {
-            // Log l'erreur
-            Log::error('Erreur lors de la recherche de magasins à proximité', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            
-            return response()->json([
-                'error' => 'Une erreur est survenue lors de la recherche de magasins à proximité',
-                'message' => $e->getMessage()
-            ], 500);
-        }
     }
 }

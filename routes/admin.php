@@ -7,12 +7,26 @@ use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\ExceptionController;
 use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\StoreManagementController;
-use App\Http\Controllers\User\HomeController;
-
+use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Admin\ScheduleDashboardController;
 
 
 
 Route::prefix('admin')->name('admin.')->group(function () {
+
+    
+    Route::get('/stores/{store}/subsidiaries', [StoreController::class, 'manageSubsidiaries'])->name('stores.subsidiaries');
+    Route::post('/stores/{store}/apply-schedules', [StoreController::class, 'applySchedulesToSubsidiaries'])->name('stores.apply-schedules');
+
+        // Ajouter ces routes dans le groupe admin existant
+        Route::get('/stores/bulk-schedule', [StoreController::class, 'bulkScheduleManager'])->name('stores.bulk-schedule');
+        Route::post('/stores/apply-bulk-schedule', [StoreController::class, 'applyBulkSchedule'])->name('stores.apply-bulk-schedule');
+
+        // Route::get('/admin/stores/bulk-schedule-modal', function () {
+        // return view('admin.stores.bulk-schedule-modal');
+        // })->name('admin.stores.bulk-schedule-modal');
+
+
         // Dashboard admin
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         
@@ -36,7 +50,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/{schedule}/edit', [ScheduleController::class, 'edit'])->name('edit');
             Route::put('/{schedule}', [ScheduleController::class, 'update'])->name('update');
             Route::delete('/{schedule}', [ScheduleController::class, 'destroy'])->name('destroy');
-        });
+
+
+       });           // Tableau de bord des horaires
+        Route::get('/table', [ScheduleDashboardController::class, 'index'])->name('dashboard');
+        
+        // Vue calendrier
+        Route::get('/calendar', [ScheduleDashboardController::class, 'calendar'])->name('calendar');
+        
+        // Horaires d'un magasin spécifique
+        Route::get('/store/{store}', [ScheduleDashboardController::class, 'storeSchedules'])->name('store');
+        
+        // Gestion des horaires en masse
+        Route::get('/bulk', [ScheduleDashboardController::class, 'bulkManagement'])->name('bulk');
+        Route::post('/apply-bulk', [ScheduleDashboardController::class, 'applyBulkSchedules'])->name('apply-bulk');
+  
+    
+
         
         // Routes pour les exceptions
         Route::prefix('stores/{store}/exceptions')->name('stores.exceptions.')->group(function () {
@@ -80,4 +110,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/stores/{store}/staff/{staff}/edit', [StoreManagementController::class, 'editStaff'])->name('stores.staff.edit');
     Route::put('/stores/{store}/staff/{staff}', [StoreManagementController::class, 'updateStaff'])->name('stores.staff.update');
     Route::delete('/stores/{store}/staff/{staff}', [StoreManagementController::class, 'destroyStaff'])->name('stores.staff.destroy');
-});
+
+     });

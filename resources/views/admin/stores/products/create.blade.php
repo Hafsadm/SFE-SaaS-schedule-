@@ -7,19 +7,16 @@
 <style>
     /* Variables de couleur */
     :root {
-        --primary: #A67C52; /* Marron doré */
-        --primary-light: #C8AD7F;
-        --primary-dark: #8A6642;
-        --secondary: #D2B48C; /* Beige doré */
-        --light-beige: #F5F5DC;
-        --dark-beige: #E0C9B4;
-        --text-dark: #333333;
-        --text-light: #F8F4E6;
-        --success: #82B183; /* Vert doux */
-        --error: #C17C74; /* Rouge doux */
-        --border: #E0C9B4;
-        --card-shadow: 0 4px 12px rgba(92, 64, 51, 0.1);
-        --transition: all 0.3s ease;
+        --primary: #157575;
+        --primary-light: #429182;
+        --primary-dark: #1b5858;
+        --secondary: #4a9cad;
+        --light-beige: #ccd6d6;
+        --dark-beige: #1d4b4b;
+        --text-dark: #1d4b4b;
+        --text-light: #f5f5f5;
+        --border: #2a6363;
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
     /* Reset et base */
@@ -30,9 +27,10 @@
     }
 
     body {
-        font-family: 'Inter', sans-serif;
+        font-family: 'georgia', serif;
+        font-size: 1rem;
         color: var(--text-dark);
-        background-color: #fff;
+        background-color: #ffffff;
         line-height: 1.6;
     }
 
@@ -44,10 +42,11 @@
 
     /* En-tête */
     .page-header {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         padding: 2rem 0;
         color: var(--text-light);
         margin-bottom: 2rem;
+        border-radius: 0 0 30px 30px;
     }
 
     .page-title {
@@ -63,11 +62,24 @@
 
     /* Cartes */
     .card {
-        background-color: white;
-        border-radius: 12px;
+        background-color: var(--text-light);
+        border-radius: 30px 0;
         box-shadow: var(--card-shadow);
-        padding: 1.5rem;
+        padding: 2rem;
         margin-bottom: 2rem;
+        border: 1px solid var(--border);
+        position: relative;
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        border-radius: 30px 0 0 0;
     }
 
     .card-header {
@@ -80,59 +92,78 @@
     }
 
     .card-title {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: 600;
         color: var(--primary);
+        position: relative;
+        padding-left: 1rem;
+    }
+
+    .card-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 70%;
+        background-color: var(--primary);
+        border-radius: 2px;
     }
 
     /* Formulaires */
     .form-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
     }
 
     .form-label {
         display: block;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         font-weight: 500;
+        color: var(--primary);
     }
 
     .form-control {
         width: 100%;
-        padding: 0.75rem;
+        padding: 1rem;
         border: 1px solid var(--border);
-        border-radius: 8px;
-        font-family: 'Inter', sans-serif;
-        font-size: 0.9rem;
+        border-radius: 20px 0;
+        font-family: 'georgia', serif;
+        font-size: 1rem;
+        background-color: var(--light-beige);
+        transition: all 0.3s ease;
     }
 
     .form-control:focus {
         outline: none;
         border-color: var(--primary);
-        box-shadow: 0 0 0 2px rgba(166, 124, 82, 0.2);
+        box-shadow: 0 0 0 3px rgba(66, 145, 130, 0.2);
     }
 
     .form-text {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         color: var(--text-dark);
         opacity: 0.7;
-        margin-top: 0.25rem;
+        margin-top: 0.5rem;
+        display: block;
     }
 
     .form-check {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.5rem;
+        gap: 1rem;
+        margin-bottom: 1rem;
     }
 
     .form-check-input {
-        width: 1rem;
-        height: 1rem;
+        width: 1.25rem;
+        height: 1.25rem;
         accent-color: var(--primary);
     }
 
     .form-check-label {
-        font-size: 0.9rem;
+        font-size: 1rem;
+        color: var(--text-dark);
     }
 
     /* Boutons */
@@ -140,48 +171,60 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.25rem;
-        border-radius: 8px;
-        font-weight: 500;
+        gap: 0.75rem;
+        padding: 1rem 1.75rem;
+        border-radius: 30px 0;
+        font-weight: 600;
         text-decoration: none;
-        transition: var(--transition);
+        transition: all 0.3s ease;
         cursor: pointer;
         border: none;
         font-family: 'Inter', sans-serif;
-        font-size: 0.9rem;
+        font-size: 1rem;
+        box-shadow: var(--card-shadow);
     }
 
     .btn-primary {
-        background-color: var(--primary);
-        color: white;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: var(--text-light);
     }
 
     .btn-primary:hover {
-        background-color: var(--primary-dark);
+        background: linear-gradient(135deg, #4BA793 0%, #2A6A7D 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(66, 145, 130, 0.3);
     }
 
     .btn-secondary {
-        background-color: white;
+        background-color: var(--text-light);
         color: var(--primary);
         border: 1px solid var(--primary);
     }
 
     .btn-secondary:hover {
-        background-color: var(--light-beige);
+        background-color: rgba(66, 145, 130, 0.1);
+        transform: translateY(-2px);
     }
 
     /* Prévisualisation d'image */
+    .image-preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
     .image-preview {
         width: 150px;
         height: 150px;
-        border-radius: 8px;
+        border-radius: 20px 0;
         background-color: var(--light-beige);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-top: 0.5rem;
         overflow: hidden;
+        border: 1px dashed var(--border);
+        position: relative;
     }
 
     .image-preview img {
@@ -195,17 +238,57 @@
         font-size: 3rem;
     }
 
+    .image-upload-container {
+        position: relative;
+    }
+
+    .image-upload-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 150px;
+        height: 150px;
+        border-radius: 20px 0;
+        background-color: var(--light-beige);
+        border: 2px dashed var(--border);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .image-upload-label:hover {
+        background-color: rgba(66, 145, 130, 0.1);
+    }
+
+    .image-upload-icon {
+        font-size: 2rem;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .image-upload-text {
+        font-size: 0.9rem;
+        color: var(--primary);
+        text-align: center;
+    }
+
     /* Alertes */
     .alert {
-        padding: 1rem;
-        border-radius: 8px;
-        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        border-radius: 20px 0;
+        margin-bottom: 2rem;
+        border-left: 4px solid;
     }
 
     .alert-danger {
-        background-color: rgba(193, 124, 116, 0.2);
+        background-color: rgba(220, 53, 69, 0.1);
         color: var(--error);
-        border: 1px solid var(--error);
+        border-color: var(--error);
+    }
+
+    .alert ul {
+        margin: 0;
+        padding-left: 1.5rem;
     }
 
     /* Utilitaires */
@@ -217,18 +300,32 @@
         justify-content: space-between;
     }
 
-    .gap-2 {
-        gap: 0.5rem;
+    .gap-4 {
+        gap: 1.5rem;
     }
 
-    .mt-4 {
-        margin-top: 1rem;
+    .mt-6 {
+        margin-top: 3rem;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
         .container {
-            padding: 0 1rem;
+            padding: 0 1.5rem;
+        }
+        
+        .card {
+            padding: 1.5rem;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
+        }
+        
+        .d-flex {
+            flex-direction: column;
+            gap: 1rem;
         }
     }
 </style>
@@ -247,7 +344,7 @@
     <!-- Alertes d'erreur -->
     @if($errors->any())
         <div class="alert alert-danger">
-            <ul style="margin: 0; padding-left: 1rem;">
+            <ul>
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -269,13 +366,9 @@
             </div>
             
             <div class="form-group">
-                <label for="category" class="form-label">Catégorie *</label>
-                <select id="category" name="category" class="form-control" required>
-                    <option value="">Sélectionner une catégorie</option>
-                    @foreach($categories as $value => $label)
-                        <option value="{{ $value }}" {{ old('category') == $value ? 'selected' : '' }}>{{ $label }}</option>
-                    @endforeach
-                </select>
+                <label for="category" class="form-label">Catégorie(s) *</label>
+                <textarea id="category" name="category" class="form-control" rows="3" placeholder="Entrez une ou plusieurs catégories séparées par des virgules">{{ old('category') }}</textarea>
+                <small class="form-text">Vous pouvez entrer plusieurs catégories séparées par des virgules (ex: Montures, Solaires)</small>
             </div>
             
             <div class="form-group">
@@ -286,34 +379,38 @@
             
             <div class="form-group">
                 <label for="description" class="form-label">Description</label>
-                <textarea id="description" name="description" class="form-control" rows="4">{{ old('description') }}</textarea>
+                <textarea id="description" name="description" class="form-control" rows="5">{{ old('description') }}</textarea>
             </div>
             
             <div class="form-group">
-                <label for="image" class="form-label">Image du produit</label>
-                <input type="image" id="image" name="image" class="form-control" accept="image/*" onchange="previewImage(this)">
-                <small class="form-text">Format recommandé: JPG ou PNG, max 2MB</small>
-                
-                <div class="image-preview" id="imagePreview">
-                    <i data-lucide="image" class="w-12 h-12"></i>
+                <label class="form-label">Images du produit</label>
+                <div class="image-preview-container" id="imagePreviewContainer">
+                    <div class="image-upload-container">
+                        <label for="images" class="image-upload-label">
+                            <i data-lucide="plus" class="image-upload-icon"></i>
+                            <span class="image-upload-text">Ajouter des images</span>
+                        </label>
+                        <input type="file" id="images" name="images[]" accept="image/*" style="display: none;" multiple onchange="previewImages(this)">
+                    </div>
                 </div>
+                <small class="form-text">Vous pouvez sélectionner plusieurs images. Format recommandé: JPG ou PNG, max 5MB par image</small>
             </div>
             
             <div class="form-group">
                 <div class="form-check">
-                    <input type="checkbox" id="is_available" name="is_available" class="form-check-input" {{ old('is_available') ? 'checked' : '' }}>
+                    <input type="checkbox" id="is_available" name="is_available" class="form-check-input" {{ old('is_available') ? 'checked' : 'checked' }}>
                     <label for="is_available" class="form-check-label">Produit disponible</label>
                 </div>
                 <small class="form-text">Décochez si le produit est temporairement indisponible</small>
             </div>
             
-            <div class="d-flex justify-between mt-4">
+            <div class="d-flex justify-between gap-4 mt-6">
                 <a href="{{ route('admin.stores.manage', $store->id) }}" class="btn btn-secondary">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
                     Retour
                 </a>
                 <button type="submit" class="btn btn-primary">
-                    <i data-lucide="save" class="w-4 h-4"></i>
+                    <i data-lucide="save" class="w-5 h-5"></i>
                     Enregistrer
                 </button>
             </div>
@@ -325,27 +422,37 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialiser les icônes Lucide
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
+        lucide.createIcons();
     });
     
-    // Prévisualisation de l'image
-    function previewImage(input) {
-        const preview = document.getElementById('imagePreview');
+    function previewImages(input) {
+        const container = document.getElementById('imagePreviewContainer');
+        const uploadLabel = container.querySelector('.image-upload-container');
         
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                preview.innerHTML = `<img src="${e.target.result}" alt="Prévisualisation">`;
+        // Supprimer les prévisualisations existantes
+        const existingPreviews = container.querySelectorAll('.image-preview');
+        existingPreviews.forEach(preview => {
+            if (!preview.classList.contains('image-upload-container')) {
+                preview.remove();
             }
-            
-            reader.readAsDataURL(input.files[0]);
-        } else {
-            preview.innerHTML = `<i data-lucide="image" class="w-12 h-12"></i>`;
-            lucide.createIcons();
+        });
+        
+        if (input.files && input.files.length > 0) {
+            for (let i = 0; i < input.files.length; i++) {
+                const file = input.files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const preview = document.createElement('div');
+                    preview.className = 'image-preview';
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Prévisualisation">`;
+                    
+                    // Insérer avant le label d'upload
+                    container.insertBefore(preview, uploadLabel);
+                };
+                
+                reader.readAsDataURL(file);
+            }
         }
     }
 </script>

@@ -7,22 +7,19 @@
 <style>
     /* Variables de couleur */
     :root {
-        --primary: #A67C52; /* Marron doré */
-        --primary-light: #C8AD7F;
-        --primary-dark: #8A6642;
-        --secondary: #D2B48C; /* Beige doré */
-        --light-beige: #F5F5DC;
-        --dark-beige: #E0C9B4;
-        --text-dark: #333333;
-        --text-light: #F8F4E6;
-        --success: #82B183; /* Vert doux */
-        --error: #C17C74; /* Rouge doux */
-        --border: #E0C9B4;
-        --card-shadow: 0 4px 12px rgba(92, 64, 51, 0.1);
-        --transition: all 0.3s ease;
-    }
+            --primary: #157575;
+            --primary-light: #429182;
+            --primary-dark: #1b5858;
+            --secondary: #4a9cad;
+            --light-beige: #ccd6d6;
+            --dark-beige: #1d4b4b;
+            --text-dark: #1d4b4b;
+            --text-light: #f5f5f5;
+            --border: #2a6363;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
 
-    /* Reset et base */
+
     * {
         margin: 0;
         padding: 0;
@@ -30,7 +27,7 @@
     }
 
     body {
-        font-family: 'Inter', sans-serif;
+        font-family: 'georgia', serif;
         color: var(--text-dark);
         background-color: #fff;
         line-height: 1.6;
@@ -131,7 +128,7 @@
         transition: var(--transition);
         cursor: pointer;
         border: none;
-        font-family: 'Inter', sans-serif;
+        font-family: 'georgia', serif;
         font-size: 0.9rem;
     }
 
@@ -253,12 +250,8 @@
             
             <div class="form-group">
                 <label for="role" class="form-label">Rôle / Fonction *</label>
-                <select id="role" name="role" class="form-control" required>
-                    <option value="">Sélectionner un rôle</option>
-                    @foreach($roles as $value => $label)
-                        <option value="{{ $value }}" {{ old('role') == $value ? 'selected' : '' }}>{{ $label }}</option>
-                    @endforeach
-                </select>
+                <textarea id="role" name="role" class="form-control" rows="3" placeholder="Entrez un ou plusieurs rôles séparés par des virgules">{{ old('role') }}</textarea>
+                <small class="form-text">Vous pouvez entrer plusieurs rôles séparés par des virgules (ex: Opticien, Responsable)</small>
             </div>
             
             <div class="form-group">
@@ -279,8 +272,8 @@
             
             <div class="form-group">
                 <label for="image" class="form-label">Photo</label>
-                <input type="image" id="image" name="image" class="form-control" accept="image/*" onchange="previewImage(this)">
-                <img class="form-text">Format recommandé: JPG ou PNG, max 2MB</small>
+                <input type="file" id="image" name="image" class="form-control" accept="image/*" onchange="previewImage(this)">
+                <small class="form-text">Format recommandé: JPG ou PNG, max 2MB</small>
                 
                 <div class="image-preview" id="imagePreview">
                     <i data-lucide="user" class="w-12 h-12"></i>
@@ -330,4 +323,3 @@
     }
 </script>
 @endpush
-

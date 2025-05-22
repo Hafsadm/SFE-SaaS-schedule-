@@ -47,12 +47,18 @@
 
 <style>
     :root {
-        --primary-color: #8B4513;
-        --secondary-color: #F5F5DC;
-        --text-color: #333;
-        --border-color: #D2B48C;
-        --error-color: #F44336;
+        --primary: #2a6363;
+        --primary-light: #3a7a7a;
+        --secondary: #0a2e2e;
+        --accent: #D2B48C;
+        --accent-light: #e5d5b8;
+        --text: #333333;
+        --text-light: #f8f8f8;
+        --border: #c4b7a0;
+        --error: #e74c3c;
+        --success: #2ecc71;
     }
+
 
     .schedule-form-container {
         max-width: 800px;
@@ -66,115 +72,143 @@
         align-items: center;
         margin-bottom: 2rem;
         padding: 1rem;
-        background-color: var(--secondary-color);
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+        border-radius: 30px 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     .schedule-form-title {
         font-size: 1.5rem;
         font-weight: 600;
-        color: var(--primary-color);
+        color: var(--accent);
         margin: 0;
+        letter-spacing: -0.5px;
     }
 
     .back-button {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background-color: var(--primary-color);
-        color: white;
+        padding: 0.75rem 1.5rem;
+        background-color: var(--primary);
+        color: var(--text-light);
         border: none;
-        border-radius: 4px;
+        border-radius: 30px 0;
         text-decoration: none;
-        transition: all 0.2s;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
 
     .back-button:hover {
-        background-color: #6B2B00;
-        transform: translateY(-1px);
+        background-color: var(--secondary);
+        transform: translateY(-2px);
     }
 
     .alert {
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 4px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
     }
 
     .alert-error {
-        background-color: #FFEBEE;
-        color: var(--error-color);
-        border: 1px solid var(--error-color);
+        background-color: rgba(231, 76, 60, 0.1);
+        color: var(--error);
+        border-left: 4px solid var(--error);
     }
 
     .schedule-form {
-        background: white;
+        background: var(--secondary);
         padding: 2rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        border: 1px solid var(--border-color);
+        border-radius: 30px 0;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border);
     }
 
     .form-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
     }
 
     .form-group label {
         display: block;
-        margin-bottom: 0.5rem;
-        color: var(--text-color);
-        font-weight: 500;
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        color: var(--accent);
+        letter-spacing: 0.2px;
+        
     }
 
     .form-control {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
+        width: 97%;
+        padding: 1rem;
+        border: 2px solid var(--border);
+        border-radius: 10px 0;
         background: white;
-        color: var(--text-color);
+        color: var(--text);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        margin-right:90px;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(42, 99, 99, 0.2);
+        outline: none;
     }
 
     .form-actions {
         display: flex;
-        justify-content: flex-end;
+        justify-content: flex-start;
+        padding-left: 20px;
+        margin-top: 2rem;
     }
 
     .submit-btn {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        background-color: var(--primary-color);
-        color: white;
+        padding: 1rem 2.25rem;
+        background-color: var(--primary);
+        color: var(--accent);
         border: none;
-        border-radius: 4px;
+        border-radius: 30px 0;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-left: auto;
+        margin-right: -10px;
+        margin-top: 20px;
+        font-family: Georgia, 'Times New Roman', Times, serif;
     }
 
     .submit-btn:hover {
-        background-color: #6B2B00;
-        transform: translateY(-1px);
+        background-color: var(--secondary);
+        transform: translateY(-2px);
     }
 
     .error-message {
-        color: var(--error-color);
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
+        color: var(--error);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        font-weight: 500;
     }
 
     @media (max-width: 768px) {
         .schedule-form-header {
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.25rem;
             text-align: center;
         }
 
         .back-button {
             width: 100%;
             justify-content: center;
+        }
+
+        .schedule-form {
+            padding: 1.5rem;
         }
     }
 </style>

@@ -320,11 +320,16 @@
 
 <style>
     :root {
-        --primary-color: #8B4513;
-        --secondary-color: #F5F5DC;
-        --text-color: #333;
-        --border-color: #D2B48C;
-        --error-color: #F44336;
+        --primary: #429182;
+        --secondary: #337b8d;
+        --light-beige: #F9F5EF;
+        --dark-beige: #1b5858;
+        --text-dark: #000000;
+        --text-light: #FFFFFF;
+        --success: #5DBB63;
+        --error: #dc3545;
+        --border: #E6D8C3;
+        --card-shadow: 0 4px 12px rgba(27, 88, 88, 0.1);
     }
 
     .schedule-form-container {
@@ -338,55 +343,86 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 2rem;
-        padding: 1rem;
-        background-color: var(--secondary-color);
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        background-color: var(--light-beige);
+        border-radius: 30px 0;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border);
     }
 
     .schedule-form-title {
         font-size: 1.5rem;
         font-weight: 600;
-        color: var(--primary-color);
+        color: var(--primary);
         margin: 0;
+        position: relative;
+        padding-left: 1rem;
+    }
+
+    .schedule-form-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 70%;
+        background-color: var(--primary);
+        border-radius: 2px;
     }
 
     .back-button {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background-color: var(--primary-color);
-        color: white;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--dark-beige) 100%);
+        color: var(--text-light);
         border: none;
-        border-radius: 4px;
+        border-radius: 30px 0;
         text-decoration: none;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        box-shadow: var(--card-shadow);
     }
 
     .back-button:hover {
-        background-color: #6B2B00;
-        transform: translateY(-1px);
+        background: linear-gradient(135deg, #4BA793 0%, #2A5F6F 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(66, 145, 130, 0.3);
     }
 
     .alert {
         padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 4px;
+        margin-bottom: 1.5rem;
+        border-radius: 30px 0;
+        border-left: 4px solid;
     }
 
     .alert-error {
-        background-color: #FFEBEE;
-        color: var(--error-color);
-        border: 1px solid var(--error-color);
+        background-color: rgba(220, 53, 69, 0.1);
+        border-color: var(--error);
+        color: var(--error);
     }
 
     .schedule-form {
-        background: white;
+        background: var(--text-light);
         padding: 2rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        border: 1px solid var(--border-color);
+        border-radius: 30px 0;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .schedule-form::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        border-radius: 30px 0 0 0;
     }
 
     .form-group {
@@ -395,42 +431,65 @@
 
     .form-group label {
         display: block;
-        margin-bottom: 0.5rem;
-        color: var(--text-color);
+        margin-bottom: 0.75rem;
+        color: var(--primary);
         font-weight: 500;
     }
 
     .form-control {
         width: 100%;
-        padding: 0.75rem;
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        background: white;
-        color: var(--text-color);
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: 20px 0;
+        background: var(--light-beige);
+        color: var(--text-dark);
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(66, 145, 130, 0.2);
     }
 
     .checkbox-label {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
         cursor: pointer;
+        color: var(--primary);
     }
 
     .checkbox-label input[type="checkbox"] {
         width: 1.25rem;
         height: 1.25rem;
-        accent-color: var(--primary-color);
+        accent-color: var(--primary);
+        border-radius: 4px;
     }
 
     .time-slots-container {
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
     }
 
     .time-slots-container h3 {
         margin-top: 0;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
         font-size: 1.1rem;
-        color: var(--primary-color);
+        color: var(--primary);
+        position: relative;
+        padding-left: 0.75rem;
+    }
+
+    .time-slots-container h3::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        background-color: var(--primary);
+        border-radius: 2px;
     }
 
     .time-slot-group {
@@ -443,57 +502,73 @@
     .time-inputs {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
         flex: 1;
     }
 
     .time-input {
-        padding: 0.5rem;
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        background: white;
-        color: var(--text-color);
+        padding: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: 20px 0;
+        background: var(--light-beige);
+        color: var(--text-dark);
         flex: 1;
+        transition: all 0.3s ease;
+    }
+
+    .time-input:focus {
+        outline: none;
+        border-color: var(--primary);
     }
 
     .time-separator {
-        color: var(--primary-color);
+        color: var(--primary);
         font-weight: 600;
     }
 
     .remove-slot {
         background: none;
         border: none;
-        color: #dc3545;
+        color: var(--error);
         cursor: pointer;
-        padding: 0.25rem;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: all 0.2s;
+    }
+
+    .remove-slot:hover {
+        background-color: rgba(220, 53, 69, 0.1);
     }
 
     .add-slot-btn {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.75rem 1rem;
-        background-color: var(--primary-color);
-        color: white;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: var(--text-light);
         border: none;
-        border-radius: 4px;
+        border-radius: 30px 0;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
         width: 100%;
         justify-content: center;
         margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
     }
 
     .add-slot-btn:hover {
-        background-color: #6B2B00;
-        transform: translateY(-1px);
+        background: linear-gradient(135deg, #4BA793 0%, #2A6A7D 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(66, 145, 130, 0.3);
     }
 
     .form-actions {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
     }
 
     .submit-btn {
@@ -501,17 +576,18 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.75rem 1.5rem;
-        background-color: var(--primary-color);
-        color: white;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--dark-beige) 100%);
+        color: var(--text-light);
         border: none;
-        border-radius: 4px;
+        border-radius: 30px 0;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        box-shadow: var(--card-shadow);
     }
 
     .submit-btn:hover {
-        background-color: #6B2B00;
-        transform: translateY(-1px);
+        background: linear-gradient(135deg, #4BA793 0%, #2A5F6F 100%);
+        transform: translateY(-2px);
     }
 
     .delete-btn {
@@ -519,57 +595,60 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.75rem 1.5rem;
-        background-color: #dc3545;
-        color: white;
+        background: linear-gradient(135deg, #dc3545 0%, #a71d2a 100%);
+        color: var(--text-light);
         border: none;
-        border-radius: 4px;
+        border-radius: 30px 0;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
     }
 
     .delete-btn:hover {
-        background-color: #c82333;
-        transform: translateY(-1px);
+        background: linear-gradient(135deg, #c82333 0%, #8a1a22 100%);
+        transform: translateY(-2px);
     }
 
     .error-message {
-        color: var(--error-color);
+        color: var(--error);
         font-size: 0.875rem;
-        margin-top: 0.25rem;
+        margin-top: 0.5rem;
+        padding-left: 0.5rem;
     }
 
     .suggested-slots {
-        margin-bottom: 1rem;
-        padding: 0.75rem;
-        background-color: #f8f9fa;
-        border: 1px dashed var(--border-color);
-        border-radius: 4px;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background-color: rgba(249, 245, 239, 0.7);
+        border: 1px dashed var(--border);
+        border-radius: 20px 0;
     }
     
     .suggested-slots p {
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         font-size: 0.9rem;
-        color: #666;
+        color: var(--primary);
     }
     
     .suggested-slots-buttons {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.75rem;
     }
     
     .use-suggested-slots {
-        padding: 0.5rem 0.75rem;
-        background-color: var(--primary-color);
+        padding: 0.75rem 1rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 30px 0;
         cursor: pointer;
-        font-size: 0.85rem;
-        transition: all 0.2s;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
     }
     
     .use-suggested-slots:hover {
-        background-color: #6B2B00;
+        background: linear-gradient(135deg, #4BA793 0%, #2A6A7D 100%);
+        transform: translateY(-2px);
     }
 
     @media (max-width: 768px) {
@@ -579,6 +658,10 @@
             text-align: center;
         }
 
+        .schedule-form-title::before {
+            display: none;
+        }
+
         .back-button {
             width: 100%;
             justify-content: center;
@@ -586,15 +669,42 @@
         
         .form-actions {
             flex-direction: column;
-            gap: 1rem;
         }
         
         .submit-btn, .delete-btn {
             width: 100%;
-            justify-content: center;
+        }
+
+        .time-slot-group {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .time-inputs {
+            width: 100%;
+        }
+    }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+        .schedule-form, .schedule-form-header {
+            background-color: #0a2e2e;
+            border-color: #2a6363;
+        }
+        
+        .form-control, .time-input, .suggested-slots {
+            background-color: rgba(27, 88, 88, 0.3);
+            color: #f1f1f1;
+        }
+        
+        .checkbox-label, .form-group label {
+            color: #f1f1f1;
         }
     }
 </style>
+
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

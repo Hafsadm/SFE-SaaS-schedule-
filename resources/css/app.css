@@ -1,0 +1,16 @@
+.app-container {
+    padding: 16px;
+    background-color: #bfdbfe; /* bleu clair */
+    color: #247083; /* bleu foncé */
+    border-radius: 8px;
+}
+
+.app-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.app-description {
+    font-size: 16px;
+}

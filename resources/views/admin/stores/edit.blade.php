@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('header')
-<div class="header">
     <div class="header-content">
       
         <div class="header-title">
@@ -10,20 +9,19 @@
                 <i class="fas fa-arrow-left"></i>
                 Retour
             </a>
-   
-    <div class="action-buttons">
-        <form action="{{ route('admin.stores.destroy', $store) }}" method="POST" class="delete-form" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce point de vente ?');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn-delete">
-                <i class="fas fa-trash"></i>
-                Supprimer
-            </button>
-        </form>
-    </div>
+    
+            <div class="action-buttons">
+                <form action="{{ route('admin.stores.destroy', $store) }}" method="POST" class="delete-form" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce point de vente ?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn-delete">
+                        <i class="fas fa-trash"></i>
+                        Supprimer
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('content')
@@ -301,7 +299,7 @@
 
 <style>
     :root {
-        --primary: #429182; 
+        --primary: #235c5cc9; 
         --secondary: #337b8d; 
         --light-beige: #F9F5EF;
         --dark-beige: #1b5858; 
@@ -320,86 +318,110 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Header */
-    .header {
-        background: var(--primary);
-        color:var(--primary) ;
-        padding: 15px 0;
-        margin-bottom: 30px;
-        box-shadow: var(--shadow);
-       
-    }
 
+/* Header moderne et chic */
+.header-content {
+    max-width: 1140px;
+    margin: 0 auto;
+    color: var(--text-light);
+    border-radius: 30px ;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 2.5rem;
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-title h1 {
+    font-size: 1.75rem;
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    flex-grow: 1;
+    color: var(--text-light);
+}
+
+/* Bouton Retour */
+.btn-back {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    padding: 0.6rem 1.5rem;
+    border-radius: 60px 30px ;
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-back i {
+    font-size: 0.9rem;
+}
+
+/* Bouton Supprimer */
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.delete-form {
+    margin: 0;
+}
+
+.btn-delete {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);   
+    height: 50px;
+    padding: 0.6rem 1.5rem;
+    border-radius:  30px 60px ;
+    border: none;
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: var(--transition);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 15px rgba(220, 53, 69, 0.2);
+}
+
+.btn-delete:hover {
+    background: rgba(200, 35, 51, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(220, 53, 69, 0.3);
+}
+
+.btn-delete i {
+    font-size: 0.9rem;
+}
+
+/* Effets glassmorphism */
+@media (prefers-color-scheme: dark) {
     .header-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 20px;
+        background: linear-gradient(135deg, #0a2e2e 0%, #2a6363 100%);
     }
-
-    .header-title {
-        
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .header-title h1 {
-        font-size: 1.8rem;
-        margin: 0;
-        font-weight: 600;
-    }
-
     .btn-back {
-        background-color: var(--secondary);
-        color: var(--text-light);
-        padding: 10px 20px;
-        border-radius: 30px 0;
-        text-decoration: none;
-        font-weight: 500;
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: right;
-        gap: 8px;
+        background: rgba(255, 255, 255, 0.05);
     }
-
-    .btn-back:hover {
-        background-color: var(--dark-beige);
-        transform: translateY(-2px);
-    }
-
-      /* Boutons d'action */
-      .action-buttons {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 20px;
-    }
-
-    .delete-form {
-        display: flex;
-    }
-
-    .btn-delete {
-        background-color: var(--danger);
-        color: var(--text-light);
-        padding: 12px 24px;
-        border-radius: 30px 0;
-        border: none;
-        font-size: 1rem;
-        font-weight: 500;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: var(--transition);
-        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
-    }
-
-    .btn-delete:hover {
-        background-color: #c82333;
-        transform: translateY(-2px);
-    }
-
-
+}
 
     /* Container principal */
     .form-container {
@@ -449,7 +471,7 @@
   
     /* Formulaire principal */
     .store-form {
-        background: var(--light-beige);
+        background: #ffffff;
         border-radius: 30px 0;
         box-shadow: var(--shadow);
         padding: 40px;

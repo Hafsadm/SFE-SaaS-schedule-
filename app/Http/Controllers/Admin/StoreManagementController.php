@@ -46,22 +46,34 @@ class StoreManagementController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'category' => 'required|string|max:255',
-            'image' => 'nullable|image|max:2048',
-            'is_available' => 'boolean',
+            'category' => 'required|string',
+            'images.*' => 'nullable|image|max:5120', // Accepte plusieurs images jusqu'à 5MB chacune
+            'is_available' => 'nullable',
         ]);
         
-        // Gérer l'upload d'image
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-            $validated['image'] = $imagePath;
+        // Créer le produit d'abord
+        $product = new Product();
+        $product->store_id = $store->id;
+        $product->name = $validated['name'];
+        $product->description = $validated['description'] ?? null;
+        $product->price = $validated['price'];
+        $product->category = $validated['category'];
+        $product->is_available = $request->has('is_available') ? true : false;
+        
+        // Gérer l'upload de plusieurs images
+        $imagesPaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('Produit'), $filename);
+                $imagesPaths[] = $filename;
+            }
         }
         
-        // Définir la disponibilité
-        $validated['is_available'] = $request->has('is_available');
+        // Stocker les chemins des images au format JSON
+        $product->image = !empty($imagesPaths) ? json_encode($imagesPaths) : null;
         
-        // Créer le produit
-        $product = new Product($validated);
+        // Sauvegarder le produit
         $store->products()->save($product);
         
         return redirect()->route('admin.stores.manage', $storeId)
@@ -84,6 +96,9 @@ class StoreManagementController extends Controller
         
         $categories = $this->getProductCategories($store);
         
+        // Décoder les images JSON en tableau
+        $product->imageArray = $product->image ? json_decode($product->image) : [];
+        
         return view('admin.stores.products.edit', compact('store', 'product', 'categories'));
     }
     
@@ -104,27 +119,51 @@ class StoreManagementController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'category' => 'required|string|max:255',
-            'image' => 'nullable|image|max:2048',
-            'is_available' => 'boolean',
+            'category' => 'required|string',
+            'images.*' => 'nullable|image|max:5120',
+            'is_available' => 'nullable',
+            'delete_images' => 'nullable|array',
         ]);
         
-        // Gérer l'upload d'image
-        if ($request->hasFile('image')) {
-            // Supprimer l'ancienne image si elle existe
-            if ($product->image && Storage::disk('public')->exists($product->image)) {
-                Storage::disk('public')->delete($product->image);
+        // Mettre à jour les informations de base
+        $product->name = $validated['name'];
+        $product->description = $validated['description'] ?? null;
+        $product->price = $validated['price'];
+        $product->category = $validated['category'];
+        $product->is_available = $request->has('is_available') ? true : false;
+        
+        // Récupérer les images existantes
+        $existingImages = $product->image ? json_decode($product->image, true) : [];
+        
+        // Supprimer les images sélectionnées
+        if ($request->has('delete_images')) {
+            foreach ($request->delete_images as $index) {
+                if (isset($existingImages[$index])) {
+                    $imagePath = public_path('Produit/' . $existingImages[$index]);
+                    if (file_exists($imagePath)) {
+                        unlink($imagePath);
+                    }
+                    unset($existingImages[$index]);
+                }
             }
-            
-            $imagePath = $request->file('image')->store('products', 'public');
-            $validated['image'] = $imagePath;
+            // Réindexer le tableau
+            $existingImages = array_values($existingImages);
         }
         
-        // Définir la disponibilité
-        $validated['is_available'] = $request->has('is_available');
+        // Ajouter de nouvelles images
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('Produit'), $filename);
+                $existingImages[] = $filename;
+            }
+        }
         
-        // Mettre à jour le produit
-        $product->update($validated);
+        // Mettre à jour le champ image
+        $product->image = !empty($existingImages) ? json_encode($existingImages) : null;
+        
+        // Sauvegarder les modifications
+        $product->save();
         
         return redirect()->route('admin.stores.manage', $storeId)
             ->with('success', 'Produit mis à jour avec succès');
@@ -143,9 +182,15 @@ class StoreManagementController extends Controller
                 ->with('error', 'Ce produit n\'appartient pas à ce point de vente');
         }
         
-        // Supprimer l'image si elle existe
-        if ($product->image && Storage::disk('public')->exists($product->image)) {
-            Storage::disk('public')->delete($product->image);
+        // Supprimer les images si elles existent
+        if ($product->image) {
+            $images = json_decode($product->image, true);
+            foreach ($images as $image) {
+                $imagePath = public_path('Produit/' . $image);
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
         }
         
         // Supprimer le produit
@@ -177,21 +222,31 @@ class StoreManagementController extends Controller
         
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'role' => 'required|string|max:255',
+            'role' => 'required|string',
             'bio' => 'nullable|string',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'image' => 'nullable|image|max:2048',
         ]);
         
+        // Créer le membre du personnel
+        $staff = new Staff();
+        $staff->store_id = $store->id;
+        $staff->name = $validated['name'];
+        $staff->role = $validated['role'];
+        $staff->bio = $validated['bio'] ?? null;
+        $staff->email = $validated['email'] ?? null;
+        $staff->phone = $validated['phone'] ?? null;
+        
         // Gérer l'upload d'image
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('staff', 'public');
-            $validated['image'] = $imagePath;
+            $image = $request->file('image');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('Stuff'), $filename);
+            $staff->image = $filename;
         }
         
-        // Créer le membre du personnel
-        $staff = new Staff($validated);
+        // Sauvegarder le membre du personnel
         $store->staff()->save($staff);
         
         return redirect()->route('admin.stores.manage', $storeId)
@@ -232,26 +287,35 @@ class StoreManagementController extends Controller
         
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'role' => 'required|string|max:255',
+            'role' => 'required|string',
             'bio' => 'nullable|string',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'image' => 'nullable|image|max:2048',
         ]);
         
+        // Mettre à jour les informations
+        $staff->name = $validated['name'];
+        $staff->role = $validated['role'];
+        $staff->bio = $validated['bio'] ?? null;
+        $staff->email = $validated['email'] ?? null;
+        $staff->phone = $validated['phone'] ?? null;
+        
         // Gérer l'upload d'image
         if ($request->hasFile('image')) {
             // Supprimer l'ancienne image si elle existe
-            if ($staff->image && Storage::disk('public')->exists($staff->image)) {
-                Storage::disk('public')->delete($staff->image);
+            if ($staff->image && file_exists(public_path('Stuff/' . $staff->image))) {
+                unlink(public_path('Stuff/' . $staff->image));
             }
             
-            $imagePath = $request->file('image')->store('staff', 'public');
-            $validated['image'] = $imagePath;
+            $image = $request->file('image');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('Stuff'), $filename);
+            $staff->image = $filename;
         }
         
-        // Mettre à jour le membre du personnel
-        $staff->update($validated);
+        // Sauvegarder les modifications
+        $staff->save();
         
         return redirect()->route('admin.stores.manage', $storeId)
             ->with('success', 'Membre du personnel mis à jour avec succès');
@@ -271,8 +335,8 @@ class StoreManagementController extends Controller
         }
         
         // Supprimer l'image si elle existe
-        if ($staff->image && Storage::disk('public')->exists($staff->image)) {
-            Storage::disk('public')->delete($staff->image);
+        if ($staff->image && file_exists(public_path('Stuff/' . $staff->image))) {
+            unlink(public_path('Stuff/' . $staff->image));
         }
         
         // Supprimer le membre du personnel

@@ -26,5 +26,12 @@ class Staff extends Model
     {
         return $this->belongsTo(Store::class);
     }
+    
+    /**
+     * Récupère le chemin complet de l'image
+     */
+    public function getImagePathAttribute()
+    {
+        return $this->image ? asset('Stuff/' . $this->image) : null;
+    }
 }
-

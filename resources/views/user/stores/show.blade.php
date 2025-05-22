@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,22 +14,21 @@
 <style>
     /* Variables de couleur */
     :root {
-    --primary: #429182;
-    --secondary: #337b8d;
-    --light-beige: #F9F5EF;
-    --dark-beige: #1b5858;
-    --text-dark: #000000;
-    --text-light: #FFFFFF;
-    --success: #5DBB63;
-    --border: #E6D8C3;
-    /* Ajoutez ces variables manquantes */
-    --light: #f8fafc;
-    --dark: #1e293b;
-    --white: #ffffff;
-    --danger: #ef4444;
-    --warning: #f59e0b;
-    --light-gray: #e2e8f0;
-}
+        --primary: #0A2E2E; 
+        --secondary: #2A6363; 
+        --tertiary: #8E6E53;
+        --light: #C69C72; 
+        --text-dark: #000000; 
+        --text-light: #FFFFFF; 
+        --success: #5DBB63;
+        --border: #E6D8C3;
+        /* Ajoutez ces variables manquantes */
+        --dark: #1e293b;
+        --white: #ffffff;
+        --danger: #dc3545;
+        --warning: #f59e0b;
+        --light-gray: #e2e8f0;
+    }
 
 /* Reset et base */
 * {
@@ -44,7 +41,7 @@ body {
   font-family: Georgia, 'Times New Roman', Times, serif;
   line-height: 1.6;
   color: var(--dark);
-  background-color: var(--light);
+  background-color: #ffffff;
   max-width: 1990px;
   margin: 0 auto;
   padding: 0 20px;
@@ -70,7 +67,7 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: linear-gradient(130deg, #1b5858, #639caa);
+  background: linear-gradient(130deg, var(--primary), var(--secondary));
   color: var(--white);
   padding: 2rem 1rem; /* Modifié pour avoir un padding latéral */
   width: 90%; /* Prend toute la largeur disponible */
@@ -79,8 +76,6 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   border-radius: 2rem; /* Optionnel pour les coins arrondis */
 }
-
-
 
 .store-title {
   font-size: 2.5rem;
@@ -98,7 +93,6 @@ body {
 }
 
 .store-badges {
-
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
@@ -107,14 +101,12 @@ body {
 .store-badge {
   align-items: center;
   display: inline-flex;
-  background-color: rgba(155, 219, 228, 0.2);
+  background-color: rgba(198, 156, 114, 0.2);
   padding: 0.375rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 500;
-  
   backdrop-filter: blur(4px);
-
 }
 
 .store-status {
@@ -163,43 +155,17 @@ body {
 
 .sidebar {
     padding: 1.5rem;
-    background: linear-gradient(165deg,#639caa, #1b5858 , #639caa);
+    background: linear-gradient(165deg, var(--secondary), var(--primary), var(--secondary));
     border-radius: 1rem;
-    border: 1px solid rgba(116, 163, 177, 0.2);
+    border: 1px solid rgba(198, 156, 114, 0.2);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    color: #1b5858;
+    color: var(--text-light);
     position: sticky;
     top: 20px;
     height: fit-content;
     backdrop-filter: blur(8px);
     z-index: 10;
 }
-
-/* .sidebar {
-    padding: 1.5rem;
-    background: linear-gradient(195deg, var(--primary), #1b5858);
-    border-radius: 2.5rem;
-  outline: 1px dashed rgb(142, 170, 172);
-} */
-/* 
-.sidebar {
-background-color: rgb(29, 105, 131)
-  border-radius: 2.5rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-  border: var(--border) solid;
- outline: 1px dashed rgb(72, 105, 116);
-  position: sticky;
-  top: 20px; 
-  height: fit-content;
-    padding: 2rem;
-    z-index: 10;
-    position: relative;
-    display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-} */
-
 
 /* Assure que le contenu principal ne dépasse pas */
 .main-column > .section {
@@ -235,7 +201,7 @@ background-color: rgb(29, 105, 131)
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  color: var(--dark);
+  color: var(--primary);
 }
 
 /* Galerie */
@@ -315,6 +281,7 @@ background-color: rgb(29, 105, 131)
 
 .info-value {
   font-weight: 500;
+  color: var(--text-dark);
 }
 
 /* Produits */
@@ -337,7 +304,7 @@ background-color: rgb(29, 105, 131)
 }
 
 .product-card {
-  background-color: var(--light);
+  background-color: #ffffff;
   border-radius: 0.5rem;
   padding: 1.5rem;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -364,6 +331,7 @@ background-color: rgb(29, 105, 131)
 
 .product-name {
   font-weight: 600;
+  color: var(--text-dark);
   margin-bottom: 0.5rem;
 }
 
@@ -386,7 +354,7 @@ background-color: rgb(29, 105, 131)
 }
 
 .staff-card {
-  background-color: var(--light);
+  background-color: #ffffff;
   border-radius: 0.5rem;
   padding: 1.5rem;
   border: 1px solid var(--light-gray);
@@ -407,6 +375,7 @@ background-color: rgb(29, 105, 131)
 
 .staff-name {
   font-weight: 600;
+  color: var(--text-dark);
   margin-bottom: 0.25rem;
 }
 
@@ -418,7 +387,7 @@ background-color: rgb(29, 105, 131)
 }
 
 .staff-bio {
-  color: var(--secondary);
+  color: var(--text-dark);
   font-size: 0.875rem;
 }
 
@@ -443,6 +412,7 @@ background-color: rgb(29, 105, 131)
   padding: 1rem 0;
   cursor: pointer;
   font-weight: 500;
+  color: var(--text-dark);
 }
 
 .faq-question:hover {
@@ -451,7 +421,7 @@ background-color: rgb(29, 105, 131)
 
 .faq-answer {
   padding-bottom: 1rem;
-  color: var(--secondary);
+  color: var(--text-dark);
   display: none;
 }
 
@@ -468,7 +438,7 @@ background-color: rgb(29, 105, 131)
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
-  border-bottom: 1px solid var(--light-gray);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .opening-day:last-child {
@@ -477,10 +447,11 @@ background-color: rgb(29, 105, 131)
 
 .day-name {
   font-weight: 500;
+  color: var(--text-light);
 }
 
 .day-hours {
-  color: var(--secondary);
+  color: var(--text-light);
 }
 
 /* Carte */
@@ -500,7 +471,7 @@ background-color: rgb(29, 105, 131)
 }
 
 .review-card {
-  background-color: var(--light);
+  background-color: #ffffff;
   border-radius: 0.5rem;
   padding: 1.5rem;
   border: 1px solid var(--light-gray);
@@ -532,6 +503,7 @@ background-color: rgb(29, 105, 131)
 
 .reviewer-name {
   font-weight: 600;
+  color: var(--text-dark);
 }
 
 .review-date {
@@ -549,7 +521,7 @@ background-color: rgb(29, 105, 131)
 }
 
 .review-content {
-  color: var(--dark);
+  color: var(--text-dark);
 }
 
 /* Boutons */
@@ -580,8 +552,7 @@ background-color: rgb(29, 105, 131)
 
 .btn-primary:hover {
   background-color: var(--secondary);
-    color: var(--white);
-
+  color: var(--white);
 }
 
 .btn-secondary {
@@ -590,17 +561,17 @@ background-color: rgb(29, 105, 131)
 }
 
 .btn-secondary:hover {
-  background-color: #475569;
+  background-color: var(--tertiary);
 }
 
 .btn-outline {
   background-color: transparent;
-  color: var(--primary);
-  border: 1px solid var(--primary);
+  color: var(--text-light);
+  border: 1px solid var(--text-light);
 }
 
 .btn-outline:hover {
-  background-color: rgba(59, 130, 246, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .share-buttons {
@@ -616,13 +587,13 @@ background-color: rgb(29, 105, 131)
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: var(--light);
-  color: var(--dark);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
   transition: all 0.2s;
 }
 
 .share-button:hover {
-  background-color: var(--light-gray);
+  background-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
 
@@ -635,7 +606,7 @@ background-color: rgb(29, 105, 131)
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  color: var(--dark);
+  color: var(--primary);
 }
 
 .similar-stores-grid {
@@ -671,6 +642,7 @@ background-color: rgb(29, 105, 131)
 
 .similar-store-name {
   font-weight: 600;
+  color: var(--text-dark);
   margin-bottom: 0.5rem;
 }
 
@@ -686,7 +658,7 @@ background-color: rgb(29, 105, 131)
   gap: 0.25rem;
   font-size: 0.875rem;
   margin-bottom: 1rem;
-  margin:0   0.5rem ;
+  margin: 0 0.5rem;
 }
 
 .similar-store-status.open {
@@ -705,19 +677,8 @@ background-color: rgb(29, 105, 131)
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  margin: 0.5rem 0 0 0 ;
-
-
+  margin: 0.5rem 0 0 0;
 }
-
-/* .similar-store-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Ligne de séparation subtile */
-} */
 
 .similar-store-link:hover {
   text-decoration: underline;
@@ -751,7 +712,7 @@ background-color: rgb(29, 105, 131)
 }
 
 .back-to-top:hover {
-  background-color: var(--primary-hover);
+  background-color: var(--secondary);
   transform: translateY(-2px);
 }
 
@@ -789,6 +750,68 @@ background-color: rgb(29, 105, 131)
   .store-subtitle {
     font-size: 1rem;
   }
+}
+
+/* Styles spécifiques pour la sidebar */
+.sidebar .section {
+  background-color: transparent;
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .section-title {
+  color: var(--text-light);
+}
+
+.sidebar .info-label {
+  color: var(--light);
+}
+
+.sidebar .info-value {
+  color: var(--text-light);
+}
+
+/* Styles pour les horaires dans la sidebar */
+.sidebar .weekly-hours {
+  color: var(--text-light);
+}
+
+.sidebar .day-schedule {
+  margin-bottom: 0.5rem;
+}
+
+.sidebar .day-name {
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.sidebar .time-slot {
+  color: var(--text-light);
+  opacity: 0.9;
+}
+
+.sidebar .closed-text {
+  color: var(--danger);
+}
+
+.sidebar .no-hours {
+  color: var(--text-light);
+  opacity: 0.7;
+}
+
+/* Styles pour les avis dans la sidebar */
+.sidebar .review-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .reviewer-name {
+  color: var(--text-light);
+}
+
+.sidebar .review-content {
+  color: var(--text-light);
+  opacity: 0.9;
 }
 </style>
 </head>
@@ -930,7 +953,15 @@ background-color: rgb(29, 105, 131)
                             @foreach($store->products as $product)
                                 <div class="product-card">
                                     <div class="product-image">
-                                        <i data-lucide="package" class="w-8 h-8"></i>
+                                        @php
+                                            $images = json_decode($product->image, true);
+                                        @endphp
+                                        
+                                        @if($images && count($images) > 0)
+                                            <img src="{{ asset('Produit/' . $images[0]) }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        @else
+                                            <i data-lucide="package" class="w-8 h-8"></i>
+                                        @endif
                                     </div>
                                     <h3 class="product-name">{{ $product->name }}</h3>
                                     <p class="product-price">{{ $product->price }} €</p>
@@ -1001,7 +1032,11 @@ background-color: rgb(29, 105, 131)
                             @foreach($store->staff as $member)
                                 <div class="staff-card">
                                     <div class="staff-avatar">
-                                        <i data-lucide="user" class="w-8 h-8"></i>
+                                        @if($member->image)
+                                            <img src="{{ asset('Stuff/' . $member->image) }}" alt="{{ $member->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                        @else
+                                            <i data-lucide="user" class="w-8 h-8"></i>
+                                        @endif
                                     </div>
                                     <h3 class="staff-name">{{ $member->name }}</h3>
                                     <p class="staff-role">{{ $member->role }}</p>
@@ -1312,8 +1347,6 @@ background-color: rgb(29, 105, 131)
     <i data-lucide="chevron-up" class="w-6 h-6"></i>
 </button>
 
-
-
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8&callback=initMap" async defer></script>
 
@@ -1373,6 +1406,13 @@ background-color: rgb(29, 105, 131)
             mapTypeControl: false,
             streetViewControl: false,
             fullscreenControl: true,
+            styles: [
+                {
+                    featureType: "water",
+                    elementType: "all",
+                    stylers: [{ color: "#0A2E2E" }, { visibility: "on" }],
+                }
+            ]
         });
         
         const marker = new google.maps.Marker({
@@ -1385,9 +1425,9 @@ background-color: rgb(29, 105, 131)
         const infoWindow = new google.maps.InfoWindow({
             content: `
                 <div style="padding: 10px; max-width: 200px;">
-                    <h3 style="margin-bottom: 5px; color: #A67C52; font-weight: 600;">{{ $store->nom }}</h3>
+                    <h3 style="margin-bottom: 5px; color: #0A2E2E; font-weight: 600;">{{ $store->nom }}</h3>
                     <p style="margin-bottom: 10px; color: #333; font-size: 14px;">{{ $store->adresse }}</p>
-                    <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($store->adresse . ', ' . $store->ville) }}" target="_blank" style="color: #A67C52; text-decoration: underline; font-size: 14px;">
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($store->adresse . ', ' . $store->ville) }}" target="_blank" style="color: #2A6363; text-decoration: underline; font-size: 14px;">
                         Ouvrir dans Google Maps
                     </a>
                 </div>

@@ -4,49 +4,54 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+    @vite(entrypoints: 'resources/js/app.jsx')
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
+        /* Variables de couleur */
+        :root {
+            --primary: #0A2E2E; 
+            --secondary: #2A6363; 
+            --tertiary: #8E6E53;
+            --light: #C69C72; 
+            --text-dark: #000000; 
+            --text-light: #FFFFFF; 
+            --success: #5DBB63;
+            --error: #dc3545;
+            --border: #E6D8C3; 
+            --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
+        }
+
         body {
-            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-family: 'Georgia', 'Times New Roman', Times, serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             margin: 0;
             padding: 0;
             line-height: 1.6;
-            color: #4a615e;
+            background-color: #FFFFFF;
+            color: var(--text-dark);
         }
 
         h1, h2, h3, h4, h5, h6 {
-            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-family: 'Georgia', 'Times New Roman', Times, serif;
             font-weight: 600;
             letter-spacing: -0.02em;
             line-height: 1.2;
+            color: var(--primary);
         }
 
         .nav-logo, .nav-link, .user-button, .auth-link, .header-content {
             font-family: Georgia, 'Times New Roman', Times, serif;
         }
-
-        /* .main-container {
-            min-height: 100vh;
-            background-color: #fffbeb;
-            display: flex;
-            flex-direction: column;
-        } */
-
-        /* .main-container.dark {
-            background-color: #887f79;
-        } */
 
         .content-wrapper {
             flex: 1;
@@ -55,13 +60,12 @@
         }
 
         .header {
-            background-color: #376b64;
+            background-color: var(--primary);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-            margin-top: 70px;
         }
 
         .header.dark {
-            background-color: #f5ebe6;
+            background-color: #ffffff;
         }
 
         .header-content {
@@ -91,8 +95,8 @@
         
         /* Styles de navigation */
         .main-nav {
-            background: linear-gradient(135deg, #cecece 0%, #ebebeb 100%);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(70px);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             position: fixed;
@@ -117,7 +121,7 @@
 
         .nav-logo .logo-link {
             text-decoration: none;
-            color: #2b1302;
+            color: var(--text-light);
             font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: 0.5px;
@@ -125,7 +129,7 @@
         }
 
         .nav-logo .logo-link:hover {
-            color: #4fa18f;
+            color: var(--light);
         }
 
         .nav-links {
@@ -135,7 +139,7 @@
 
         .nav-link {
             text-decoration: none;
-            color: #22463f;
+            color: var(--text-light);
             font-weight: 500;
             padding: 0.5rem 1rem;
             border-radius: 5px;
@@ -146,8 +150,8 @@
         }
 
         .nav-link:hover, .nav-link.active {
-            background-color: rgba(128, 72, 21, 0.1);
-            color: #429182;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--light);
             transform: translateY(-2px);
         }
 
@@ -162,7 +166,7 @@
         .user-button {
             background: none;
             border: none;
-            color: #429182;
+            color: var(--text-light);
             font-weight: 500;
             cursor: pointer;
             padding: 0.5rem 1rem;
@@ -174,8 +178,8 @@
         }
 
         .user-button:hover {
-            background-color: rgba(52, 152, 219, 0.1);
-            color: #22463f;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--light);
         }
 
         .dropdown-menu {
@@ -205,14 +209,14 @@
             gap: 0.75rem;
             padding: 0.75rem 1rem;
             text-decoration: none;
-            color: #429182;
+            color: var(--primary);
             border-radius: 5px;
             transition: all 0.3s ease;
         }
 
         .dropdown-item:hover {
-            background-color: rgba(52, 152, 219, 0.1);
-            color: #347976;
+            background-color: rgba(10, 46, 46, 0.1);
+            color: var(--secondary);
         }
 
         .dropdown-item i {
@@ -235,7 +239,7 @@
 
         .auth-link {
             text-decoration: none;
-            color: #39695f;
+            color: var(--text-light);
             padding: 0.5rem 1rem;
             border-radius: 5px;
             transition: all 0.3s ease;
@@ -245,17 +249,17 @@
         }
 
         .auth-link:hover {
-            background-color: rgba(52, 152, 219, 0.1);
-            color: #4f9ea1;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--light);
         }
 
         .auth-link.register {
-            background-color: #22463f;
+            background-color: var(--secondary);
             color: white;
         }
 
         .auth-link.register:hover {
-            background-color: #429182;
+            background-color: var(--primary);
         }
 
         @media (max-width: 768px) {
@@ -316,15 +320,12 @@
     <script>
         // Gestion du mode sombre
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-        const container = document.querySelector('.main-container');
         const header = document.querySelector('.header');
 
         function updateDarkMode(e) {
             if (e.matches) {
-                container.classList.add('dark');
                 header?.classList.add('dark');
             } else {
-                container.classList.remove('dark');
                 header?.classList.remove('dark');
             }
         }

@@ -48,7 +48,7 @@ class ScheduleController extends Controller
     /**
      * Affiche le formulaire pour ajouter un horaire régulier
      */
-    public function createRegular(Store $store)
+     public function createRegular(Store $store)
     {
         // Récupérer les jours de la semaine déjà configurés
         $existingDays = $store->schedules()
@@ -89,6 +89,7 @@ class ScheduleController extends Controller
  
         return view('admin.stores.schedules.regular', compact('store', 'availableDays', 'sundayExists'));
     }
+
 
     /**
      * Enregistre un nouvel horaire régulier

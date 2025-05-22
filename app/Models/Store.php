@@ -28,6 +28,9 @@ class Store extends Model
         'email',
         'annee_ouverture',
         'site_web',
+        'user_id',         // Ajout: ID de l'admin propriétaire
+        'parent_store_id', // Ajout: ID du magasin principal (si filiale)
+        'is_main_store',   // Ajout: Indique si c'est un magasin principal
     ];
 
     protected $casts = [
@@ -35,8 +38,28 @@ class Store extends Model
         'latitude' => 'float',
         'longitude' => 'float',
         'annee_ouverture' => 'integer',
+        'is_main_store' => 'boolean',
     ];
 
+    // Relation avec l'utilisateur (admin) propriétaire
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Relation avec le magasin principal (si c'est une filiale)
+    public function parentStore()
+    {
+        return $this->belongsTo(Store::class, 'parent_store_id');
+    }
+
+    // Relation avec les filiales (si c'est un magasin principal)
+    public function subsidiaries()
+    {
+        return $this->hasMany(Store::class, 'parent_store_id');
+    }
+
+  
     public function schedules()
     {
         return $this->hasMany(Schedule::class);

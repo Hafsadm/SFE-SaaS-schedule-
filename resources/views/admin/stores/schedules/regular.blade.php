@@ -65,12 +65,7 @@
                 @endif
             </div>
 
-            <div class="form-group">
-                <label for="is_closed" class="checkbox-label">
-                    <input type="checkbox" name="is_closed" id="is_closed" {{ old('is_closed') ? 'checked' : '' }}>
-                    Fermé
-                </label>
-            </div>
+      
    
             
             @error('time_slots')
@@ -84,6 +79,14 @@
             @enderror
         </div>
 
+
+        <div class="form-group">
+            <label for="is_closed" class="checkbox-label">
+                <input type="checkbox" name="is_closed" id="is_closed">
+                Fermé
+            </label>
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="submit-btn">
                 <i data-lucide="save"></i>
@@ -95,15 +98,15 @@
 
 <style>
     :root {
-        --primary-color: #8B4513;
-        --secondary-color: #F5F5DC;
+        --primary-color:  #2a6363;
+        --secondary-color: #0a2e2e;
         --text-color: #333;
         --border-color: #D2B48C;
         --error-color: #F44336;
     }
 
     .schedule-form-container {
-        max-width: 800px;
+        max-width: 700px;
         margin: 2rem auto;
         padding: 0 1rem;
     }
@@ -115,14 +118,14 @@
         margin-bottom: 2rem;
         padding: 1rem;
         background-color: var(--secondary-color);
-        border-radius: 8px;
+        border-radius:  30px  0 ;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .schedule-form-title {
         font-size: 1.5rem;
         font-weight: 600;
-        color: var(--primary-color);
+        color: #D2B48C;
         margin: 0;
     }
 
@@ -131,16 +134,16 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.5rem 1rem;
-        background-color: var(--primary-color);
+        background-color:  #2a6363;
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 30px 0;
         text-decoration: none;
         transition: all 0.2s;
     }
 
     .back-button:hover {
-        background-color: #6B2B00;
+        background-color:  #0a2e2e;
         transform: translateY(-1px);
     }
 
@@ -157,9 +160,10 @@
     }
 
     .schedule-form {
-        background: white;
+        background: #0a2e2e;
         padding: 2rem;
-        border-radius: 8px;
+        border-radius: 30px 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         border: 1px solid var(--border-color);
     }
@@ -170,18 +174,25 @@
 
     .form-group label {
         display: block;
+        font-size: 1rem;
         margin-bottom: 0.5rem;
-        color: var(--text-color);
-        font-weight: 500;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 0.5rem;
+        color: #D2B48C;
     }
 
     .form-control {
-        width: 100%;
+        width: 97%;
         padding: 0.75rem;
         border: 1px solid var(--border-color);
-        border-radius: 4px;
+        border-radius: 10px 0;
         background: white;
         color: var(--text-color);
+        margin-left: auto;
+        margin-right: auto;
+        
     }
 
     .checkbox-label {
@@ -199,13 +210,14 @@
 
     .time-slots-container {
         margin-bottom: 1.5rem;
+        
     }
 
     .time-slots-container h3 {
         margin-top: 0;
         margin-bottom: 1rem;
         font-size: 1.1rem;
-        color: var(--primary-color);
+        color:  #D2B48C;
     }
 
     .time-slot-group {
@@ -219,14 +231,18 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        flex: 1;
+        flex: 10px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .time-input {
         padding: 0.5rem;
         border: 1px solid var(--border-color);
-        border-radius: 4px;
+        border-radius: 20px 0;
+       
         background: white;
+        align-items: center;
         color: var(--text-color);
         flex: 1;
     }
@@ -249,7 +265,7 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.75rem 1rem;
-        background-color: var(--primary-color);
+        background-color: #0a2e2e;
         color: white;
         border: none;
         border-radius: 4px;
@@ -261,30 +277,38 @@
     }
 
     .add-slot-btn:hover {
-        background-color: #6B2B00;
+        background-color:  #2a6363;
         transform: translateY(-1px);
     }
 
     .form-actions {
         display: flex;
         justify-content: flex-end;
+
     }
 
     .submit-btn {
+        font-family: Georgia, 'Times New Roman', Times, serif
         display: flex;
         align-items: center;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;     
+        font-size: 1rem;
         gap: 0.5rem;
         padding: 0.75rem 1.5rem;
-        background-color: var(--primary-color);
-        color: white;
+        background-color:  #2a6363;
+        color: #D2B48C;
         border: none;
-        border-radius: 4px;
+        border-radius: 30px 0;
         cursor: pointer;
         transition: all 0.2s;
+        margin-right: 1.3rem;
+        margin-top: 1.4rem;
     }
 
     .submit-btn:hover {
-        background-color: #6B2B00;
+        background-color: #0a2e2e;
         transform: translateY(-1px);
     }
 

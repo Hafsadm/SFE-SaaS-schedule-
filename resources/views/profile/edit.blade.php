@@ -3,45 +3,23 @@
     <style>
         /* Variables de couleur */
         :root {
-    /* Palette principale - tons chauds beige/marron */
-    --primary: #8B5A2B;  /* Marron chaud */
-    --primary-hover: #A67C52;  /* Marron plus clair */
-    --secondary: #D2B48C;  /* Beige doré */
-    --secondary-hover: #E0C9B4;  /* Beige clair */
-    
-    /* Accents */
-    --danger: #C17C74;  /* Rouge terreux */
-    --danger-hover: #B5655D;
-    --success: #82B183;  /* Vert mousse */
-    
-    /* Neutres */
-    --text: #3E2723;  /* Marron très foncé */
-    --text-light: #5D4037;  /* Marron foncé */
-    --bg: #F5F5DC;  /* Beige très clair */
-    --card-bg: #FFFFFF;  /* Blanc pur */
-    --border: #D7CCC8;  /* Beige grisâtre */
-}
-
-/* Dark mode raffiné */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --primary: #D2B48C;  /* Beige doré devient primaire */
-        --primary-hover: #E0C9B4;
-        --text: #EFEBE9;  /* Beige très clair */
-        --text-light: #D7CCC8;
-        --bg: #968d74;  /* Noir chaud */
-        --card-bg: #44372a;  /* Marron foncé */
-        --border: #5d5037;  /* Marron moyen */
-        --secondary: #4E342E;  /* Marron sombre */
-        --secondary-hover: #3E2723;
-    }
-}
+            --primary: #0A2E2E; 
+            --secondary: #2A6363; 
+            --tertiary: #8E6E53;
+            --light: #C69C72; 
+            --text-dark: #000000; 
+            --text-light: #FFFFFF; 
+            --success: #5DBB63;
+            --error: #dc3545;
+            --border: #E6D8C3; 
+            --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
+        }
 
         /* Base */
         body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: 'Georgia', system-ui, sans-serif;
+            background-color: #FFFFFF;
+            color: var(--text-dark);
             line-height: 1.5;
         }
 
@@ -54,21 +32,23 @@
 
         /* Cartes */
         .card {
-            background: var(--card-bg);
+            background: #FFFFFF;
             border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--card-shadow);
             padding: 2rem;
             margin-bottom: 2rem;
+            border: 1px solid var(--border);
         }
 
         .card-title {
             font-size: 1.25rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
+            color: var(--primary);
         }
 
         .card-description {
-            color: var(--text-light);
+            color: var(--secondary);
             margin-bottom: 1.5rem;
         }
 
@@ -81,7 +61,7 @@
             display: block;
             font-weight: 500;
             margin-bottom: 0.5rem;
-            color: var(--text);
+            color: var(--primary);
         }
 
         input[type="text"],
@@ -91,15 +71,15 @@
             padding: 0.625rem 0.75rem;
             border: 1px solid var(--border);
             border-radius: 0.375rem;
-            background-color: var(--card-bg);
-            color: var(--text);
+            background-color: #FFFFFF;
+            color: var(--text-dark);
             font-size: 1rem;
         }
 
         input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(42, 99, 99, 0.1);
         }
 
         /* Boutons */
@@ -122,25 +102,25 @@
         }
 
         .btn-primary:hover {
-            background-color: var(--primary-hover);
+            background-color: var(--secondary);
         }
 
         .btn-danger {
-            background-color: var(--danger);
+            background-color: var(--error);
             color: white;
         }
 
         .btn-danger:hover {
-            background-color: var(--danger-hover);
+            background-color: #b52e3e;
         }
 
         .btn-secondary {
-            background-color: var(--secondary);
-            color: var(--text);
+            background-color: var(--tertiary);
+            color: var(--text-light);
         }
 
         .btn-secondary:hover {
-            background-color: var(--secondary-hover);
+            background-color: var(--light);
         }
 
         /* Messages */
@@ -154,7 +134,7 @@
         }
 
         .message-error {
-            color: var(--danger);
+            color: var(--error);
         }
 
         /* Flex utilities */
@@ -188,7 +168,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: var(--card-bg);
+            background: #FFFFFF;
             border-radius: 0.5rem;
             padding: 1.5rem;
             width: 90%;
@@ -205,11 +185,12 @@
             font-size: 1.125rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
+            color: var(--primary);
         }
 
         .modal-content {
             margin-bottom: 1.5rem;
-            color: var(--text-light);
+            color: var(--secondary);
         }
 
         /* Responsive */
@@ -220,6 +201,50 @@
             
             .card {
                 padding: 1.5rem;
+            }
+        }
+
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #ffffff;
+            }
+            
+            .card {
+                background-color: var(--primary);
+                border-color: var(--secondary);
+            }
+            
+            .card-title {
+                color: var(--text-light);
+            }
+            
+            .card-description {
+                color: var(--light);
+            }
+            
+            label {
+                color: var(--text-light);
+            }
+            
+            input[type="text"],
+            input[type="email"],
+            input[type="password"] {
+                background-color: var(--secondary);
+                color: var(--text-light);
+                border-color: var(--secondary);
+            }
+            
+            .modal {
+                background-color: var(--primary);
+            }
+            
+            .modal-title {
+                color: var(--text-light);
+            }
+            
+            .modal-content {
+                color: var(--light);
             }
         }
     </style>
@@ -361,6 +386,4 @@
             messages.forEach(msg => msg.style.display = 'none');
         }, 3000);
     </script>
-
-
 @endsection

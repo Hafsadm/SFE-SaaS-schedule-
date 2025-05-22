@@ -32,9 +32,9 @@
         /* Dark mode */
         @media (prefers-color-scheme: dark) {
             :root {
-            --color-primary: #298675;;
+            --color-primary: #298675;
             --color-primary-light: #337b8d;
-            --color-secondary: #D2B48C;
+            --color-secondary: #8cd2c9;
             --color-background: #F9F5EF;
             --color-card: #FFFFFF;
             --color-text: #1b5858;
@@ -94,7 +94,7 @@
         .card {
             background-color: var(--color-card);
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 8px rgba(66, 145, 130, 0.05);
             padding: 2rem;
             margin-bottom: 2rem;
             border: 1px solid var(--color-border);

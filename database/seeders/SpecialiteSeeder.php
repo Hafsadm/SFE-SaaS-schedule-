@@ -18,8 +18,8 @@ class SpecialiteSeeder extends Seeder
             ['nom' => 'Optométriste']
         ];
 
-        foreach ($specialites as $specialite) {
-            Specialite::create($specialite);
-        }
+        // foreach ($specialites as $specialite) {
+        //     Specialite::create($specialite);
+        // }
     }
 } 

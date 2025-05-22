@@ -5,20 +5,18 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
-    /* Variables de couleur */
     :root {
-        --primary: #A67C52; /* Marron doré */
-        --primary-light: #C8AD7F;
-        --primary-dark: #8A6642;
-        --secondary: #D2B48C; /* Beige doré */
-        --light-beige: #F5F5DC;
-        --dark-beige: #E0C9B4;
-        --text-dark: #130404;
-        --text-light: #F8F4E6;
-        --success: #82B183; /* Vert doux */
-        --error: #C17C74; /* Rouge doux */
-        --border: #E0C9B4;
-        --card-shadow: 0 4px 12px rgba(92, 64, 51, 0.1);
+        --primary: #2a6363;
+        --primary-light: #3a7a7a;
+        --secondary: #0a2e2e;
+        --accent: #D2B48C;
+        --accent-light: #e5d5b8;
+        --text: #333333;
+        --text-light: #f8f8f8;
+        --border: #c4b7a0;
+        --error: #e74c3c;
+        --success: #2ecc71;
+        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         --transition: all 0.3s ease;
     }
 
@@ -31,7 +29,7 @@
 
     body {
         font-family: 'Inter', sans-serif;
-        color: var(--text-dark);
+        color: var(--text);
         background-color: #fff;
         line-height: 1.6;
     }
@@ -44,21 +42,24 @@
 
     /* En-tête */
     .manage-header {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
         padding: 2rem 0;
-        color: var(--text-light);
+        color: var(--accent);
         margin-bottom: 2rem;
+        border-radius: 30px 0 0 0;
     }
 
     .manage-title {
         font-size: 1.8rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
     }
 
     .manage-subtitle {
         font-size: 1rem;
         opacity: 0.9;
+        color: var(--accent-light);
     }
 
     /* Onglets */
@@ -71,15 +72,15 @@
     .tab {
         padding: 1rem 1.5rem;
         cursor: pointer;
-        font-weight: 500;
-        color: var(--text-dark);
+        font-weight: 600;
+        color: var(--text);
         border-bottom: 3px solid transparent;
         transition: var(--transition);
     }
 
     .tab.active {
-        color: var(--primary);
-        border-bottom-color: var(--primary);
+        color: var(--accent);
+        border-bottom-color: var(--accent);
     }
 
     .tab:hover:not(.active) {
@@ -98,11 +99,12 @@
 
     /* Cartes */
     .card {
-        background-color: white;
-        border-radius: 12px;
+        background-color: var(--secondary);
+        border-radius: 30px 0;
         box-shadow: var(--card-shadow);
         padding: 1.5rem;
         margin-bottom: 2rem;
+        border: 1px solid var(--border);
     }
 
     .card-header {
@@ -117,7 +119,7 @@
     .card-title {
         font-size: 1.25rem;
         font-weight: 600;
-        color: var(--primary);
+        color: var(--accent);
     }
 
     .card-actions {
@@ -131,9 +133,9 @@
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        padding: 0.75rem 1.25rem;
-        border-radius: 8px;
-        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+        border-radius: 30px 0;
+        font-weight: 600;
         text-decoration: none;
         transition: var(--transition);
         cursor: pointer;
@@ -144,21 +146,23 @@
 
     .btn-primary {
         background-color: var(--primary);
-        color: white;
+        color: var(--accent);
     }
 
     .btn-primary:hover {
-        background-color: var(--primary-dark);
+        background-color: var(--secondary);
+        transform: translateY(-2px);
     }
 
     .btn-secondary {
-        background-color: white;
-        color: var(--primary);
-        border: 1px solid var(--primary);
+        background-color: transparent;
+        color: var(--accent);
+        border: 2px solid var(--accent);
     }
 
     .btn-secondary:hover {
-        background-color: var(--light-beige);
+        background-color: rgba(210, 180, 140, 0.1);
+        transform: translateY(-2px);
     }
 
     .btn-danger {
@@ -167,11 +171,12 @@
     }
 
     .btn-danger:hover {
-        background-color: #A6655E;
+        background-color: #c0392b;
+        transform: translateY(-2px);
     }
 
     .btn-sm {
-        padding: 0.5rem 0.75rem;
+        padding: 0.5rem 1rem;
         font-size: 0.8rem;
     }
 
@@ -190,12 +195,12 @@
         padding: 1rem;
         text-align: left;
         border-bottom: 1px solid var(--border);
+        color: var(--accent-light);
     }
 
     .table th {
         font-weight: 600;
-        color: var(--primary);
-        background-color: var(--light-beige);
+        background-color: rgba(42, 99, 99, 0.2);
     }
 
     .table tr:last-child td {
@@ -203,7 +208,7 @@
     }
 
     .table tr:hover td {
-        background-color: rgba(245, 245, 220, 0.5);
+        background-color: rgba(42, 99, 99, 0.1);
     }
 
     /* Badges */
@@ -212,16 +217,16 @@
         padding: 0.25rem 0.75rem;
         border-radius: 50px;
         font-size: 0.8rem;
-        font-weight: 500;
+        font-weight: 600;
     }
 
     .badge-success {
-        background-color: rgba(130, 177, 131, 0.2);
+        background-color: rgba(46, 204, 113, 0.2);
         color: var(--success);
     }
 
     .badge-danger {
-        background-color: rgba(193, 124, 116, 0.2);
+        background-color: rgba(231, 76, 60, 0.2);
         color: var(--error);
     }
 
@@ -229,27 +234,50 @@
     .thumbnail {
         width: 60px;
         height: 60px;
-        border-radius: 8px;
+        border-radius: 10px 0;
         object-fit: cover;
+        border: 2px solid var(--border);
+    }
+
+    /* Galerie d'images */
+    .image-gallery {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .image-gallery-item {
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        object-fit: cover;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .image-gallery-item:hover {
+        transform: scale(1.1);
     }
 
     /* Alertes */
     .alert {
-        padding: 1rem;
-        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        border-radius: 10px 0;
         margin-bottom: 1.5rem;
+        font-weight: 500;
     }
 
     .alert-success {
-        background-color: rgba(130, 177, 131, 0.2);
+        background-color: rgba(46, 204, 113, 0.1);
         color: var(--success);
-        border: 1px solid var(--success);
+        border-left: 4px solid var(--success);
     }
 
     .alert-danger {
-        background-color: rgba(193, 124, 116, 0.2);
+        background-color: rgba(231, 76, 60, 0.1);
         color: var(--error);
-        border: 1px solid var(--error);
+        border-left: 4px solid var(--error);
     }
 
     /* Formulaires */
@@ -259,30 +287,32 @@
 
     .form-label {
         display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        color: var(--accent);
     }
 
     .form-control {
         width: 100%;
-        padding: 0.75rem;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-family: 'Inter', sans-serif;
-        font-size: 0.9rem;
+        padding: 1rem;
+        border: 2px solid var(--border);
+        border-radius: 10px 0;
+        background: white;
+        color: var(--text);
+        font-size: 1rem;
+        transition: var(--transition);
     }
 
     .form-control:focus {
-        outline: none;
         border-color: var(--primary);
-        box-shadow: 0 0 0 2px rgba(166, 124, 82, 0.2);
+        box-shadow: 0 0 0 3px rgba(42, 99, 99, 0.2);
+        outline: none;
     }
 
     .form-text {
         font-size: 0.8rem;
-        color: var(--text-dark);
-        opacity: 0.7;
-        margin-top: 0.25rem;
+        color: var(--accent-light);
+        margin-top: 0.5rem;
     }
 
     /* Responsive */
@@ -299,11 +329,17 @@
             flex: 1 0 auto;
             text-align: center;
             padding: 0.75rem;
+            font-size: 0.9rem;
         }
         
         .table th,
         .table td {
             padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1rem;
         }
     }
 
@@ -343,19 +379,53 @@
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
-        color: var(--text-dark);
-        opacity: 0.7;
+        color: var(--accent-light);
     }
 
     .empty-state i {
         font-size: 3rem;
         margin-bottom: 1rem;
-        color: var(--primary-light);
+        color: var(--accent);
     }
 
     .empty-state-text {
         margin-bottom: 1.5rem;
         font-size: 1.1rem;
+    }
+
+    /* Modal pour les images */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-content {
+        margin: auto;
+        display: block;
+        max-width: 80%;
+        max-height: 80%;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+    .modal-close:hover {
+        color: #bbb;
     }
 </style>
 @endpush
@@ -422,8 +492,27 @@
                             @foreach($store->products as $product)
                                 <tr>
                                     <td>
-                                        @if($product->image)
-                                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="thumbnail">
+                                        @php
+                                            $images = json_decode($product->image, true);
+                                        @endphp
+                                        
+                                        @if($images && count($images) > 0)
+                                            {{-- <img src="{{ asset('Produit/' . $images[0]) }}" alt="{{ $product->name  > 0 }}" class="thumbnail"> --}}
+                                            <img src="{{ asset('Produit/' . $images[0]) }}" alt="{{ $product->name }}" class="thumbnail">
+                                            
+                                            @if(count($images) > 1)
+                                                <div class="image-gallery">
+                                                    @foreach(array_slice($images, 1, 3) as $index => $image)
+                                                        <img src="{{ asset('Produit/' . $image) }}" alt="{{ $product->name }}" class="image-gallery-item" onclick="openImageModal('{{ asset('Produit/' . $image) }}')">
+                                                    @endforeach
+                                                    
+                                                    @if(count($images) > 4)
+                                                        <div class="image-gallery-item" style="display: flex; align-items: center; justify-content: center; background-color: rgba(42, 99, 99, 0.2);">
+                                                            <span style="color: var(--accent);">+{{ count($images) - 4 }}</span>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            @endif
                                         @else
                                             <div class="thumbnail d-flex align-center justify-between" style="background-color: var(--light-beige);">
                                                 <i data-lucide="package" class="w-6 h-6 m-auto" style="color: var(--primary);"></i>
@@ -505,7 +594,7 @@
                                 <tr>
                                     <td>
                                         @if($staff->image)
-                                            <img src="{{ asset('storage/' . $staff->image) }}" alt="{{ $staff->name }}" class="thumbnail">
+                                            <img src="{{ asset('Stuff/' . $staff->image) }}" alt="{{ $staff->name }}" class="thumbnail">
                                         @else
                                             <div class="thumbnail d-flex align-center justify-between" style="background-color: var(--light-beige);">
                                                 <i data-lucide="user" class="w-6 h-6 m-auto" style="color: var(--primary);"></i>
@@ -578,22 +667,10 @@
                             <th>Ville</th>
                             <td>{{ $store->ville }}</td>
                         </tr>
-                        {{-- <tr>
-                            <th>Code postal</th>
-                            <td>{{ $store->code_postal }}</td>
-                        </tr> --}}
                         <tr>
                             <th>Téléphone</th>
                             <td>{{ $store->phone ?? '-' }}</td>
                         </tr>
-                        {{-- <tr>
-                            <th>Email</th>
-                            <td>{{ $store->email ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <th>Site web</th>
-                            <td>{{ $store->website ?? '-' }}</td>
-                        </tr> --}}
                         <tr>
                             <th>Services</th>
                             <td>
@@ -633,6 +710,12 @@
         </div>
     </div>
 </div>
+
+<!-- Modal pour afficher les images en grand -->
+<div id="imageModal" class="modal">
+    <span class="modal-close" onclick="closeImageModal()">&times;</span>
+    <img class="modal-content" id="modalImage">
+</div>
 @endsection
 
 @push('scripts')
@@ -661,5 +744,17 @@
             });
         });
     });
+    
+    // Fonctions pour la modal d'image
+    function openImageModal(src) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        modal.style.display = "block";
+        modalImg.src = src;
+    }
+    
+    function closeImageModal() {
+        document.getElementById('imageModal').style.display = "none";
+    }
 </script>
 @endpush

@@ -174,10 +174,7 @@ class HomeController extends Controller
         return $html;
     }  
         
-    
-    /**
-     * Retourne le nom français d'un jour de la semaine
-     */
+
     private function getFrenchDayName($day)
     {
         $frenchDays = [
@@ -200,12 +197,15 @@ class HomeController extends Controller
         
         $query = Store::with(['schedules', 'exceptions', 'holidays']);
         
-        // 1. Filtre par SERVICES (cases cochées Dentiste/Opticien/Audition)
-        if ($request->has('specialite') && !empty($request->specialite)) {
-            $query->where(function ($q) use ($request) {
-                foreach ($request->specialite as $service) {
-                    $q->orWhereJsonContains('services', $service);
-                }
+        // 1. Filtre par SERVICES (recherche textuelle)
+        if ($request->has('service_search') && !empty($request->service_search)) {
+            $serviceSearch = strtolower($request->service_search);
+            Log::info('Recherche de service', ['service_search' => $serviceSearch]);
+            
+            $query->where(function ($q) use ($serviceSearch) {
+                // Recherche dans le champ JSON services
+                $q->whereRaw('LOWER(JSON_EXTRACT(services, "$[*]")) LIKE ?', ['%' . $serviceSearch . '%'])
+                  ->orWhereRaw('LOWER(services) LIKE ?', ['%' . $serviceSearch . '%']);
             });
         }
 

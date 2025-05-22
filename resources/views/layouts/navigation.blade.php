@@ -1,5 +1,3 @@
-
-
 <nav class="main-nav">
     <div class="nav-container">
         <div class="nav-content">
@@ -13,11 +11,19 @@
                 <div class="nav-links">
                     <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="fas fa-home"></i>
-                        Home
+                        Tableau de bord
                     </a>
                     <a href="{{ route('admin.stores.index') }}" class="nav-link {{ request()->routeIs('admin.stores.*') ? 'active' : '' }}">
                         <i class="fas fa-store"></i>
                         Points de vente
+                    </a>
+                    <a href="{{ route('admin.stores.bulk-schedule') }}" class="nav-link {{ request()->routeIs('admin.stores.bulk-schedule') ? 'active' : '' }}">
+                        <i class="fas fa-clock"></i>
+                        Horaires
+                    </a>
+                    <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+                        <i class="fas fa-user-cog"></i>
+                        Paramètres
                     </a>
                 </div>
 

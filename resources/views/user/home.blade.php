@@ -14,16 +14,18 @@
 
 <style>
   /* 🎨 Variables de couleur modernisées */
-:root {
-    --primary: #429182; 
-    --secondary: #337b8d; 
-    --light-beige: #F9F5EF;
-    --dark-beige: #1b5858; 
-    --text-dark: #000000; 
-    --text-light: #FFFFFF; 
-    --success: #5DBB63;
-    --border: #E6D8C3; 
-}
+    :root {
+        --primary: #0A2E2E; 
+        --secondary: #2A6363; 
+        --tertiary: #8E6E53;
+        --light: #C69C72; 
+        --text-dark: #000000; 
+        --text-light: #FFFFFF; 
+        --success: #5DBB63;
+        --error: #dc3545;
+        --border: #E6D8C3; 
+        --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
+    }
 
 /* Loader */
 #loader {
@@ -40,7 +42,7 @@
     font-size: 1rem;
     font-weight: 500;
     color: var(--primary);
-    border: 1px solid rgba(66, 145, 130, 0.2);
+    border: 1px solid rgba(42, 99, 99, 0.2);
     animation: fadeIn 0.3s ease-out;
 }
 
@@ -50,7 +52,7 @@
     width: 1rem;
     height: 1rem;
     margin-left: 0.75rem;
-    border: 2px solid rgba(66, 145, 130, 0.3);
+    border: 2px solid rgba(42, 99, 99, 0.3);
     border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -128,7 +130,7 @@ body {
 .title {
     font-size: 2.5rem;
     font-weight: 800;
-    color: #000000;
+    color: var(--primary);
     letter-spacing: 1.2px;
     position: relative;
     display: inline-block;
@@ -142,8 +144,8 @@ body {
     transform: translateX(-50%);
     width: 90px;
     height: 3px;
-    background-color:#337b8d;
-    border-radius: 60px 0 ;
+    background-color: var(--secondary);
+    border-radius: 60px 0;
 }
 
     /* Conteneur principal */
@@ -177,15 +179,18 @@ body {
         width: 100%;
         padding: 0.75rem 1.5rem;
         border: 1px solid var(--border);
-        border-radius: 30px 0px ;
+        border-radius: 30px 0px;
         cursor: pointer;
         font-size: 0.9rem;
         text-align: center;
         transition: all 0.3s ease;
+        background-color: white;
+        color: var(--primary);
     }
 
     .filter-button:hover {
-        background-color: var(--secondary)
+        background-color: var(--secondary);
+        color: var(--text-light);
     }
 
     /* Recherche par localisation */
@@ -196,13 +201,11 @@ body {
         background-color: var(--primary);
         color: white;
         padding: 0.75rem 1rem;
-        border-radius: 30px 0 ;
+        border-radius: 30px 0;
         cursor: pointer;
         transition: all 0.3s ease;
         height: 50px;
         width: 190px;
-    
-        
     }
 
     .location-search:hover {
@@ -211,11 +214,7 @@ body {
 
     .location-search-icon {
         margin-right: 0.5rem;
-    
-
     }
-
-
 
     .location-search-text {
         font-weight: 500;
@@ -233,15 +232,17 @@ body {
         padding: 0.75rem 1rem;
         border: 1px solid var(--border);
         border-right: none;
-        border-radius: 30px 0 0 0 ;
+        border-radius: 30px 0 0 0;
         width: 100%;
         height: 46px;
         transition: all 0.3s ease;
+        color: var(--text-dark);
+        background-color: white;
     }
 
     .search-input:focus {
         outline: none;
-        border-color: #000000;
+        border-color: var(--primary);
     }
 
     .ok-button {
@@ -265,7 +266,7 @@ body {
         align-items: center;
         justify-content: center;
         background-color: #f8f8f8;
-        color: var(--text-dark);
+        color: var(--primary);
         border: 1px solid var(--border);
         border-radius: 30px 0;
         padding: 0.75rem 1.5rem;
@@ -292,49 +293,6 @@ body {
         margin-bottom: 3rem;
     }
 
-    /* Carte */
-    /* .map-container {
-        height: 600px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        overflow: hidden;
-        position: relative;
-        box-shadow: 0 4px 12px rgba(92, 64, 51, 0.1);
-    } */
-
-    /* .map-controls {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        z-index: 10;
-        background: white;
-        border-radius: 6px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    } */
-
-    /* .map-type-buttons {
-        display: flex;
-    } */
-/* 
-    .map-type-button {
-        padding: 0.5rem 1rem;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-    }
-
-    .map-type-button.active {
-        background-color: var(--primary);
-        color: white;
-    }
-
-    .map-type-button:not(.active):hover {
-        background-color: var(--light-beige);
-    } */
-
     /* Liste des boutiques */
     .stores-container {
         display: flex;
@@ -343,8 +301,7 @@ body {
         max-height: 600px;
         overflow-y: auto;
         padding-right: 0.5rem;
-        color: #000000;
-
+        color: var(--text-dark);
     }
 
     /* Message "Aucun résultat trouvé" */
@@ -386,12 +343,12 @@ body {
     }
 
     .stores-container::-webkit-scrollbar-track {
-        background: var(--light-beige);
-        border-radius: 30px  ;
+        background: #f1f1f1;
+        border-radius: 30px;
     }
 
     .stores-container::-webkit-scrollbar-thumb {
-        background-color: var(--dark-beige);
+        background-color: var(--secondary);
         border-radius: 10px;
     }
 
@@ -401,30 +358,37 @@ body {
         padding: 1.5rem;
         transition: all 0.3s ease;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        background-color: white;
     }
 
     .store-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(92, 64, 51, 0.15);
+        box-shadow: 0 4px 12px rgba(10, 46, 46, 0.15);
     }
 
+    .store-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
+    .store-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
 
     .store-badge {
         background-color: var(--primary);
         color: white;
-        margin-bottom:1rem;
         padding: 0.25rem 0.75rem;
-        border-radius: 4px;
+        border-radius: 30px 60px 30px 60px;
         font-size: 0.8rem;
         font-weight: 600;
     }
     
-    
     .store-status {
-        display: inline-block;
-        margin-left: 70px;
-        margin-right: auto;
         font-weight: 600;
         font-size: 1.2rem;
     }
@@ -437,16 +401,16 @@ body {
         color: var(--error);
     }
 
-
-
     .store-hours {
-
         display: flex;
         align-items: center;
-        color:#418a71;
+        color:#0A2E2E;
         font-weight: 500;
         margin-top: 1.3rem;
-        font-size: 0.9rem;
+        font-size: 1rem;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        gap: 0.5rem;
+        font-weight: 700;
     }
 
     .store-hours i {
@@ -454,7 +418,6 @@ body {
     }
 
     .store-info {
-        
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
@@ -462,17 +425,18 @@ body {
     }
 
     .store-location {
-        margin-top :15px;
+        margin-top: 15px;
         font-size: 1.4rem;
-        font-weight: 600;
+        font-weight: 700;
         margin-bottom: 0.5rem;
-        color:#000000 ;
+        color: var(--primary);
     }
 
     .store-address {
         font-size: 0.9rem;
         color: var(--text-dark);
         opacity: 0.8;
+        font-weight: 700;
     }
 
     .locate-button {
@@ -490,7 +454,7 @@ body {
     }
 
     .locate-button:hover {
-        background-color: rgba(166, 124, 82, 0.1);
+        background-color: rgba(42, 99, 99, 0.1);
     }
 
     .locate-button i {
@@ -513,7 +477,7 @@ body {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        color: #000000  ;
+        color: #dc2626;
         font-size: 0.9rem;
         cursor: pointer;
         font-weight: 500;
@@ -523,14 +487,13 @@ body {
     }
 
     .store-hours-toggle:hover {
-        color:#000000;
+        color: var(--secondary);
     }
-
 
     .hours-dropdown {
         display: none;
         position: absolute;
-        background: rgb(190, 207, 211);
+        background: white;
         border: 1px solid var(--border);
         border-radius: 6px;
         padding: 1rem;
@@ -538,6 +501,7 @@ body {
         z-index: 10;
         box-shadow: var(--card-shadow);
         width: calc(100% - 3rem);
+        color: var(--text-dark);
     }
 
     .closed-text {
@@ -546,7 +510,7 @@ body {
     }
 
     .holiday-text {
-        color: var(--primary);
+        color: var(--tertiary);
         font-weight: 500;
     }
 
@@ -555,8 +519,6 @@ body {
         opacity: 0.6;
         font-style: italic;
     }
-
-
 
     .time-slot {
         padding: 0.25rem 0;
@@ -567,7 +529,7 @@ body {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        color: var(--primary);
+        color: var(--secondary);
         font-size: 0.9rem;
         margin-bottom: 1rem;
         cursor: pointer;
@@ -576,7 +538,7 @@ body {
     }
 
     .store-locate:hover {
-        color: var(--text-dark);
+        color: var(--tertiary);
     }
 
     .store-locate i {
@@ -605,7 +567,7 @@ body {
     }
 
     .btn-primary:hover {
-        background-color: rgba(166, 124, 82, 0.1);
+        background-color: rgba(10, 46, 46, 0.1);
     }
 
     .btn-secondary {
@@ -625,7 +587,7 @@ body {
     }
 
     .btn-secondary:hover {
-        background-color: #8C5E3B;
+        background-color: var(--secondary);
     }
 
     /* Animation des marqueurs */
@@ -669,11 +631,9 @@ body {
         }
     }
 
-
-
     .store-actions {
         display: grid;
-        color: #000;
+        color: var(--text-dark);
         grid-template-columns: 1fr 1fr;
         gap: 0.75rem;
     }
@@ -697,7 +657,9 @@ body {
     }
 
     .appointment-button:hover {
-        background-color: var(--secondary);    }
+        background-color: var(--secondary);
+        color: white;
+    }
 
     .details-button {
         background-color: var(--primary);
@@ -783,186 +745,317 @@ body {
     @media (prefers-color-scheme: dark) {
         body {
             background-color: #ffffff;
-            color: var(--text-light);
+            color: var(--text-dark);
         }
         
         .dashboard-header {
             background-color: #ffffff;
-            border-bottom-color: #FFFFFF;
+            border-bottom-color: var(--border);
         }
         
         .title {
-            color:#1b5858;
+            color: var(--primary);
         }
         
         .filter-button {
-            background-color: #1b5858;
-            border-color:#1b5858;
-            color: var(--text-light);
+            background-color: white;
+            color: var(--primary);
+            border-color: var(--border);
         }
         
         .search-input {
-            background-color: #1b5858;
-            border-color: #000000;
-            color: var(--text-light);
+            background-color: #ffffff;
+            color: var(--text-dark);
+            border-color: var(--border);
         }
         
         .store-card {
-    background-color: #1b5858;
-    backdrop-filter: blur(8px); 
-    border: 1px solid #000000;
-    border-radius: 16px;
-    padding: 1rem;
-}
+            background-color: #ffffff;
+            backdrop-filter: blur(8px); 
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+        }
         
         .store-address, .store-hours-toggle {
-            color: #ffffff;
+            color: var(--text-dark);
         }
         
         .appointment-button {
-            background-color: var(--primary);       
-            border-color: var(--dark-beige);
-            color:#FFF;
+            background-color: white;
+            border-color: var(--secondary);
+            color: var(--secondary);
         }
 
         .dropdown-options {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        background:#1b5858;
-        border: 1px solid #505050;
-        border-radius:0  30px 0 30px ;
-        padding: 10px;
-        margin-top: 5px;
-        min-width: 200px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        z-index: 10;
-    }
-    .hours-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 0 30px 0 30px;
+            padding: 10px;
+            margin-top: 5px;
+            min-width: 200px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 10;
+            color: var(--text-dark);
+        }
+        
+        .hours-dropdown {
             background-color: #ffffff;
-            border-color: #080807;
+            border-color: var(--border);
+            color: var(--text-dark);
         }
     
-    .dropdown-option {
-        padding: 8px 0;
+        .dropdown-option {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dark);
+        }
+        
+        .dropdown-icon {
+            transition: transform 0.2s;
+        }
+        
+        .dropdown-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .reset-button {
+            background-color: #f8f8f8;
+            color: var(--primary);
+            border-color: var(--border);
+        }
+
+        .reset-button:hover {
+            background-color: #e8e8e8;
+        }
+
+        .no-results {
+            background-color: #f8f9fa;
+            border-color: var(--border);
+            color: #6c757d;
+        }
+
+        .no-results h3 {
+            color: var(--text-dark);
+        }
+    }
+
+    .phone-link {
         display: flex;
         align-items: center;
-        gap: 8px;
-    }
-    
-    .dropdown-icon {
-        transition: transform 0.2s;
-    }
-    
-    .dropdown-icon.rotated {
-        transform: rotate(180deg);
+        gap: 0.5rem;
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
     }
 
-    .reset-button {
-        background-color: #2a2a2a;
-        color: #ffffff;
-        border-color: #505050;
-    }
-
-    .reset-button:hover {
-        background-color: #3a3a3a;
-    }
-
-    .no-results {
-        background-color: #2a2a2a;
-        border-color: #505050;
-        color: #aaaaaa;
-    }
-
-    .no-results h3 {
-        color: #ffffff;
-    }
-    }
-
-
-
-    .phone-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 500;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    transition: all 0.2s ease;
-}
-
-.phone-link:hover {
-    background-color: rgba(188, 207, 204, 0.1);
-    text-decoration: underline;
-}
-
-.phone-link:active {
-    transform: scale(0.98);
-}
-
-.phone-icon {
-    width: 1rem;
-    height: 1rem;
-    color: var(--primary);
-}
-
-/* Style pour les appareils mobiles */
-@media (max-width: 768px) {
-    .phone-link {
-        padding: 0.75rem 1rem;
-        background-color: var(--primary);
-        color: white;
-        justify-content: center;
-    }
-    
     .phone-link:hover {
-        background-color: #000000;
+        background-color: rgba(10, 46, 46, 0.1);
+        text-decoration: underline;
     }
-    
-    .phone-icon {
-        color: white;
-    }
-}
 
-/* Accessibilité - Focus visible */
-.phone-link:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
+    .phone-link:active {
+        transform: scale(0.98);
+    }
+
+    .phone-icon {
+        width: 1rem;
+        height: 1rem;
+        color: var(--primary);
+    }
+
+    /* Style pour les appareils mobiles */
+    @media (max-width: 768px) {
+        .phone-link {
+            padding: 0.75rem 1rem;
+            background-color: var(--primary);
+            color: white;
+            justify-content: center;
+        }
+        
+        .phone-link:hover {
+            background-color: var(--secondary);
+        }
+        
+        .phone-icon {
+            color: white;
+        }
+    }
+
+    /* Accessibilité - Focus visible */
+    .phone-link:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    .service-filter-group {
+        position: relative;
+        min-width: 200px;
+    }
+
+    .service-search-container {
+        display: flex;
+        align-items: center;
+        position: relative;
+        width: 100%;
+    }
+
+    .service-search-input {
+        width: 95%;
+        padding: 0.75rem 1.5rem 0.75rem 2.5rem;
+        border: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        border-radius: 30px 0px;
+        cursor: pointer;
+        height: 50px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background-color: white;
+        color: var(--text-dark);
+    }
+
+    .service-search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(10, 46, 46, 0.1);
+    }
+
+    .service-search-icon {
+        position: absolute;
+        left: 0.55rem;
+        right: 0.55rem;
+        color: var(--primary);
+        font-size: 1.2rem;
+        width: 1rem;
+        height: 1rem;
+    }
+
+    /* --- TYPO Responsive et moderne --- */
+    .title {
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+    }
+
+    /* --- Responsive amélioré pour la grille principale --- */
+    .content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+
+    @media (max-width: 992px) {
+        .content {
+            grid-template-columns: 1fr;
+        }
+
+        .search-bar {
+            max-width: 100%;
+        }
+
+        .filters-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+
+    /* --- Pour les très petits écrans --- */
+    @media (max-width: 480px) {
+        .filter-group,
+        .search-bar,
+        .reset-button,
+        .location-search {
+            width: 100% !important;
+        }
+
+        .ok-button {
+            width: 100%;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .search-input {
+            border-radius: 10px 10px 0 0;
+            border-right: 1px solid var(--border);
+        }
+
+        .filters-container {
+            padding: 1rem 0;
+            gap: 0.75rem;
+        }
+
+        .dashboard-header {
+            padding: 1rem 0;
+        }
+    }
+
+    /* --- Loader moderne et accessible --- */
+    #loader {
+        backdrop-filter: blur(4px);
+        border-radius: 1rem;
+        font-size: 1rem;
+    }
+
+    /* --- Hover améliorés --- */
+    .filter-button:hover,
+    .ok-button:hover,
+    .location-search:hover,
+    .reset-button:hover {
+        transform: scale(1.02);
+    }
+
+    /* --- Focus accessibles --- */
+    .search-input:focus,
+    .filter-button:focus,
+    .ok-button:focus,
+    .reset-button:focus {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    /* --- Scroll personnalisé pour la liste des boutiques --- */
+    .stores-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .stores-container::-webkit-scrollbar-thumb {
+        background-color: var(--primary);
+        border-radius: 4px;
+    }
+
+    .stores-container {
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary) transparent;
+    }
 
 </style>
 </head>
 <body>
 
-  <div class="dashboard-header">
+
+    <div class="dashboard-header">
         <h1 class="title">NOS BOUTIQUES</h1>
     </div>
+
+    
     
     <div class="container">
         <div class="filters-container">
     
-            <div class="filter-group">
-                <button class="filter-button" onclick="toggleDropdown(this)">
-                    Service
-                    <i data-lucide="chevron-down" class="dropdown-icon"></i>
-                </button>
-                <div class="dropdown-options" style="display: none;">
-                    <div class="dropdown-option">
-                        <input type="checkbox" id="specialite1" name="specialite" value="dentiste">
-                        <label for="specialite1">Dentiste</label>
-                    </div>     
-                    <div class="dropdown-option">
-                        <input type="checkbox" id="specialite2" name="specialite" value="opticien">
-                        <label for="specialite2">Opticien</label>
-                    </div>  
-                    <div class="dropdown-option">
-                        <input type="checkbox" id="specialite3" name="specialite" value="audition">
-                        <label for="specialite3">Audition</label>      
-                    </div>
+            <div class="filter-group service-filter-group">
+                <div class="service-search-container">
+                    <input type="text" id="serviceSearch" placeholder="Rechercher un service..." class="service-search-input">
+                    <i data-lucide="search" class="service-search-icon"></i>
                 </div>
-            </div> 
+            </div>
     
          
         
@@ -1068,87 +1161,6 @@ body {
             document.addEventListener('DOMContentLoaded', function() {
                 lucide.createIcons();
             });
-
-            function filterStores() {
-                // Récupérer les services sélectionnés
-                const selectedServices = [];
-                document.querySelectorAll('input[name="specialite"]:checked').forEach((checkbox) => {
-                    selectedServices.push(checkbox.value);
-                });
-
-                // Envoyer la requête via Fetch
-                // fetch('/filter-stores', {
-                //     method: 'GET',  // ou POST si tu préfères
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify({ specialite: selectedServices }),
-                // })
-                // .then(response => response.json() )
-                // .then(data => {
-                //     // Mettre à jour la liste des magasins
-                //     const storesList = document.getElementById('stores-list');
-                //     storesList.innerHTML = '';  // Vider la liste avant de la remplir
-
-                //     data.stores.forEach(store => {
-                //         const storeElement = document.createElement('div');
-                //         storeElement.innerHTML = `
-                //             <h3>${store.nom}</h3>
-                //             <p>${store.adresse}, ${store.ville}</p>
-                //             <p>Services: ${store.services.join(', ')}</p>
-                //         `;
-                //         storesList.appendChild(storeElement);
-                //     });
-                // })
-                // .catch(error => {
-                //     console.error('Erreur lors du filtrage des magasins', error);
-                // });
-            }
-
-            // Fonction de réinitialisation
-            function resetFilters() {
-                // Réinitialiser les checkboxes et radios
-                document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(input => {
-                    input.checked = false;
-                });
-                
-                // Réinitialiser le champ de recherche
-                document.getElementById('storeSearch').value = '';
-                
-                // Désactiver le bouton "Autour de moi"
-                document.querySelector('.location-search').classList.remove('active');
-                
-                // Réinitialiser la carte et les marqueurs
-                if (window.map) {
-                    // Recharger tous les magasins
-                    loadAllStores();
-                }
-            }
-
-            // Fonction pour charger tous les magasins
-            function loadAllStores() {
-                showLoading(true);
-                
-                fetch('/stores', {
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return response.json();
-                })
-                .then(stores => {
-                    updateStoresList(stores);
-                    updateMap(stores);
-                })
-                .catch(error => {
-                    console.error("Fetch error:", error);
-                    showError("Erreur lors du chargement des résultats");
-                })
-                .finally(() => showLoading(false));
-            }
         </script>
         
     
@@ -1164,23 +1176,16 @@ body {
             <div class="stores-container" id="stores-container">
                 @foreach($stores as $store)
                 <div class="store-card" >
+                
                     <div class="store-header">
                         <span class="store-badge">
-                            {{ is_array($store->services) ? implode(', ', $store->services) : ($store->services ?? 'Service non défini') }}
-                        </span>              
-                         
-                        {{-- <span class="store-status {{ $store->is_open ? 'open' : 'closed' }}">
-                            {{ $store->is_open ? 'Ouvert' : 'Fermé' }}
-                        </span> --}}
-                        
-                                  
+                            {{ is_array($store->services) ? implode(' - ', $store->services) : ($store->services ?? 'Service non défini') }}
+                        </span>                                             
                         <span class="store-status {{ $store->is_open ? 'open' : 'closed' }}">
                             {{ $store->today_status }}
                         </span>
-                 
-    
-    
                     </div>
+
                     
                     @if($store->ouvert_jusqua && !$store->is_closed)
                     <div class="store-hours">
@@ -1249,6 +1254,14 @@ body {
     </div>
     
     <script>
+
+        const rootElement = document.getElementById('react-root');
+        if (rootElement) {
+            const root = ReactDOM.createRoot(rootElement);
+            root.render(<App />);
+        }
+
+
         // Fonction pour afficher/masquer les horaires
         function toggleHours(element) {
             const dropdown = element.querySelector('.hours-dropdown');
@@ -1280,17 +1293,15 @@ body {
         });
     </script>
 
-
-
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8&callback=initMap" async defer></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('storeSearch');
+            const serviceSearchInput = document.getElementById('serviceSearch');
             const searchButton = document.getElementById('searchButton');
             const locationButton = document.querySelector('.location-search');
             const storesContainer = document.getElementById('stores-container');
-            const serviceCheckboxes = document.querySelectorAll('input[name="specialite"]');
             const horaireRadios = document.querySelectorAll('input[name="horaire"]');
             const resetButton = document.getElementById('resetButton');
             
@@ -1308,6 +1319,10 @@ body {
                 });
             }
             
+            if (serviceSearchInput) {
+                serviceSearchInput.addEventListener('input', debounce(performSearch, 500));
+            }
+            
             if (locationButton) {
                 locationButton.addEventListener('click', function() {
                     this.classList.toggle('active');
@@ -1319,11 +1334,7 @@ body {
                 resetButton.addEventListener('click', resetFilters);
             }
             
-            // Ajouter des écouteurs pour les filtres de service et d'horaire
-            serviceCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', performSearch);
-            });
-            
+            // Ajouter des écouteurs pour les filtres d'horaire
             horaireRadios.forEach(radio => {
                 radio.addEventListener('change', performSearch);
             });
@@ -1331,7 +1342,7 @@ body {
             // Fonction principale de recherche
             function performSearch() {
                 // 1. Récupérer les valeurs des filtres
-                const selectedServices = Array.from(document.querySelectorAll('input[name="specialite"]:checked')).map(el => el.value);
+                const serviceSearchTerm = document.getElementById('serviceSearch')?.value.trim() || '';
                 const selectedHoraire = document.querySelector('input[name="horaire"]:checked')?.value;
                 const searchTerm = document.getElementById('storeSearch')?.value.trim() || '';
                 const aroundMeChecked = document.querySelector('.location-search').classList.contains('active');
@@ -1339,10 +1350,8 @@ body {
                 // 2. Préparer les paramètres pour l'URL
                 const params = new URLSearchParams();
     
-                // Ajouter les services
-                selectedServices.forEach(service => {
-                    params.append('specialite[]', service);
-                });
+                // Ajouter le terme de recherche de service
+                if (serviceSearchTerm) params.append('service_search', serviceSearchTerm);
     
                 // Ajouter les autres filtres
                 if (selectedHoraire) params.append('horaire', selectedHoraire);
@@ -1398,23 +1407,19 @@ body {
     
             // Fonction de réinitialisation
             function resetFilters() {
-                // Réinitialiser les checkboxes et radios
-                document.querySelectorAll('input[name="specialite"]:checked').forEach(checkbox => {
-                    checkbox.checked = false;
-                });
-                
+                // Réinitialiser les radios
                 document.querySelectorAll('input[name="horaire"]:checked').forEach(radio => {
                     radio.checked = false;
                 });
                 
-                // Réinitialiser le champ de recherche
+                // Réinitialiser les champs de recherche
                 document.getElementById('storeSearch').value = '';
+                document.getElementById('serviceSearch').value = '';
                 
                 // Désactiver le bouton "Autour de moi"
                 document.querySelector('.location-search').classList.remove('active');
                 
                 // Utiliser les données initiales des magasins au lieu de faire une nouvelle requête
-                // Cela évite l'erreur "Erreur lors du chargement des résultats"
                 const initialStores = window.stores || [];
                 updateStoresList(initialStores);
                 updateMap(initialStores);
@@ -1472,8 +1477,7 @@ body {
             function sendFetchRequest(params) {
                 showLoading(true);
     
-                // Pour le développement et les tests, utilisez cette approche
-                // qui simule une réponse si la requête échoue
+                // Envoyer la requête au backend
                 fetch(`/filter?${params.toString()}`, {
                     headers: {
                         'Accept': 'application/json',
@@ -1651,6 +1655,18 @@ body {
                     .replace(/"/g, "&quot;")
                     .replace(/'/g, "&#039;");
             }
+            
+            // Fonction de debounce pour limiter les appels lors de la frappe
+            function debounce(func, wait) {
+                let timeout;
+                return function() {
+                    const context = this, args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        func.apply(context, args);
+                    }, wait);
+                };
+            }
         });
     </script>
     
@@ -1666,82 +1682,107 @@ body {
         // Stocker les données initiales pour la réinitialisation
         window.stores = stores;
         
-        function initMap() {
-            // Coordonnées par défaut (Paris, France)
-            const defaultLocation = { lat: 48.8566, lng: 2.3522 };
-            
-            // Initialiser la carte
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: defaultLocation,
-                zoom: 4,
-                mapTypeControl: true,
-                streetViewControl: false,
-                fullscreenControl: true,
-                styles: [
-              {
-                featureType: "administrative",
-                elementType: "labels.text.fill",
-                stylers: [{ color: "#444444" }],
-              },
-              {
-                featureType: "landscape",
-                elementType: "all",
-                stylers: [{ color: "#f2f2f2" }],
-              },
-              {
-                featureType: "poi",
-                elementType: "all",
-                stylers: [{ visibility: "off" }],
-              },
-              
-              {
-                featureType: "road",
-                elementType: "all",
-                stylers: [{ saturation: -100 }, { lightness: 45 }],
-              },
-              {
-                featureType: "road.highway",
-                elementType: "all",
-                stylers: [{ visibility: "simplified" }],
-              },
-              {
-                featureType: "road.arterial",
-                elementType: "labels.icon",
-                stylers: [{ visibility: "off" }],
-              },
-              {
-                featureType: "transit",
-                elementType: "all",
-                stylers: [{ visibility: "off" }],
-              },
-              {
-                featureType: "water",
-                elementType: "all",
-                stylers: [{ color: "#429182" }, { visibility: "on" }],
-              },
-              
-            ],
-            });
-
-            
-            
-            // Créer une fenêtre d'info
-            infoWindow = new google.maps.InfoWindow();
-            
-            // Rendre les variables accessibles globalement
-            window.map = map;
-            window.infoWindow = infoWindow;
-            
-            // Ajouter les marqueurs pour chaque boutique
-            addMarkersToMap(stores);
-            
-            // Ajuster la vue pour inclure tous les marqueurs
-            if (markers.length > 0) {
-                const bounds = new google.maps.LatLngBounds();
-                markers.forEach(marker => bounds.extend(marker.getPosition()));
-                map.fitBounds(bounds);
-            }
+     function initMap() {
+        // Coordonnées par défaut (centre du Maroc)
+        const defaultLocation = { lat: 31.7917, lng: -7.0926 };
+        
+        // Initialiser la carte avec les styles pour masquer les frontières du Sahara Occidental
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: defaultLocation,
+            zoom: 5,
+            mapTypeControl: true,
+            streetViewControl: false,
+            fullscreenControl: true,
+            styles: [
+                {
+                    // Masquer toutes les frontières des pays
+                    featureType: "administrative.country",
+                    elementType: "geometry.stroke",
+                    stylers: [
+                        { visibility: "off" }
+                    ]
+                },
+                {
+                    featureType: "administrative",
+                    elementType: "labels.text.fill",
+                    stylers: [{ color: "#444444" }],
+                },
+                {
+                    featureType: "landscape",
+                    elementType: "all",
+                    stylers: [{ color: "#f2f2f2" }],
+                },
+                {
+                    featureType: "poi",
+                    elementType: "all",
+                    stylers: [{ visibility: "off" }],
+                },
+                {
+                    featureType: "road",
+                    elementType: "all",
+                    stylers: [{ saturation: -100 }, { lightness: 45 }],
+                },
+                {
+                    featureType: "road.highway",
+                    elementType: "all",
+                    stylers: [{ visibility: "simplified" }],
+                },
+                {
+                    featureType: "road.arterial",
+                    elementType: "labels.icon",
+                    stylers: [{ visibility: "off" }],
+                },
+                {
+                    featureType: "transit",
+                    elementType: "all",
+                    stylers: [{ visibility: "off" }],
+                },
+                {
+                    featureType: "water",
+                    elementType: "all",
+                    stylers: [{ color: "#0A2E2E" }, { visibility: "on" }],
+                },
+            ]
+        });
+        
+        // Charger les frontières des pays (sauf Sahara Occidental)
+        loadCountryBorders();
+        
+        // Créer une fenêtre d'info
+        infoWindow = new google.maps.InfoWindow();
+        
+        // Ajouter les marqueurs pour chaque boutique
+        addMarkersToMap();
+        
+        // Ajuster la vue pour inclure tous les marqueurs
+        if (markers.length > 0) {
+            bounds = new google.maps.LatLngBounds();
+            markers.forEach(marker => bounds.extend(marker.getPosition()));
+            map.fitBounds(bounds);
         }
+    }
+    
+    // Fonction pour charger les frontières des pays
+    function loadCountryBorders() {
+        // Charger le GeoJSON des frontières mondiales
+        map.data.loadGeoJson(
+            "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
+        );
+        
+        // Styler chaque pays: masquer le Sahara Occidental, dessiner les autres
+        map.data.setStyle(function(feature) {
+            const name = feature.getProperty("name");
+            return {
+                // pas de remplissage
+                fillOpacity: 0,
+                // style de bordure pour les "autres" pays
+                strokeColor: "#444",
+                strokeWeight: 1,
+                strokeOpacity: name === "Sahara Occidental" ? 0 : 1
+            };
+        });
+    }
+    
         
         // Fonction pour ajouter des marqueurs à la carte avec clustering
         function addMarkersToMap(stores) {
@@ -2078,6 +2119,6 @@ body {
         });
     </script>
 
-
+    
 </body>
 </html>

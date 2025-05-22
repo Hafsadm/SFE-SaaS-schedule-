@@ -31,4 +31,21 @@ class Product extends Model
     {
         return $this->belongsTo(Store::class);
     }
+    
+    /**
+     * Récupère les images du produit sous forme de tableau
+     */
+    public function getImagesAttribute()
+    {
+        return $this->image ? json_decode($this->image) : [];
+    }
+    
+    /**
+     * Récupère la première image du produit pour l'affichage en miniature
+     */
+    public function getThumbnailAttribute()
+    {
+        $images = $this->getImagesAttribute();
+        return !empty($images) ? $images[0] : null;
+    }
 }
