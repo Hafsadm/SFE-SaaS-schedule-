@@ -16,9 +16,16 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.stores.schedules.store', $store) }}" method="POST" class="schedule-form">
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <form action="{{ route('admin.stores.schedules.store', $store) }}" method="POST" class="schedule-form" id="scheduleForm">
         @csrf
         <input type="hidden" name="type" value="regular">
+        <input type="hidden" name="apply_to_all_days" id="applyToAllDays" value="0">
 
         <div class="form-group">
             <label for="day_of_week">Jour de la semaine</label>
@@ -33,12 +40,10 @@
             @enderror
         </div>
 
-
-
         <div id="time_slots_container" class="time-slots-container" style="{{ old('is_closed') ? 'display: none;' : '' }}">
             <h3>Créneaux horaires</h3>
             <div id="time_slots">
-                @if(old('day_of_week') == 'dimanche' && old('time_slots'))
+                @if(old('time_slots'))
                     @foreach(old('time_slots') as $index => $slot)
                         <div class="time-slot-group">
                             <div class="time-inputs">
@@ -66,34 +71,45 @@
             </div>
 
       
-   
-            
-            @error('time_slots')
-                <div class="error-message">{{ $message }}</div>
-            @enderror
-            @error('time_slots.*.start')
-                <div class="error-message">{{ $message }}</div>
-            @enderror
-            @error('time_slots.*.end')
-                <div class="error-message">{{ $message }}</div>
-            @enderror
         </div>
-
-
+{{-- 
         <div class="form-group">
             <label for="is_closed" class="checkbox-label">
-                <input type="checkbox" name="is_closed" id="is_closed">
+                <input type="checkbox" name="is_closed" id="is_closed" {{ old('is_closed') ? 'checked' : '' }}>
                 Fermé
             </label>
-        </div>
+        </div> --}}
 
         <div class="form-actions">
+            <button type="button" class="apply-all-btn" id="applyToAllButton">
+                <i data-lucide="copy"></i>
+                Appliquer à tous les jours
+            </button>
             <button type="submit" class="submit-btn">
                 <i data-lucide="save"></i>
                 Enregistrer l'horaire
             </button>
         </div>
     </form>
+</div>
+
+<!-- Modal de confirmation -->
+<div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Confirmation</h2>
+            <span class="close" id="closeModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>Voulez-vous appliquer ces horaires à tous les jours de la semaine?</p>
+            <p class="modal-info">Cette action va créer ou remplacer les horaires pour tous les jours de la semaine avec les créneaux horaires que vous avez définis.</p>
+            <div id="schedulePreview" class="schedule-preview"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="cancelButton" class="cancel-btn">Annuler</button>
+            <button id="confirmButton" class="confirm-btn">Confirmer</button>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -103,6 +119,7 @@
         --text-color: #333;
         --border-color: #D2B48C;
         --error-color: #F44336;
+        --success-color: #4CAF50;
     }
 
     .schedule-form-container {
@@ -159,12 +176,17 @@
         border: 1px solid var(--error-color);
     }
 
+    .alert-success {
+        background-color: #E8F5E8;
+        color: var(--success-color);
+        border: 1px solid var(--success-color);
+    }
+
     .schedule-form {
         background: #0a2e2e;
         padding: 2rem;
         border-radius: 30px 0;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         border: 1px solid var(--border-color);
     }
 
@@ -174,8 +196,6 @@
 
     .form-group label {
         display: block;
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
         font-size: 1.2rem;
         font-weight: 600;
         cursor: pointer;
@@ -192,7 +212,6 @@
         color: var(--text-color);
         margin-left: auto;
         margin-right: auto;
-        
     }
 
     .checkbox-label {
@@ -210,7 +229,6 @@
 
     .time-slots-container {
         margin-bottom: 1.5rem;
-        
     }
 
     .time-slots-container h3 {
@@ -231,7 +249,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        flex: 10px;
+        flex: 1;
         margin-left: auto;
         margin-right: auto;
     }
@@ -240,9 +258,7 @@
         padding: 0.5rem;
         border: 1px solid var(--border-color);
         border-radius: 20px 0;
-       
         background: white;
-        align-items: center;
         color: var(--text-color);
         flex: 1;
     }
@@ -258,6 +274,16 @@
         color: #dc3545;
         cursor: pointer;
         padding: 0.25rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+    }
+
+    .remove-slot:hover {
+        background-color: rgba(220, 53, 69, 0.1);
     }
 
     .add-slot-btn {
@@ -283,12 +309,13 @@
 
     .form-actions {
         display: flex;
-        justify-content: flex-end;
-
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
     }
 
-    .submit-btn {
-        font-family: Georgia, 'Times New Roman', Times, serif
+    .submit-btn, .apply-all-btn {
+        font-family: Georgia, 'Times New Roman', Times, serif;
         display: flex;
         align-items: center;
         border: none;
@@ -297,18 +324,32 @@
         font-size: 1rem;
         gap: 0.5rem;
         padding: 0.75rem 1.5rem;
-        background-color:  #2a6363;
-        color: #D2B48C;
-        border: none;
         border-radius: 30px 0;
-        cursor: pointer;
         transition: all 0.2s;
-        margin-right: 1.3rem;
         margin-top: 1.4rem;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .submit-btn {
+        background-color: #2a6363;
+        color: #D2B48C;
+    }
+
+    .apply-all-btn {
+        background-color: #D2B48C;
+        color: #0a2e2e;
     }
 
     .submit-btn:hover {
         background-color: #0a2e2e;
+        color: #D2B48C;
+        transform: translateY(-1px);
+    }
+
+    .apply-all-btn:hover {
+        background-color: #b89a76;
+        color: #0a2e2e;
         transform: translateY(-1px);
     }
 
@@ -316,6 +357,137 @@
         color: var(--error-color);
         font-size: 0.875rem;
         margin-top: 0.25rem;
+    }
+
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: #0a2e2e;
+        margin: 10% auto;
+        padding: 0;
+        border: 1px solid var(--border-color);
+        border-radius: 30px 0;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        animation: modalFadeIn 0.3s;
+    }
+
+    @keyframes modalFadeIn {
+        from {opacity: 0; transform: translateY(-20px);}
+        to {opacity: 1; transform: translateY(0);}
+    }
+
+    .modal-header {
+        padding: 1rem;
+        background-color: var(--secondary-color);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 30px 0 0 0;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        color: #D2B48C;
+        font-size: 1.5rem;
+    }
+
+    .close {
+        color: #D2B48C;
+        font-size: 1.5rem;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
+
+    .close:hover {
+        color: white;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        color: #D2B48C;
+    }
+
+    .modal-info {
+        font-size: 0.9rem;
+        color: #aaa;
+        margin-top: 1rem;
+    }
+
+    .schedule-preview {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: rgba(210, 180, 140, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(210, 180, 140, 0.3);
+    }
+
+    .schedule-preview h4 {
+        margin: 0 0 0.5rem 0;
+        color: #D2B48C;
+    }
+
+    .schedule-preview .preview-item {
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .modal-footer {
+        padding: 1rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    .cancel-btn, .confirm-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 30px 0;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s;
+    }
+
+    .cancel-btn {
+        background-color: #555;
+        color: white;
+    }
+
+    .confirm-btn {
+        background-color: #2a6363;
+        color: #D2B48C;
+    }
+
+    .cancel-btn:hover {
+        background-color: #444;
+        transform: translateY(-1px);
+    }
+
+    .confirm-btn:hover {
+        background-color: #1b5858;
+        transform: translateY(-1px);
     }
 
     @media (max-width: 768px) {
@@ -329,17 +501,34 @@
             width: 100%;
             justify-content: center;
         }
+
+        .form-actions {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .apply-all-btn, .submit-btn {
+            width: 100%;
+        }
+
+        .modal-content {
+            width: 95%;
+            margin: 5% auto;
+        }
     }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('Script chargé');
         lucide.createIcons();
         
         const isClosedCheckbox = document.getElementById('is_closed');
         const timeSlotsContainer = document.getElementById('time_slots_container');
         
+        // Gestion de la checkbox "Fermé"
         isClosedCheckbox.addEventListener('change', function() {
+            console.log('Checkbox fermé changée:', this.checked);
             timeSlotsContainer.style.display = this.checked ? 'none' : 'block';
             
             // Gérer les attributs required des champs de temps
@@ -348,9 +537,131 @@
                 input.required = !this.checked;
             });
         });
+
+        // Modal de confirmation
+        const modal = document.getElementById('confirmModal');
+        const applyToAllButton = document.getElementById('applyToAllButton');
+        const confirmButton = document.getElementById('confirmButton');
+        const cancelButton = document.getElementById('cancelButton');
+        const closeButton = document.getElementById('closeModal');
+        const applyToAllDaysInput = document.getElementById('applyToAllDays');
+        const scheduleForm = document.getElementById('scheduleForm');
+
+        console.log('Éléments trouvés:', {
+            modal: !!modal,
+            applyToAllButton: !!applyToAllButton,
+            confirmButton: !!confirmButton,
+            cancelButton: !!cancelButton,
+            closeButton: !!closeButton
+        });
+
+        // Ouvrir le modal
+        if (applyToAllButton) {
+            applyToAllButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Bouton "Appliquer à tous" cliqué');
+                
+                // Vérifier si un jour est sélectionné
+                const dayOfWeek = document.getElementById('day_of_week').value;
+                if (!dayOfWeek) {
+                    alert('Veuillez sélectionner un jour de la semaine avant d\'appliquer à tous les jours.');
+                    return;
+                }
+
+                // Vérifier si des créneaux horaires sont définis (si le magasin n'est pas fermé)
+                if (!isClosedCheckbox.checked) {
+                    const timeInputs = document.querySelectorAll('.time-input');
+                    let allFilled = true;
+                    
+                    timeInputs.forEach(input => {
+                        if (!input.value) {
+                            allFilled = false;
+                        }
+                    });
+
+                    if (!allFilled) {
+                        alert('Veuillez remplir tous les créneaux horaires avant d\'appliquer à tous les jours.');
+                        return;
+                    }
+                }
+
+                // Générer l'aperçu
+                generateSchedulePreview();
+                
+                // Afficher le modal
+                modal.style.display = 'block';
+                console.log('Modal affiché');
+            });
+        }
+
+        // Fermer le modal
+        function closeModal() {
+            modal.style.display = 'none';
+            console.log('Modal fermé');
+        }
+
+        if (closeButton) {
+            closeButton.addEventListener('click', closeModal);
+        }
+
+        if (cancelButton) {
+            cancelButton.addEventListener('click', closeModal);
+        }
+
+        // Cliquer en dehors du modal pour le fermer
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Confirmer l'application à tous les jours
+        if (confirmButton) {
+            confirmButton.addEventListener('click', function() {
+                console.log('Confirmation cliquée');
+                applyToAllDaysInput.value = '1';
+                console.log('Valeur apply_to_all_days définie à:', applyToAllDaysInput.value);
+                
+                // Soumettre le formulaire
+                scheduleForm.submit();
+            });
+        }
+
+        // Fonction pour générer l'aperçu des horaires
+        function generateSchedulePreview() {
+            const previewContainer = document.getElementById('schedulePreview');
+            const isClosed = isClosedCheckbox.checked;
+            
+            let previewHtml = '<h4>Aperçu des horaires qui seront appliqués :</h4>';
+            
+            if (isClosed) {
+                previewHtml += '<div class="preview-item"><strong>Tous les jours :</strong> Fermé</div>';
+            } else {
+                const timeSlots = [];
+                const timeInputs = document.querySelectorAll('.time-slot-group');
+                
+                timeInputs.forEach(group => {
+                    const startInput = group.querySelector('input[name*="[start]"]');
+                    const endInput = group.querySelector('input[name*="[end]"]');
+                    
+                    if (startInput && endInput && startInput.value && endInput.value) {
+                        timeSlots.push(startInput.value + ' - ' + endInput.value);
+                    }
+                });
+                
+                if (timeSlots.length > 0) {
+                    previewHtml += '<div class="preview-item"><strong>Tous les jours :</strong> ' + timeSlots.join(', ') + '</div>';
+                } else {
+                    previewHtml += '<div class="preview-item"><strong>Tous les jours :</strong> Aucun créneau défini</div>';
+                }
+            }
+            
+            previewContainer.innerHTML = previewHtml;
+        }
     });
 
     function addTimeSlot() {
+        console.log('Ajout d\'un créneau');
         const container = document.getElementById('time_slots');
         const timeSlotCount = container.children.length;
         
@@ -372,11 +683,6 @@
         lucide.createIcons();
     }
 
-    function removeTimeSlot(button) {
-        const container = document.getElementById('time_slots');
-        if (container.children.length > 1) {
-            button.closest('.time-slot-group').remove();
-        }
-    }
+
 </script>
 @endsection

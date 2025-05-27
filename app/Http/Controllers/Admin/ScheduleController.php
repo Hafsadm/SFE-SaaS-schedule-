@@ -90,7 +90,6 @@ class ScheduleController extends Controller
         return view('admin.stores.schedules.regular', compact('store', 'availableDays', 'sundayExists'));
     }
 
-
     /**
      * Enregistre un nouvel horaire régulier
      */
@@ -98,7 +97,12 @@ class ScheduleController extends Controller
     {
         Log::info('Début de la méthode store avec les données:', $request->all());
         
-        // Validation
+        // Vérifier si on doit appliquer à tous les jours
+        $applyToAllDays = $request->input('apply_to_all_days') == '1';
+        
+        Log::info('Apply to all days:', ['value' => $applyToAllDays]);
+        
+        // Validation de base
         $rules = [
             'day_of_week' => 'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
         ];
@@ -120,6 +124,11 @@ class ScheduleController extends Controller
         }
         
         try {
+            // Si on applique à tous les jours, on traite différemment
+            if ($applyToAllDays) {
+                return $this->applyToAllDays($request, $store);
+            }
+            
             // Vérifier si un horaire existe déjà pour ce jour
             $existingSchedule = $store->schedules()
                 ->where('day_of_week', $request->day_of_week)
@@ -135,13 +144,14 @@ class ScheduleController extends Controller
             $data = [
                 'store_id' => $store->id,
                 'day_of_week' => $request->day_of_week,
-                'is_closed' => $request->has('is_closed'),
-                'time_slots' => $request->has('is_closed') ? [] : $request->time_slots,
+                'is_closed' => $request->has('is_closed') ? 1 : 0,
+                'time_slots' => $request->has('is_closed') ? [] : ($request->time_slots ?? []),
             ];
             
             // Cas spécial pour le dimanche
             if ($request->day_of_week === 'sunday' && !$request->has('sunday_override')) {
-                $data['is_closed'] = true;
+                $data['is_closed'] = 1;
+                $data['time_slots'] = [];
             }
             
             // Créer l'horaire
@@ -160,6 +170,86 @@ class ScheduleController extends Controller
             
             return redirect()->back()
                 ->with('error', 'Une erreur est survenue: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    /**
+     * Applique les horaires à tous les jours de la semaine
+     */
+    private function applyToAllDays(Request $request, Store $store)
+    {
+        Log::info('Application des horaires à tous les jours pour le magasin:', ['store_id' => $store->id]);
+        
+        try {
+            // Liste des jours de la semaine
+            $daysOfWeek = [
+                'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
+            ];
+            
+            // Préparer les données communes
+            $isClosed = $request->has('is_closed') ? 1 : 0;
+            $timeSlots = $request->has('is_closed') ? [] : ($request->time_slots ?? []);
+            
+            Log::info('Données à appliquer:', [
+                'is_closed' => $isClosed,
+                'time_slots' => $timeSlots
+            ]);
+            
+            // Compteurs pour le message de succès
+            $created = 0;
+            $updated = 0;
+            
+            // Parcourir tous les jours de la semaine
+            foreach ($daysOfWeek as $day) {
+                // Vérifier si un horaire existe déjà pour ce jour
+                $existingSchedule = $store->schedules()
+                    ->where('day_of_week', $day)
+                    ->first();
+                
+                // Préparer les données spécifiques au jour
+                $data = [
+                    'store_id' => $store->id,
+                    'day_of_week' => $day,
+                    'is_closed' => $isClosed,
+                    'time_slots' => $timeSlots,
+                ];
+                
+                // Cas spécial pour le dimanche - toujours fermé sauf si override
+                if ($day === 'sunday' && !$request->has('sunday_override')) {
+                    $data['is_closed'] = 1;
+                    $data['time_slots'] = [];
+                }
+                
+                if ($existingSchedule) {
+                    // Mettre à jour l'horaire existant
+                    $existingSchedule->update($data);
+                    $updated++;
+                    Log::info('Horaire mis à jour pour:', ['day' => $day, 'schedule_id' => $existingSchedule->id]);
+                } else {
+                    // Créer un nouvel horaire
+                    $newSchedule = Schedule::create($data);
+                    $created++;
+                    Log::info('Nouvel horaire créé pour:', ['day' => $day, 'schedule_id' => $newSchedule->id]);
+                }
+            }
+            
+            Log::info('Horaires appliqués à tous les jours avec succès', [
+                'created' => $created,
+                'updated' => $updated
+            ]);
+            
+            return redirect()->route('admin.stores.schedules.index', $store)
+                ->with('success', "Horaires appliqués à tous les jours avec succès ($created créés, $updated mis à jour)");
+                
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'application des horaires à tous les jours: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request_data' => $request->all()
+            ]);
+            
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue lors de l\'application des horaires: ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -184,14 +274,17 @@ class ScheduleController extends Controller
         $isSunday = ($schedule->day_of_week === 'sunday');
         $type = 'regular';
         return view('admin.stores.schedules.edit', compact('store', 'schedule', 'days', 'isSunday', 'type'));
-}
+    }
+
     /**
      * Met à jour un horaire
      */
-    
     public function update(Request $request, Store $store, Schedule $schedule)
     {
         Log::info('Début de la méthode update avec les données:', $request->all());
+        
+        // Vérifier si on doit appliquer à tous les jours
+        $applyToAllDays = $request->input('apply_to_all_days') == '1';
         
         // Validation
         $rules = [
@@ -215,6 +308,11 @@ class ScheduleController extends Controller
         }
         
         try {
+            // Si on applique à tous les jours, on traite différemment
+            if ($applyToAllDays) {
+                return $this->applyToAllDays($request, $store);
+            }
+            
             // Vérifier si un autre horaire existe déjà pour ce jour
             if ($request->day_of_week !== $schedule->day_of_week) {
                 $existingSchedule = $store->schedules()
@@ -232,13 +330,14 @@ class ScheduleController extends Controller
             // Préparer les données
             $data = [
                 'day_of_week' => $request->day_of_week,
-                'is_closed' => $request->has('is_closed'),
-                'time_slots' => $request->has('is_closed') ? [] : $request->time_slots,
+                'is_closed' => $request->has('is_closed') ? 1 : 0,
+                'time_slots' => $request->has('is_closed') ? [] : ($request->time_slots ?? []),
             ];
             
             // Cas spécial pour le dimanche
             if ($request->day_of_week === 'sunday' && !$request->has('sunday_override')) {
-                $data['is_closed'] = true;
+                $data['is_closed'] = 1;
+                $data['time_slots'] = [];
             }
             
             // Mettre à jour l'horaire

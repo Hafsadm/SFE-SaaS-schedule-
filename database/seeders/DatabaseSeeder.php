@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             SpecialiteSeeder::class,
-        ]);
+        SettingsSeeder::class,
+    ]);
+
     }
 }

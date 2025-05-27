@@ -481,11 +481,13 @@
     }
 
     .hours-content {
+    
         padding: 1rem;
         display: none;
     }
 
     .day-schedule {
+      color: var(--text-light)
         padding: 0.75rem 0;
         border-bottom: 1px solid var(--border);
     }
@@ -503,7 +505,7 @@
 
     .day-name {
         font-weight: 600;
-        color: var(--primary);
+        color: var(--text-light);
         margin-bottom: 0.5rem;
     }
 

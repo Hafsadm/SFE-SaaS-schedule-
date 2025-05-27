@@ -251,16 +251,23 @@
 </div>
 
 <style>
-    :root {
-        --primary: #429182; 
-        --secondary: #337b8d; 
-        --light-beige: #F9F5EF;
-        --dark-beige: #1b5858; 
+     :root {
+           --primary: #0A2E2E; 
+        --secondary: #143333; 
+        --primary-light: #5aad9e;
+        --primary-dark: #337b8d;
+        --secondary-light: #ffffff;
+        --secondary-dark: #0a2e2e;
+        --tertiary: #8E6E53;
+        --light: #C69C72; 
         --text-dark: #000000; 
         --text-light: #FFFFFF; 
         --success: #5DBB63;
+        --error: #dc3545;
         --border: #E6D8C3; 
+        --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
     }
+
 
     .form-container {
         max-width: 1200px;

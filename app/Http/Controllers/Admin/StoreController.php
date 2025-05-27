@@ -30,12 +30,12 @@ class StoreController extends Controller
         // Sinon, l'admin ne voit que ses propres points de vente
         if ($user->role === 'super_admin') {
             $stores = Store::with(['schedules', 'exceptions', 'holidays'])
-                ->orderBy('is_main_store', 'desc') // Afficher d'abord les magasins principaux
+                // ->orderBy('is_main_store', 'desc') // Afficher d'abord les magasins principaux
                 ->get();
         } else {
             $stores = Store::with(['schedules', 'exceptions', 'holidays'])
                 ->where('user_id', $user->id)
-                ->orderBy('is_main_store', 'desc') // Afficher d'abord les magasins principaux
+                // ->orderBy('is_main_store', 'desc') // Afficher d'abord les magasins principaux
                 ->get();
         }
         
@@ -92,7 +92,7 @@ class StoreController extends Controller
             $mainStores = Store::where('is_main_store', true)->get();
         } else {
             $mainStores = Store::where('user_id', $user->id)
-                ->where('is_main_store', true)
+                // ->where('is_main_store', true)
                 ->get();
         }
         
@@ -120,7 +120,7 @@ class StoreController extends Controller
             'exterior_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'interior_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'equipment_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'is_main_store' => 'nullable|boolean',
+            // 'is_main_store' => 'nullable|boolean',
             'parent_store_id' => 'nullable|exists:stores,id',
             'copy_parent_schedule' => 'nullable|boolean',
         ]);
@@ -144,16 +144,16 @@ class StoreController extends Controller
         $data['user_id'] = Auth::id();
         
         // Gérer les relations magasin principal/filiale
-        if ($request->has('is_main_store') && $request->is_main_store) {
-            $data['is_main_store'] = true;
-            $data['parent_store_id'] = null;
-        } else {
-            $data['is_main_store'] = false;
-            // Si parent_store_id n'est pas fourni, c'est un magasin indépendant
-            if (!$request->has('parent_store_id') || !$request->parent_store_id) {
-                $data['parent_store_id'] = null;
-            }
-        }
+        // if ($request->has('is_main_store') && $request->is_main_store) {
+        //     $data['is_main_store'] = true;
+        //     $data['parent_store_id'] = null;
+        // } else {
+        //     $data['is_main_store'] = false;
+        //     // Si parent_store_id n'est pas fourni, c'est un magasin indépendant
+        //     if (!$request->has('parent_store_id') || !$request->parent_store_id) {
+        //         $data['parent_store_id'] = null;
+        //     }
+        // }
         
         // Traitement de l'image principale (ancienne colonne)
         if ($request->hasFile('image')) {
@@ -234,9 +234,9 @@ class StoreController extends Controller
     public function applySchedulesToSubsidiaries(Store $store)
     {
         // Vérifier que c'est bien un magasin principal
-        if (!$store->is_main_store) {
-            return redirect()->back()->with('error', 'Cette action n\'est disponible que pour les magasins principaux');
-        }
+        // if (!$store->is_main_store) {
+        //     return redirect()->back()->with('error', 'Cette action n\'est disponible que pour les magasins principaux');
+        // }
         
         // Vérifier que l'utilisateur a le droit de modifier ce magasin
         $user = Auth::user();
@@ -287,7 +287,7 @@ class StoreController extends Controller
                 ->get();
         } else {
             $mainStores = Store::where('user_id', $user->id)
-                ->where('is_main_store', true)
+                // ->where('is_main_store', true)
                 ->where('id', '!=', $store->id) // Exclure le magasin actuel
                 ->get();
         }
@@ -322,7 +322,7 @@ class StoreController extends Controller
             'exterior_image' => 'sometimes|image|mimes:jpeg,png,jpg|max:2048',
             'interior_image' => 'sometimes|image|mimes:jpeg,png,jpg|max:2048',
             'equipment_image' => 'sometimes|image|mimes:jpeg,png,jpg|max:2048',
-            'is_main_store' => 'nullable|boolean',
+            // 'is_main_store' => 'nullable|boolean',
             'parent_store_id' => 'nullable|exists:stores,id',
             'copy_parent_schedule' => 'nullable|boolean',
         ]);
@@ -343,28 +343,28 @@ class StoreController extends Controller
         }
         
         // Gérer les relations magasin principal/filiale
-        if ($request->has('is_main_store')) {
-            if ($request->is_main_store) {
-                $data['is_main_store'] = true;
-                $data['parent_store_id'] = null;
-            } else {
-                $data['is_main_store'] = false;
-                // Si parent_store_id n'est pas fourni, c'est un magasin indépendant
-                if (!$request->has('parent_store_id') || !$request->parent_store_id) {
-                    $data['parent_store_id'] = null;
-                } else {
-                    // Vérifier que le magasin parent n'est pas une filiale du magasin actuel
-                    // pour éviter les références circulaires
-                    $parentStore = Store::find($request->parent_store_id);
-                    if ($parentStore && $parentStore->parent_store_id == $store->id) {
-                        return redirect()->back()
-                            ->with('error', 'Impossible de créer une référence circulaire entre les magasins')
-                            ->withInput();
-                    }
-                    $data['parent_store_id'] = $request->parent_store_id;
-                }
-            }
-        }
+        // if ($request->has('is_main_store')) {
+        //     if ($request->is_main_store) {
+        //         $data['is_main_store'] = true;
+        //         $data['parent_store_id'] = null;
+        //     } else {
+        //         $data['is_main_store'] = false;
+        //         // Si parent_store_id n'est pas fourni, c'est un magasin indépendant
+        //         if (!$request->has('parent_store_id') || !$request->parent_store_id) {
+        //             $data['parent_store_id'] = null;
+        //         } else {
+        //             // Vérifier que le magasin parent n'est pas une filiale du magasin actuel
+        //             // pour éviter les références circulaires
+        //             $parentStore = Store::find($request->parent_store_id);
+        //             if ($parentStore && $parentStore->parent_store_id == $store->id) {
+        //                 return redirect()->back()
+        //                     ->with('error', 'Impossible de créer une référence circulaire entre les magasins')
+        //                     ->withInput();
+        //             }
+        //             $data['parent_store_id'] = $request->parent_store_id;
+        //         }
+        //     }
+        // }
         
         // Méthode helper pour traiter les images
         $processImage = function ($file, $currentImage) {
@@ -417,10 +417,10 @@ class StoreController extends Controller
         }
         
         // Vérifier si c'est un magasin principal avec des filiales
-        if ($store->is_main_store && $store->subsidiaries()->count() > 0) {
-            return redirect()->back()
-                ->with('error', 'Impossible de supprimer ce magasin principal car il possède des filiales. Veuillez d\'abord supprimer ou réaffecter les filiales.');
-        }
+        // if ($store->is_main_store && $store->subsidiaries()->count() > 0) {
+        //     return redirect()->back()
+        //         ->with('error', 'Impossible de supprimer ce magasin principal car il possède des filiales. Veuillez d\'abord supprimer ou réaffecter les filiales.');
+        // }
         
         // Supprimer les images si elles existent
         $deleteImage = function ($filename) {
@@ -577,25 +577,25 @@ class StoreController extends Controller
     /**
      * Affiche la page de gestion des filiales pour un magasin principal
      */
-    public function manageSubsidiaries(Store $store)
-    {
-        // Vérifier que c'est bien un magasin principal
-        if (!$store->is_main_store) {
-            return redirect()->route('admin.stores.index')
-                ->with('error', 'Cette action n\'est disponible que pour les magasins principaux');
-        }
+    // public function manageSubsidiaries(Store $store)
+    // {
+    //     // Vérifier que c'est bien un magasin principal
+    //     if (!$store->is_main_store) {
+    //         return redirect()->route('admin.stores.index')
+    //             ->with('error', 'Cette action n\'est disponible que pour les magasins principaux');
+    //     }
         
-        // Vérifier que l'utilisateur a le droit de gérer ce magasin
-        $user = Auth::user();
-        if ($user->role !== 'super_admin' && $store->user_id !== $user->id) {
-            abort(403, 'Vous n\'avez pas les droits pour gérer ce point de vente');
-        }
+    //     // Vérifier que l'utilisateur a le droit de gérer ce magasin
+    //     $user = Auth::user();
+    //     if ($user->role !== 'super_admin' && $store->user_id !== $user->id) {
+    //         abort(403, 'Vous n\'avez pas les droits pour gérer ce point de vente');
+    //     }
         
-        // Récupérer les filiales
-        $subsidiaries = $store->subsidiaries;
+    //     // Récupérer les filiales
+    //     $subsidiaries = $store->subsidiaries;
         
-        return view('admin.stores.subsidiaries', compact('store', 'subsidiaries'));
-    }
+    //     return view('admin.stores.subsidiaries', compact('store', 'subsidiaries'));
+    // }
 
 
     public function bulkScheduleManager()

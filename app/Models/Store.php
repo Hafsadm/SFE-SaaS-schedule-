@@ -29,8 +29,6 @@ class Store extends Model
         'annee_ouverture',
         'site_web',
         'user_id',         // Ajout: ID de l'admin propriétaire
-        'parent_store_id', // Ajout: ID du magasin principal (si filiale)
-        'is_main_store',   // Ajout: Indique si c'est un magasin principal
     ];
 
     protected $casts = [

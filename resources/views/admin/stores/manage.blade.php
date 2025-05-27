@@ -28,7 +28,7 @@
     }
 
     body {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Georgia', sans-serif;
         color: var(--text);
         background-color: #fff;
         line-height: 1.6;
@@ -140,7 +140,7 @@
         transition: var(--transition);
         cursor: pointer;
         border: none;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Georgia', sans-serif;
         font-size: 0.9rem;
     }
 
@@ -456,7 +456,7 @@
     <!-- Onglets -->
     <div class="tabs">
         <div class="tab active" data-tab="products">Produits</div>
-        <div class="tab" data-tab="staff">Personnel</div>
+        <div class="tab" data-tab="staff">Personne</div>
         <div class="tab" data-tab="info">Informations générales</div>
     </div>
 

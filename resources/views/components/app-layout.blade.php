@@ -17,7 +17,7 @@
             --color-primary: #429182;;
             --color-primary-light: #337b8d;
             --color-secondary: #D2B48C;
-            --color-background: #F9F5EF;
+            --color-background: #ffffff;
             --color-card: #FFFFFF;
             --color-text: #1b5858;
             --color-text-light: #1c3131;
@@ -35,7 +35,7 @@
             --color-primary: #298675;
             --color-primary-light: #337b8d;
             --color-secondary: #8cd2c9;
-            --color-background: #F9F5EF;
+            --color-background: #ffffff;
             --color-card: #FFFFFF;
             --color-text: #1b5858;
             --color-text-light: #1c3131;

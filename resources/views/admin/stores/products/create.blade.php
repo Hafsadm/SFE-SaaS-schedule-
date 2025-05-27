@@ -7,17 +7,22 @@
 <style>
     /* Variables de couleur */
     :root {
-        --primary: #157575;
-        --primary-light: #429182;
-        --primary-dark: #1b5858;
-        --secondary: #4a9cad;
-        --light-beige: #ccd6d6;
-        --dark-beige: #1d4b4b;
-        --text-dark: #1d4b4b;
-        --text-light: #f5f5f5;
-        --border: #2a6363;
-        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+           --primary: #0A2E2E; 
+        --secondary: #143333; 
+        --primary-light: #5aad9e;
+        --primary-dark: #337b8d;
+        --secondary-light: #ffffff;
+        --secondary-dark: #0a2e2e;
+        --tertiary: #8E6E53;
+        --light: #C69C72; 
+        --text-dark: #000000; 
+        --text-light: #FFFFFF; 
+        --success: #5DBB63;
+        --error: #dc3545;
+        --border: #E6D8C3; 
+        --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
     }
+
 
     /* Reset et base */
     * {

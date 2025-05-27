@@ -43,7 +43,7 @@
         </a>
 
         <!-- Notifications -->
-        <a href="{{ route('admin.settings.notifications') }}" class="settings-card">
+        {{-- <a href="{{ route('admin.settings.notifications') }}" class="settings-card">
             <div class="card-icon">
                 <i class="fas fa-bell"></i>
             </div>
@@ -54,10 +54,10 @@
             <div class="card-arrow">
                 <i class="fas fa-chevron-right"></i>
             </div>
-        </a>
+        </a> --}}
 
         <!-- Sécurité -->
-        <a href="{{ route('admin.settings.security') }}" class="settings-card">
+        {{-- <a href="{{ route('admin.settings.security') }}" class="settings-card">
             <div class="card-icon">
                 <i class="fas fa-shield-alt"></i>
             </div>
@@ -68,7 +68,7 @@
             <div class="card-arrow">
                 <i class="fas fa-chevron-right"></i>
             </div>
-        </a>
+        </a> --}}
 
         <!-- Système -->
         <a href="{{ route('admin.settings.system') }}" class="settings-card">
@@ -101,6 +101,8 @@
 </div>
 
 <style>
+   <style>
+    /* Variables de couleur - Nouvelle palette */
     :root {
         --primary: #0A2E2E; 
         --secondary: #2A6363; 
@@ -109,11 +111,12 @@
         --text-dark: #000000; 
         --text-light: #FFFFFF; 
         --success: #5DBB63;
-        --error: #dc3545;
-        --warning: #f59e0b;
+        --danger: #dc3545;
         --border: #E6D8C3; 
-        --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
+        --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
     }
+
 
     /* Base */
     .settings-container {
@@ -188,13 +191,13 @@
 
     /* Cartes de paramètres */
     .settings-card {
-        background-color: var(--text-light);
+        background-color: var(--light);
         border-radius: 20px 0;
         padding: 1.5rem;
         display: flex;
         align-items: center;
         gap: 1.25rem;
-        box-shadow: var(--card-shadow);
+        box-shadow: var(--card-shadow); 
         border: 1px solid var(--border);
         transition: all 0.3s ease;
         text-decoration: none;
@@ -203,15 +206,15 @@
 
     .settings-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(10, 46, 46, 0.15);
-        background-color: rgba(10, 46, 46, 0.02);
+        box-shadow: 0 8px 25px rgba(27, 68, 68, 0.15);
+        background-color: rgba(14, 26, 26, 0.02);
     }
 
     .card-icon {
         width: 60px;
         height: 60px;
         border-radius: 15px 0;
-        background-color: var(--primary);
+        background-color: var(--secondary);
         color: var(--text-light);
         display: flex;
         align-items: center;
@@ -282,7 +285,7 @@
         }
         
         .settings-card:hover {
-            background-color: rgba(42, 99, 99, 0.3);
+            background-color: rgba(9, 41, 41, 0.3);
         }
         
         .card-arrow {

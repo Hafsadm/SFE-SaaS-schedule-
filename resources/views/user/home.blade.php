@@ -1012,6 +1012,8 @@ body {
         transform: scale(1.02);
     }
 
+    
+
     /* --- Focus accessibles --- */
     .search-input:focus,
     .filter-button:focus,
@@ -1478,7 +1480,7 @@ body {
                 showLoading(true);
     
                 // Envoyer la requête au backend
-                fetch(`/filter?${params.toString()}`, {
+                fetch(`filter?${params.toString()}`, {
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
@@ -1670,6 +1672,515 @@ body {
         });
     </script>
     
+
+   {{--  OPTIMISATION part pour autour de moi  --}}
+   <script>
+
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("storeSearch")
+  const serviceSearchInput = document.getElementById("serviceSearch")
+  const searchButton = document.getElementById("searchButton")
+  const locationButton = document.querySelector(".location-search")
+  const storesContainer = document.getElementById("stores-container")
+  const horaireRadios = document.querySelectorAll('input[name="horaire"]')
+  const resetButton = document.getElementById("resetButton")
+
+  // Variables pour la géolocalisation
+  let userPosition = null
+  let isLocationActive = false
+
+  // Déclaration des variables updateMap et lucide
+  const updateMap = () => {} // Fonction vide par défaut
+  const lucide = window.lucide || {} // Objet vide par défaut
+
+  // Écouteurs d'événements
+  if (searchButton) {
+    searchButton.addEventListener("click", performUnifiedSearch)
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault()
+        performUnifiedSearch()
+      }
+    })
+  }
+
+  if (serviceSearchInput) {
+    serviceSearchInput.addEventListener("input", debounce(performUnifiedSearch, 500))
+  }
+
+  if (locationButton) {
+    locationButton.addEventListener("click", function () {
+      this.classList.toggle("active")
+      isLocationActive = this.classList.contains("active")
+      performUnifiedSearch()
+    })
+  }
+
+  if (resetButton) {
+    resetButton.addEventListener("click", resetFilters)
+  }
+
+  // Ajouter des écouteurs pour les filtres d'horaire
+  horaireRadios.forEach((radio) => {
+    radio.addEventListener("change", performUnifiedSearch)
+  })
+
+  // FONCTION UNIFIÉE DE RECHERCHE - Gère tous les filtres ensemble
+  async function performUnifiedSearch() {
+    try {
+      showLoading(true)
+
+      // 1. Récupérer TOUS les filtres actifs
+      const filters = getAllActiveFilters()
+
+      // 2. Gérer la géolocalisation si nécessaire
+      if (isLocationActive) {
+        // Si on a déjà la position et qu'elle est récente, l'utiliser
+        if (userPosition && isPositionRecent(userPosition)) {
+          console.log("Utilisation de la position en cache")
+          filters.latitude = userPosition.latitude
+          filters.longitude = userPosition.longitude
+        } else {
+          // Obtenir une nouvelle position
+          try {
+            userPosition = await getCurrentLocation()
+            userPosition.timestamp = Date.now()
+            filters.latitude = userPosition.latitude
+            filters.longitude = userPosition.longitude
+            showMessage("Position trouvée ! Recherche en cours...", "success")
+          } catch (error) {
+            console.error("Erreur géolocalisation:", error)
+            showError("Géolocalisation impossible - Recherche sans localisation")
+            // Continuer sans géolocalisation mais avec les autres filtres
+            isLocationActive = false
+            locationButton.classList.remove("active")
+          }
+        }
+      }
+
+      // 3. Envoyer la requête avec TOUS les filtres
+      await executeUnifiedSearch(filters)
+    } catch (error) {
+      console.error("Erreur lors de la recherche:", error)
+      showError("Erreur lors de la recherche")
+    } finally {
+      showLoading(false)
+    }
+  }
+
+  // Fonction pour récupérer tous les filtres actifs
+  function getAllActiveFilters() {
+    const filters = {}
+
+    // Filtre service
+    const serviceSearchTerm = serviceSearchInput?.value.trim()
+    if (serviceSearchTerm) {
+      filters.service_search = serviceSearchTerm
+    }
+
+    // Filtre horaire
+    const selectedHoraire = document.querySelector('input[name="horaire"]:checked')?.value
+    if (selectedHoraire) {
+      filters.horaire = selectedHoraire
+    }
+
+    // Filtre recherche texte
+    const searchTerm = searchInput?.value.trim()
+    if (searchTerm) {
+      filters.search = searchTerm
+    }
+
+    // Rayon pour la géolocalisation
+    filters.radius = 50 // 50km par défaut
+
+    console.log("Filtres actifs:", filters)
+    return filters
+  }
+
+  // Fonction pour exécuter la recherche unifiée
+  async function executeUnifiedSearch(filters) {
+    const params = new URLSearchParams()
+
+    // Ajouter tous les filtres aux paramètres
+    Object.keys(filters).forEach((key) => {
+      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== "") {
+        params.append(key, filters[key])
+      }
+    })
+
+    console.log("Paramètres de recherche:", params.toString())
+
+    try {
+      const response = await fetch(`filter?${params.toString()}`, {
+        headers: {
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const stores = await response.json()
+
+      if (!Array.isArray(stores)) {
+        throw new Error("Format de données invalide")
+      }
+
+      // Mettre à jour l'affichage
+      updateStoresList(stores)
+      updateMap(
+        stores,
+        filters.latitude && filters.longitude
+          ? {
+              lat: Number.parseFloat(filters.latitude),
+              lng: Number.parseFloat(filters.longitude),
+            }
+          : null,
+      )
+
+      // Message de succès
+      let message = `${stores.length} magasin(s) trouvé(s)`
+      if (filters.latitude && filters.longitude) {
+        message += " autour de vous"
+      }
+      if (filters.service_search) {
+        message += ` pour "${filters.service_search}"`
+      }
+      if (filters.horaire) {
+        message += ` (${getHoraireLabel(filters.horaire)})`
+      }
+
+      showMessage(message, "success")
+    } catch (error) {
+      console.error("Erreur lors de la recherche:", error)
+      showError("Erreur lors du chargement des résultats")
+
+      // En cas d'erreur, utiliser les données initiales
+      const initialStores = window.stores || []
+      updateStoresList(initialStores)
+      updateMap(initialStores)
+    }
+  }
+
+  // Fonction de géolocalisation optimisée
+  function getCurrentLocation() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Géolocalisation non supportée"))
+        return
+      }
+
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 300000, // 5 minutes de cache
+      }
+
+      showMessage("Localisation en cours...", "info")
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+          }
+
+          console.log("Position obtenue:", coords)
+          resolve(coords)
+        },
+        (error) => {
+          let errorMessage = "Erreur de géolocalisation"
+
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Autorisation de géolocalisation refusée"
+              break
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Position non disponible"
+              break
+            case error.TIMEOUT:
+              errorMessage = "Délai de géolocalisation dépassé"
+              break
+          }
+
+          console.error("Erreur géolocalisation:", error)
+          reject(new Error(errorMessage))
+        },
+        options,
+      )
+    })
+  }
+
+  // Vérifier si la position est récente (moins de 5 minutes)
+  function isPositionRecent(position) {
+    if (!position || !position.timestamp) return false
+    const fiveMinutes = 5 * 60 * 1000
+    return Date.now() - position.timestamp < fiveMinutes
+  }
+
+  // Fonction de réinitialisation
+  function resetFilters() {
+    // Réinitialiser tous les filtres
+    document.querySelectorAll('input[name="horaire"]:checked').forEach((radio) => {
+      radio.checked = false
+    })
+
+    if (searchInput) searchInput.value = ""
+    if (serviceSearchInput) serviceSearchInput.value = ""
+
+    // Désactiver la géolocalisation
+    isLocationActive = false
+    userPosition = null
+    locationButton.classList.remove("active")
+
+    // Utiliser les données initiales
+    const initialStores = window.stores || []
+    updateStoresList(initialStores)
+    updateMap(initialStores)
+
+    showMessage("Filtres réinitialisés avec succès", "success")
+  }
+
+  // Fonctions utilitaires
+  function getHoraireLabel(horaire) {
+    const labels = {
+      open_now: "Ouvert maintenant",
+      morning: "Matin",
+      afternoon: "Après-midi",
+      evening: "Soir",
+      weekend: "Week-end",
+    }
+    return labels[horaire] || horaire
+  }
+
+  function showLoading(show) {
+    const loader = document.getElementById("loader")
+    if (loader) loader.style.display = show ? "block" : "none"
+  }
+
+  function showError(message) {
+    showMessage(message, "error")
+  }
+
+  function showMessage(message, type = "info") {
+    const messageElement = document.createElement("div")
+    messageElement.style.position = "fixed"
+    messageElement.style.top = "1rem"
+    messageElement.style.left = "50%"
+    messageElement.style.transform = "translateX(-50%)"
+    messageElement.style.zIndex = "1000"
+    messageElement.style.padding = "0.75rem 1.5rem"
+    messageElement.style.borderRadius = "0.5rem"
+    messageElement.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.1)"
+    messageElement.style.fontSize = "0.9rem"
+    messageElement.style.textAlign = "center"
+    messageElement.style.maxWidth = "90%"
+    messageElement.style.animation = "slideDown 0.3s ease-out"
+
+    // Couleurs selon le type
+    switch (type) {
+      case "success":
+        messageElement.style.backgroundColor = "#f0fff4"
+        messageElement.style.border = "1px solid #c6f6d5"
+        messageElement.style.color = "#38a169"
+        break
+      case "error":
+        messageElement.style.backgroundColor = "#fff1f1"
+        messageElement.style.border = "1px solid #fee2e2"
+        messageElement.style.color = "#dc2626"
+        break
+      case "info":
+      default:
+        messageElement.style.backgroundColor = "#f0f9ff"
+        messageElement.style.border = "1px solid #bae6fd"
+        messageElement.style.color = "#0369a1"
+        break
+    }
+
+    messageElement.textContent = message
+    document.body.appendChild(messageElement)
+
+    setTimeout(() => {
+      messageElement.style.opacity = "0"
+      messageElement.style.transition = "opacity 0.3s ease-out"
+      setTimeout(() => {
+        if (document.body.contains(messageElement)) {
+          document.body.removeChild(messageElement)
+        }
+      }, 300)
+    }, 4000)
+  }
+
+  // Mettre à jour la liste des magasins
+  function updateStoresList(stores) {
+    if (!storesContainer) return
+
+    storesContainer.innerHTML = ""
+
+    if (!stores || stores.length === 0) {
+      storesContainer.innerHTML = `
+                <div class="no-results">
+                    <i data-lucide="search-x"></i>
+                    <h3>Aucun résultat trouvé</h3>
+                    <p>Essayez de modifier vos critères de recherche ou utilisez le bouton "Réinitialiser" pour afficher toutes les boutiques.</p>
+                </div>`
+
+      if (typeof lucide.createIcons === "function") {
+        lucide.createIcons()
+      }
+      return
+    }
+
+    stores.forEach((store) => {
+      const storeCard = createStoreCard(store)
+      storesContainer.appendChild(storeCard)
+    })
+
+    if (typeof lucide.createIcons === "function") {
+      lucide.createIcons()
+    }
+  }
+
+  // Créer une carte de magasin
+  function createStoreCard(store) {
+    const card = document.createElement("div")
+    card.className = "store-card"
+    card.setAttribute("data-lat", store.latitude)
+    card.setAttribute("data-lng", store.longitude)
+    card.setAttribute("id", `store-${store.id}`)
+
+    const isOpen = store.is_open === true || (store.today_status && store.today_status.toLowerCase().includes("ouvert"))
+    const statusClass = isOpen ? "open" : "closed"
+
+    let services = ""
+    if (store.services) {
+      if (Array.isArray(store.services)) {
+        services = store.services.join(", ")
+      } else if (typeof store.services === "object") {
+        services = Object.values(store.services).join(", ")
+      } else {
+        services = store.services
+      }
+    }
+
+    card.innerHTML = `
+            <div class="store-header">
+                <span class="store-badge">
+                    ${escapeHtml(services || "Service non défini")}
+                </span>
+                <span class="store-status ${statusClass}">
+                    ${escapeHtml(isOpen ? "Ouvert" : "Fermé")}
+                </span>
+            </div>
+            
+            ${
+              store.ouvert_jusqua && !store.is_closed
+                ? `
+            <div class="store-hours">
+                <i data-lucide="clock" class="hours-icon"></i>
+                <span>Ouvert jusqu'à ${formatTime(store.ouvert_jusqua)}</span>
+            </div>
+            `
+                : ""
+            }
+            
+            <div class="store-info">
+                <div class="store-details">
+                    <div class="store-location">${escapeHtml(store.nom.toUpperCase())}-${escapeHtml(store.ville || "")}</div>
+                    <div class="store-address">${escapeHtml(store.adresse || "")}</div>
+                    ${store.distance ? `<div class="store-distance">À ${Math.round(store.distance * 10) / 10} km</div>` : ""}
+                </div>
+            </div>
+            
+            <div class="store-contact">
+                ${
+                  store.phone
+                    ? `
+                    <div class="store-phone">
+                        <a href="tel:${store.phone.replace(/\s+/g, "")}" class="phone-link">
+                            ${escapeHtml(store.phone)}
+                        </a>
+                    </div>
+                `
+                    : ""
+                }                        
+                <div class="store-locate" onclick="centerMapOnStore(${store.latitude}, ${store.longitude})">
+                    <i data-lucide="map-pin"></i>
+                    Localiser sur la carte
+                </div>
+                
+                <div class="store-hours-toggle" onclick="toggleHours(this)">
+                    HORAIRES <i data-lucide="chevron-down"></i>
+                    <div class="hours-dropdown">
+                        ${store.formatted_weekly_hours || "Horaires non disponibles"}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="store-actions">
+                ${
+                  store.lien_rdv
+                    ? `
+                    <a href="${escapeHtml(store.lien_rdv)}" target="_blank" class="appointment-button">
+                        PRENDRE RENDEZ-VOUS
+                    </a>
+                `
+                    : `
+                    <button class="appointment-button" disabled>
+                        PRENDRE RENDEZ-VOUS
+                    </button>
+                `
+                }
+                
+                <a href="/stores/${store.id}" class="details-button">
+                    VOIR LA FICHE DU POINT DE VENTE
+                </a>
+            </div>
+        `
+
+    return card
+  }
+
+  function formatTime(timeString) {
+    try {
+      const date = new Date(`2000-01-01T${timeString}`)
+      return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    } catch (e) {
+      return timeString
+    }
+  }
+
+  function escapeHtml(unsafe) {
+    if (!unsafe) return ""
+    return String(unsafe)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;")
+  }
+
+  function debounce(func, wait) {
+    let timeout
+    return function () {
+      const args = arguments
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        func.apply(this, args)
+      }, wait)
+    }
+  }
+})
+
+
+   </script>
+
     {{-- THIS IS THE MAP PART --}}
     <script>
         // Variables globales pour la carte
@@ -1689,7 +2200,7 @@ body {
         // Initialiser la carte avec les styles pour masquer les frontières du Sahara Occidental
         map = new google.maps.Map(document.getElementById('map'), {
             center: defaultLocation,
-            zoom: 5,
+            zoom: 4,
             mapTypeControl: true,
             streetViewControl: false,
             fullscreenControl: true,
@@ -1752,7 +2263,7 @@ body {
         infoWindow = new google.maps.InfoWindow();
         
         // Ajouter les marqueurs pour chaque boutique
-        addMarkersToMap();
+        
         
         // Ajuster la vue pour inclure tous les marqueurs
         if (markers.length > 0) {

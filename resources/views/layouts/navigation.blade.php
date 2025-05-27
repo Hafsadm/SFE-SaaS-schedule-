@@ -17,11 +17,11 @@
                         <i class="fas fa-store"></i>
                         Points de vente
                     </a>
-                    <a href="{{ route('admin.stores.bulk-schedule') }}" class="nav-link {{ request()->routeIs('admin.stores.bulk-schedule') ? 'active' : '' }}">
+                       <a href="{{ route('admin.schedules.dashboard') }}" class="nav-link {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
                         <i class="fas fa-clock"></i>
                         Horaires
                     </a>
-                    <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+                    <a href="{{ route('admin.settings.index') }}" class="nav-link {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
                         <i class="fas fa-user-cog"></i>
                         Paramètres
                     </a>

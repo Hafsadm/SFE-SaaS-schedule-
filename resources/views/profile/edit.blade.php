@@ -67,10 +67,10 @@
         input[type="text"],
         input[type="email"],
         input[type="password"] {
-            width: 100%;
+            width: 96%;
             padding: 0.625rem 0.75rem;
             border: 1px solid var(--border);
-            border-radius: 0.375rem;
+            border-radius: 30px 0 ;
             background-color: #FFFFFF;
             color: var(--text-dark);
             font-size: 1rem;
@@ -97,17 +97,19 @@
         }
 
         .btn-primary {
-            background-color: var(--primary);
+            background-color: var(--secondary) ;
+             border-radius: 20px ;
             color: white;
         }
 
         .btn-primary:hover {
-            background-color: var(--secondary);
+            background-color:  var(--primary);
         }
 
         .btn-danger {
             background-color: var(--error);
             color: white;
+            border-radius: 20px ;
         }
 
         .btn-danger:hover {
