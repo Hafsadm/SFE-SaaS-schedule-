@@ -5,148 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Home</title>
-        <!-- Fonts -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
-
 <style>
-  /* 🎨 Variables de couleur modernisées */
+    /* 🎨 Variables de couleur modernisées */
     :root {
-        --primary: #0A2E2E; 
-        --secondary: #2A6363; 
+        --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+        --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
+        /* --light: {{ $themeColors['accent_color'] ?? '#8E6E53' }};  */
+
         --tertiary: #8E6E53;
         --light: #C69C72; 
         --text-dark: #000000; 
         --text-light: #FFFFFF; 
         --success: #5DBB63;
         --error: #dc3545;
+        --warning: #f59e0b;
         --border: #E6D8C3; 
         --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
     }
 
-/* Loader */
-#loader {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-    padding: 1.5rem 2rem;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--primary);
-    border: 1px solid rgba(42, 99, 99, 0.2);
-    animation: fadeIn 0.3s ease-out;
-}
-
-#loader::after {
-    content: "";
-    display: inline-block;
-    width: 1rem;
-    height: 1rem;
-    margin-left: 0.75rem;
-    border: 2px solid rgba(42, 99, 99, 0.3);
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-/* Animation du loader */
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translate(-50%, -45%); }
-    to { opacity: 1; transform: translate(-50%, -50%); }
-}
-
-/* Message d'erreur */
-#error-message {
-    position: fixed;
-    top: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    padding: 0.75rem 1.5rem;
-    background-color: #fff1f1;
-    border: 1px solid #fee2e2;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    font-size: 0.9rem;
-    color: #dc2626;
-    text-align: center;
-    max-width: 90%;
-    animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-    to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-
-/* Version mobile */
-@media (max-width: 768px) {
+    /* Loader */
     #loader {
-        width: 90%;
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        padding: 1.5rem 2rem;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--primary);
+        border: 1px solid rgba(42, 99, 99, 0.2);
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    #loader::after {
+        content: "";
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        margin-left: 0.75rem;
+        border: 2px solid rgba(42, 99, 99, 0.3);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    /* Animation du loader */
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translate(-50%, -45%); }
+        to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    /* Message d'erreur */
+    #error-message {
+        position: fixed;
+        top: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        padding: 0.75rem 1.5rem;
+        background-color: #fff1f1;
+        border: 1px solid #fee2e2;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        font-size: 0.9rem;
+        color: #dc2626;
         text-align: center;
+        max-width: 90%;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* Version mobile */
+    @media (max-width: 768px) {
+        #loader {
+            width: 90%;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        #error-message {
+            width: 90%;
+            padding: 0.75rem;
+        }
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Georgia', sans-serif;
+        line-height: 1.6;
         padding: 1rem;
     }
-    
-    #error-message {
-        width: 90%;
-        padding: 0.75rem;
+
+    /* 🏷️ En-tête */
+    .dashboard-header {
+        font-family: 'Georgia', sans-serif;
+        text-align: center;
+        padding: 2rem 0;
+        border-bottom: 2px solid var(--border);
+        margin-bottom: 2.5rem;
     }
-}
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    .title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary);
+        letter-spacing: 1.2px;
+        position: relative;
+        display: inline-block;
+    }
 
-body {
-    font-family: 'Georgia', sans-serif;
-    line-height: 1.6;
-    padding: 1rem;
-}
-
-/* 🏷️ En-tête */
-.dashboard-header {
-    font-family: 'Georgia', sans-serif;
-    text-align: center;
-    padding: 2rem 0;
-    border-bottom: 2px solid var(--border);
-    margin-bottom: 2.5rem;
-}
-
-.title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--primary);
-    letter-spacing: 1.2px;
-    position: relative;
-    display: inline-block;
-}
-
-.title::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90px;
-    height: 3px;
-    background-color: var(--secondary);
-    border-radius: 60px 0;
-}
+    .title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90px;
+        height: 3px;
+        background-color: var(--secondary);
+        border-radius: 60px 0;
+    }
 
     /* Conteneur principal */
     .container {
@@ -191,6 +193,71 @@ body {
     .filter-button:hover {
         background-color: var(--secondary);
         color: var(--text-light);
+    }
+
+    /* 🔧 FIX 1: Amélioration du dropdown des filtres horaires */
+    .dropdown-options {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 0 30px 0 30px;
+        padding: 0.75rem;
+        margin-top: 5px;
+        min-width: 200px;
+        max-height: 250px; /* 🔧 Hauteur maximale pour éviter l'agrandissement */
+        overflow-y: auto; /* 🔧 Scroll si nécessaire */
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15); /* 🔧 Ombre plus prononcée */
+        z-index: 1000; /* 🔧 Z-index élevé pour passer au-dessus */
+        color: var(--text-dark);
+        backdrop-filter: blur(8px); /* 🔧 Effet de flou d'arrière-plan */
+        border-top: 3px solid var(--primary); /* 🔧 Bordure supérieure colorée */
+    }
+
+    /* 🔧 Scrollbar personnalisée pour le dropdown */
+    .dropdown-options::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .dropdown-options::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 2px;
+    }
+
+    .dropdown-options::-webkit-scrollbar-thumb {
+        background-color: var(--secondary);
+        border-radius: 2px;
+    }
+
+    .dropdown-option {
+        padding: 0.6rem 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--text-dark);
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        margin-bottom: 0.25rem;
+    }
+
+    /* 🔧 Hover effect pour les options */
+    .dropdown-option:hover {
+        background-color: rgba(42, 99, 99, 0.1);
+        transform: translateX(2px);
+    }
+
+    .dropdown-option input[type="radio"] {
+        margin: 0;
+        accent-color: var(--primary);
+    }
+
+    .dropdown-option label {
+        cursor: pointer;
+        font-weight: 500;
+        flex: 1;
     }
 
     /* Recherche par localisation */
@@ -404,7 +471,7 @@ body {
     .store-hours {
         display: flex;
         align-items: center;
-        color:#0A2E2E;
+        color: var(--primary);
         font-weight: 500;
         margin-top: 1.3rem;
         font-size: 1rem;
@@ -415,6 +482,41 @@ body {
 
     .store-hours i {
         margin-right: 0.5rem;
+    }
+
+    /* Nouveau style pour les raisons de fermeture */
+    .closure-reason {
+        display: flex;
+        align-items: center;
+        margin-top: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        gap: 0.5rem;
+    }
+
+    .closure-reason.exception {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+        border-left: 3px solid var(--warning);
+    }
+
+    .closure-reason.holiday {
+        background-color: rgba(142, 110, 83, 0.1);
+        color: var(--tertiary);
+        border-left: 3px solid var(--tertiary);
+    }
+
+    .closure-reason.regular-closed {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: var(--error);
+        border-left: 3px solid var(--error);
+    }
+
+    .closure-reason i {
+        font-size: 1rem;
+        flex-shrink: 0;
     }
 
     .store-info {
@@ -482,26 +584,76 @@ body {
         cursor: pointer;
         font-weight: 500;
         transition: all 0.3s ease;
-        padding: 0.25rem 0;
+        padding: 0.5rem 0.75rem;
         margin: 1rem 0;
+        border-radius: 6px;
+        background-color: rgba(220, 38, 38, 0.05);
+        border: 1px solid rgba(220, 38, 38, 0.1);
+        position: relative; /* 🔧 Position relative pour le dropdown */
     }
 
     .store-hours-toggle:hover {
         color: var(--secondary);
+        background-color: rgba(42, 99, 99, 0.05);
+        border-color: rgba(42, 99, 99, 0.2);
     }
 
+    /* 🔧 FIX 2: Amélioration du dropdown des horaires avec scroll */
     .hours-dropdown {
         display: none;
         position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
         background: white;
         border: 1px solid var(--border);
-        border-radius: 6px;
+        border-radius: 8px;
         padding: 1rem;
         margin-top: 0.5rem;
-        z-index: 10;
-        box-shadow: var(--card-shadow);
-        width: calc(100% - 3rem);
+        z-index: 100;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         color: var(--text-dark);
+        max-height: 200px; /* 🔧 Hauteur maximale */
+        overflow-y: auto; /* 🔧 Scroll vertical */
+        backdrop-filter: blur(8px);
+        border-top: 3px solid var(--primary);
+    }
+
+    /* 🔧 Scrollbar personnalisée pour les horaires */
+    .hours-dropdown::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .hours-dropdown::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .hours-dropdown::-webkit-scrollbar-thumb {
+        background-color: var(--secondary);
+        border-radius: 3px;
+    }
+
+    .hours-dropdown::-webkit-scrollbar-thumb:hover {
+        background-color: var(--primary);
+    }
+
+    /* 🔧 Style amélioré pour le contenu des horaires */
+    .hours-dropdown .time-slot {
+        padding: 0.4rem 0;
+        color: var(--text-dark);
+        border-bottom: 1px solid rgba(230, 216, 195, 0.3);
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .hours-dropdown .time-slot:last-child {
+        border-bottom: none;
+    }
+
+    .hours-dropdown .time-slot strong {
+        color: var(--primary);
+        font-weight: 600;
     }
 
     .closed-text {
@@ -628,6 +780,14 @@ body {
         
         .store-actions {
             grid-template-columns: 1fr;
+        }
+
+        /* 🔧 Responsive pour les dropdowns */
+        .dropdown-options,
+        .hours-dropdown {
+            left: -10px;
+            right: -10px;
+            max-height: 180px;
         }
     }
 
@@ -788,17 +948,8 @@ body {
         }
 
         .dropdown-options {
-            position: absolute;
-            top: 100%;
-            left: 0;
             background: white;
             border: 1px solid var(--border);
-            border-radius: 0 30px 0 30px;
-            padding: 10px;
-            margin-top: 5px;
-            min-width: 200px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            z-index: 10;
             color: var(--text-dark);
         }
         
@@ -809,10 +960,6 @@ body {
         }
     
         .dropdown-option {
-            padding: 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
             color: var(--text-dark);
         }
         
@@ -1012,8 +1159,6 @@ body {
         transform: scale(1.02);
     }
 
-    
-
     /* --- Focus accessibles --- */
     .search-input:focus,
     .filter-button:focus,
@@ -1041,26 +1186,20 @@ body {
 </style>
 </head>
 <body>
-
-
+    <!-- Le reste du HTML reste identique -->
     <div class="dashboard-header">
         <h1 class="title">NOS BOUTIQUES</h1>
     </div>
 
-    
-    
     <div class="container">
         <div class="filters-container">
-    
             <div class="filter-group service-filter-group">
                 <div class="service-search-container">
                     <input type="text" id="serviceSearch" placeholder="Rechercher un service..." class="service-search-input">
                     <i data-lucide="search" class="service-search-icon"></i>
                 </div>
             </div>
-    
-         
-        
+
             <!-- Filtre Horaires -->
             <div class="filter-group">
                 <button class="filter-button" onclick="toggleDropdown(this)">
@@ -1068,18 +1207,15 @@ body {
                     <i data-lucide="chevron-down" class="dropdown-icon"></i>
                 </button>
                 <div class="dropdown-options" style="display: none;">
-            
-                    
                     <!-- Options principales -->
                     <div class="dropdown-option">
                         <input type="radio" id="horaire_open" name="horaire" value="open_now">
                         <label for="horaire_open">Ouvert maintenant</label>
                     </div>
                     
-                  
                     <div class="dropdown-option">
                         <input type="radio" id="horaire_morning" name="horaire" value="morning">
-                        <label for="horaire_morning">Matin </label>
+                        <label for="horaire_morning">Matin</label>
                     </div>
                     
                     <div class="dropdown-option">
@@ -1092,26 +1228,23 @@ body {
                         <label for="horaire_evening">Soir</label>
                     </div>
                     
-                    
                     <div class="dropdown-option">
                         <input type="radio" id="horaire_weekend" name="horaire" value="weekend">
                         <label for="horaire_weekend">Week-end</label>
                     </div>
                 </div>
             </div>
-    
-            
+
             <div class="location-search">
                 <i data-lucide="map-pin" class="location-search-icon"></i>
                 <span class="location-search-text">Autour de moi</span>
             </div>
 
-            
             <div class="search-bar">
                 <input type="text" id="storeSearch" placeholder="Nom,Ville ou Pays" class="search-input">
                 <button class="ok-button" id="searchButton">OK</button>
             </div>
-    
+
             <!-- Bouton de réinitialisation -->
             <button class="reset-button" id="resetButton">
                 <i data-lucide="refresh-cw"></i>
@@ -1120,12 +1253,11 @@ body {
 
             <div id="loader" style="display: none;">Chargement en cours...</div>
             <div id="error-message" style="display: none; color: red; padding: 10px;"></div>
-
         </div>
 
+        <!-- 🔧 JavaScript amélioré pour les dropdowns -->
         <script>
             function toggleDropdown(button) {
-                // Trouver le conteneur d'options correspondant
                 const optionsContainer = button.nextElementSibling;
                 const icon = button.querySelector('.dropdown-icon');
                 
@@ -1133,17 +1265,37 @@ body {
                 if (optionsContainer.style.display === 'none') {
                     optionsContainer.style.display = 'block';
                     icon.classList.add('rotated');
+                    
+                    // 🔧 Animation d'apparition
+                    optionsContainer.style.opacity = '0';
+                    optionsContainer.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        optionsContainer.style.transition = 'all 0.3s ease';
+                        optionsContainer.style.opacity = '1';
+                        optionsContainer.style.transform = 'translateY(0)';
+                    }, 10);
                 } else {
-                    optionsContainer.style.display = 'none';
-                    icon.classList.remove('rotated');
+                    // 🔧 Animation de disparition
+                    optionsContainer.style.transition = 'all 0.2s ease';
+                    optionsContainer.style.opacity = '0';
+                    optionsContainer.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        optionsContainer.style.display = 'none';
+                        icon.classList.remove('rotated');
+                    }, 200);
                 }
                 
                 // Fermer les autres dropdowns ouverts
                 document.querySelectorAll('.dropdown-options').forEach(dropdown => {
                     if (dropdown !== optionsContainer && dropdown.style.display === 'block') {
-                        dropdown.style.display = 'none';
-                        const otherIcon = dropdown.previousElementSibling.querySelector('.dropdown-icon');
-                        otherIcon.classList.remove('rotated');
+                        dropdown.style.transition = 'all 0.2s ease';
+                        dropdown.style.opacity = '0';
+                        dropdown.style.transform = 'translateY(-10px)';
+                        setTimeout(() => {
+                            dropdown.style.display = 'none';
+                            const otherIcon = dropdown.previousElementSibling.querySelector('.dropdown-icon');
+                            otherIcon.classList.remove('rotated');
+                        }, 200);
                     }
                 });
             }
@@ -1152,9 +1304,16 @@ body {
             document.addEventListener('click', function(event) {
                 if (!event.target.closest('.filter-group')) {
                     document.querySelectorAll('.dropdown-options').forEach(dropdown => {
-                        dropdown.style.display = 'none';
-                        const icon = dropdown.previousElementSibling.querySelector('.dropdown-icon');
-                        icon.classList.remove('rotated');
+                        if (dropdown.style.display === 'block') {
+                            dropdown.style.transition = 'all 0.2s ease';
+                            dropdown.style.opacity = '0';
+                            dropdown.style.transform = 'translateY(-10px)';
+                            setTimeout(() => {
+                                dropdown.style.display = 'none';
+                                const icon = dropdown.previousElementSibling.querySelector('.dropdown-icon');
+                                icon.classList.remove('rotated');
+                            }, 200);
+                        }
                     });
                 }
             });
@@ -1164,21 +1323,16 @@ body {
                 lucide.createIcons();
             });
         </script>
-        
-    
-        {{-- <div id="toggleContainer"></div> --}}
-    
+
         <div class="content">
             <div class="map-container" id="map-container">
-                <div class="map-controls">
-                </div>
+                <div class="map-controls"></div>
                 <div id="map" style="width: 100%; height: 100%;"></div>
             </div>
-    
+
             <div class="stores-container" id="stores-container">
                 @foreach($stores as $store)
-                <div class="store-card" >
-                
+                <div class="store-card">
                     <div class="store-header">
                         <span class="store-badge">
                             {{ is_array($store->services) ? implode(' - ', $store->services) : ($store->services ?? 'Service non défini') }}
@@ -1188,35 +1342,48 @@ body {
                         </span>
                     </div>
 
-                    
                     @if($store->ouvert_jusqua && !$store->is_closed)
                     <div class="store-hours">
                         <i data-lucide="clock" class="hours-icon"></i>
                         <span>Ouvert jusqu'à {{ \Carbon\Carbon::parse($store->ouvert_jusqua)->format('H:i') }}</span>
                     </div>
                     @endif
-    
+
+                    {{-- Affichage des raisons de fermeture exceptionnelle et jours fériés --}}
+                    @if($store->is_closed && $store->closed_reason)
+                        @php
+                            $closureType = 'regular-closed';
+                            $icon = 'x-circle';
+                            
+                            if(str_contains(strtolower($store->closed_reason), 'exception')) {
+                                $closureType = 'exception';
+                                $icon = 'alert-triangle';
+                            } elseif(str_contains(strtolower($store->closed_reason), 'férié') || str_contains(strtolower($store->closed_reason), 'holiday')) {
+                                $closureType = 'holiday';
+                                $icon = 'calendar-x';
+                            }
+                        @endphp
+                        
+                        <div class="closure-reason {{ $closureType }}">
+                            <i data-lucide="{{ $icon }}"></i>
+                            <span>{{ $store->closed_reason }}</span>
+                        </div>
+                    @endif
+
                     <div class="store-info">
                         <div class="store-details">
                             <div class="store-location">{{ strtoupper($store->nom) }}-{{ $store->ville }}</div>
                             <div class="store-address">{{ $store->adresse }}</div>
                         </div>
-    
 
                         <input type="hidden" id="latitude" name="latitude">
                         <input type="hidden" id="longitude" name="longitude">
-
                     </div>
-    
-                    <div class="store-contact">
-                        {{-- @if($store->phone)
-                        <div class="store-phone">{{ $store->phone }}</div>
-                        @endif --}}
 
-                       @if($store->phone)
+                    <div class="store-contact">
+                        @if($store->phone)
                         <div class="store-phone">
                             <a href="tel:{{ preg_replace('/\s+/', '', $store->phone) }}" class="phone-link">
-                                {{-- <i data-lucide="phone" class="phone-icon"></i> --}}
                                 {{ $store->phone }}
                             </a>
                         </div>
@@ -1227,6 +1394,7 @@ body {
                             Localiser sur la carte
                         </div>
                        
+                        <!-- 🔧 Amélioration du toggle des horaires -->
                         <div class="store-hours-toggle" onclick="toggleHours(this)">
                             HORAIRES <i data-lucide="chevron-down"></i>
                             <div class="hours-dropdown">
@@ -1234,6 +1402,7 @@ body {
                             </div>
                         </div>
                     </div>
+                    
                     <div class="store-actions">
                         @if($store->lien_rdv)
                             <a href="{{ $store->lien_rdv }}" target="_blank" class="appointment-button">
@@ -1250,41 +1419,66 @@ body {
                         </a>
                     </div>
                 </div>
-            </div>
+                </div>
                 @endforeach
             </div>
+        </div>
     </div>
-    
+
+    <!-- 🔧 JavaScript amélioré pour les horaires -->
     <script>
-
-        const rootElement = document.getElementById('react-root');
-        if (rootElement) {
-            const root = ReactDOM.createRoot(rootElement);
-            root.render(<App />);
-        }
-
-
-        // Fonction pour afficher/masquer les horaires
+        // Fonction pour afficher/masquer les horaires avec animation
         function toggleHours(element) {
             const dropdown = element.querySelector('.hours-dropdown');
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            
+            if (dropdown.style.display === 'block') {
+                // 🔧 Animation de fermeture
+                dropdown.style.transition = 'all 0.3s ease';
+                dropdown.style.opacity = '0';
+                dropdown.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    dropdown.style.display = 'none';
+                }, 300);
+            } else {
+                // 🔧 Animation d'ouverture
+                dropdown.style.display = 'block';
+                dropdown.style.opacity = '0';
+                dropdown.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    dropdown.style.transition = 'all 0.3s ease';
+                    dropdown.style.opacity = '1';
+                    dropdown.style.transform = 'translateY(0)';
+                }, 10);
+            }
             
             // Fermer les autres dropdowns
             document.querySelectorAll('.hours-dropdown').forEach(el => {
-                if (el !== dropdown) {
-                    el.style.display = 'none';
+                if (el !== dropdown && el.style.display === 'block') {
+                    el.style.transition = 'all 0.2s ease';
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        el.style.display = 'none';
+                    }, 200);
                 }
             });
             
             // Empêcher la propagation du clic
             event.stopPropagation();
         }
-             // Faire défiler jusqu'à la carte de boutique correspondante
 
+        // Fermer les dropdowns des horaires quand on clique ailleurs
         document.addEventListener('click', function(event) {
             if (!event.target.closest('.store-hours-toggle')) {
                 document.querySelectorAll('.hours-dropdown').forEach(el => {
-                    el.style.display = 'none';
+                    if (el.style.display === 'block') {
+                        el.style.transition = 'all 0.2s ease';
+                        el.style.opacity = '0';
+                        el.style.transform = 'translateY(-10px)';
+                        setTimeout(() => {
+                            el.style.display = 'none';
+                        }, 200);
+                    }
                 });
             }
         });
@@ -1295,8 +1489,11 @@ body {
         });
     </script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8&callback=initMap" async defer></script>
-
+    <!-- Le reste du JavaScript reste identique -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLcjtNpP0apwxa7aQp1oW01YXQrtE2cgE&callback=initMap" async defer></script>
+    
+    <!-- Votre JavaScript existant pour la recherche et la carte reste identique -->
+   
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('storeSearch');
@@ -1555,7 +1752,6 @@ body {
                 card.setAttribute('id', `store-${store.id}`);
                 
                 // Déterminer le statut d'ouverture
-                // Vérifier explicitement si is_open est true
                 const isOpen = store.is_open === true || 
                             (store.today_status && store.today_status.toLowerCase().includes('ouvert'));
                 const statusClass = isOpen ? 'open' : 'closed';
@@ -1571,6 +1767,29 @@ body {
                         services = store.services;
                     }
                 }
+
+                // Déterminer le type de fermeture et l'icône
+                let closureHtml = '';
+                if (store.is_closed && store.closed_reason) {
+                    let closureType = 'regular-closed';
+                    let icon = 'x-circle';
+                    
+                    if (store.closed_reason.toLowerCase().includes('exception')) {
+                        closureType = 'exception';
+                        icon = 'alert-triangle';
+                    } else if (store.closed_reason.toLowerCase().includes('férié') || 
+                               store.closed_reason.toLowerCase().includes('holiday')) {
+                        closureType = 'holiday';
+                        icon = 'calendar-x';
+                    }
+                    
+                    closureHtml = `
+                        <div class="closure-reason ${closureType}">
+                            <i data-lucide="${icon}"></i>
+                            <span>${escapeHtml(store.closed_reason)}</span>
+                        </div>
+                    `;
+                }
                 
                 card.innerHTML = `
                     <div class="store-header">
@@ -1578,7 +1797,7 @@ body {
                             ${escapeHtml(services || 'Service non défini')}
                         </span>
                         <span class="store-status ${statusClass}">
-                            ${escapeHtml(isOpen ? 'Ouvert' : 'Fermé')}
+                            ${escapeHtml(store.today_status || (isOpen ? 'Ouvert' : 'Fermé'))}
                         </span>
                     </div>
                     
@@ -1589,13 +1808,13 @@ body {
                     </div>
                     ` : ''}
                     
+                    ${closureHtml}
+                    
                     <div class="store-info">
                         <div class="store-details">
                             <div class="store-location">${escapeHtml(store.nom.toUpperCase())}-${escapeHtml(store.ville || '')}</div>
                             <div class="store-address">${escapeHtml(store.adresse || '')}</div>
                         </div>
-                        
-                    
                     </div>
                     
                     <div class="store-contact">
@@ -1673,514 +1892,6 @@ body {
     </script>
     
 
-   {{--  OPTIMISATION part pour autour de moi  --}}
-   <script>
-
-document.addEventListener("DOMContentLoaded", () => {
-  const searchInput = document.getElementById("storeSearch")
-  const serviceSearchInput = document.getElementById("serviceSearch")
-  const searchButton = document.getElementById("searchButton")
-  const locationButton = document.querySelector(".location-search")
-  const storesContainer = document.getElementById("stores-container")
-  const horaireRadios = document.querySelectorAll('input[name="horaire"]')
-  const resetButton = document.getElementById("resetButton")
-
-  // Variables pour la géolocalisation
-  let userPosition = null
-  let isLocationActive = false
-
-  // Déclaration des variables updateMap et lucide
-  const updateMap = () => {} // Fonction vide par défaut
-  const lucide = window.lucide || {} // Objet vide par défaut
-
-  // Écouteurs d'événements
-  if (searchButton) {
-    searchButton.addEventListener("click", performUnifiedSearch)
-  }
-
-  if (searchInput) {
-    searchInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault()
-        performUnifiedSearch()
-      }
-    })
-  }
-
-  if (serviceSearchInput) {
-    serviceSearchInput.addEventListener("input", debounce(performUnifiedSearch, 500))
-  }
-
-  if (locationButton) {
-    locationButton.addEventListener("click", function () {
-      this.classList.toggle("active")
-      isLocationActive = this.classList.contains("active")
-      performUnifiedSearch()
-    })
-  }
-
-  if (resetButton) {
-    resetButton.addEventListener("click", resetFilters)
-  }
-
-  // Ajouter des écouteurs pour les filtres d'horaire
-  horaireRadios.forEach((radio) => {
-    radio.addEventListener("change", performUnifiedSearch)
-  })
-
-  // FONCTION UNIFIÉE DE RECHERCHE - Gère tous les filtres ensemble
-  async function performUnifiedSearch() {
-    try {
-      showLoading(true)
-
-      // 1. Récupérer TOUS les filtres actifs
-      const filters = getAllActiveFilters()
-
-      // 2. Gérer la géolocalisation si nécessaire
-      if (isLocationActive) {
-        // Si on a déjà la position et qu'elle est récente, l'utiliser
-        if (userPosition && isPositionRecent(userPosition)) {
-          console.log("Utilisation de la position en cache")
-          filters.latitude = userPosition.latitude
-          filters.longitude = userPosition.longitude
-        } else {
-          // Obtenir une nouvelle position
-          try {
-            userPosition = await getCurrentLocation()
-            userPosition.timestamp = Date.now()
-            filters.latitude = userPosition.latitude
-            filters.longitude = userPosition.longitude
-            showMessage("Position trouvée ! Recherche en cours...", "success")
-          } catch (error) {
-            console.error("Erreur géolocalisation:", error)
-            showError("Géolocalisation impossible - Recherche sans localisation")
-            // Continuer sans géolocalisation mais avec les autres filtres
-            isLocationActive = false
-            locationButton.classList.remove("active")
-          }
-        }
-      }
-
-      // 3. Envoyer la requête avec TOUS les filtres
-      await executeUnifiedSearch(filters)
-    } catch (error) {
-      console.error("Erreur lors de la recherche:", error)
-      showError("Erreur lors de la recherche")
-    } finally {
-      showLoading(false)
-    }
-  }
-
-  // Fonction pour récupérer tous les filtres actifs
-  function getAllActiveFilters() {
-    const filters = {}
-
-    // Filtre service
-    const serviceSearchTerm = serviceSearchInput?.value.trim()
-    if (serviceSearchTerm) {
-      filters.service_search = serviceSearchTerm
-    }
-
-    // Filtre horaire
-    const selectedHoraire = document.querySelector('input[name="horaire"]:checked')?.value
-    if (selectedHoraire) {
-      filters.horaire = selectedHoraire
-    }
-
-    // Filtre recherche texte
-    const searchTerm = searchInput?.value.trim()
-    if (searchTerm) {
-      filters.search = searchTerm
-    }
-
-    // Rayon pour la géolocalisation
-    filters.radius = 50 // 50km par défaut
-
-    console.log("Filtres actifs:", filters)
-    return filters
-  }
-
-  // Fonction pour exécuter la recherche unifiée
-  async function executeUnifiedSearch(filters) {
-    const params = new URLSearchParams()
-
-    // Ajouter tous les filtres aux paramètres
-    Object.keys(filters).forEach((key) => {
-      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== "") {
-        params.append(key, filters[key])
-      }
-    })
-
-    console.log("Paramètres de recherche:", params.toString())
-
-    try {
-      const response = await fetch(`filter?${params.toString()}`, {
-        headers: {
-          Accept: "application/json",
-          "X-Requested-With": "XMLHttpRequest",
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const stores = await response.json()
-
-      if (!Array.isArray(stores)) {
-        throw new Error("Format de données invalide")
-      }
-
-      // Mettre à jour l'affichage
-      updateStoresList(stores)
-      updateMap(
-        stores,
-        filters.latitude && filters.longitude
-          ? {
-              lat: Number.parseFloat(filters.latitude),
-              lng: Number.parseFloat(filters.longitude),
-            }
-          : null,
-      )
-
-      // Message de succès
-      let message = `${stores.length} magasin(s) trouvé(s)`
-      if (filters.latitude && filters.longitude) {
-        message += " autour de vous"
-      }
-      if (filters.service_search) {
-        message += ` pour "${filters.service_search}"`
-      }
-      if (filters.horaire) {
-        message += ` (${getHoraireLabel(filters.horaire)})`
-      }
-
-      showMessage(message, "success")
-    } catch (error) {
-      console.error("Erreur lors de la recherche:", error)
-      showError("Erreur lors du chargement des résultats")
-
-      // En cas d'erreur, utiliser les données initiales
-      const initialStores = window.stores || []
-      updateStoresList(initialStores)
-      updateMap(initialStores)
-    }
-  }
-
-  // Fonction de géolocalisation optimisée
-  function getCurrentLocation() {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error("Géolocalisation non supportée"))
-        return
-      }
-
-      const options = {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 300000, // 5 minutes de cache
-      }
-
-      showMessage("Localisation en cours...", "info")
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const coords = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-          }
-
-          console.log("Position obtenue:", coords)
-          resolve(coords)
-        },
-        (error) => {
-          let errorMessage = "Erreur de géolocalisation"
-
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              errorMessage = "Autorisation de géolocalisation refusée"
-              break
-            case error.POSITION_UNAVAILABLE:
-              errorMessage = "Position non disponible"
-              break
-            case error.TIMEOUT:
-              errorMessage = "Délai de géolocalisation dépassé"
-              break
-          }
-
-          console.error("Erreur géolocalisation:", error)
-          reject(new Error(errorMessage))
-        },
-        options,
-      )
-    })
-  }
-
-  // Vérifier si la position est récente (moins de 5 minutes)
-  function isPositionRecent(position) {
-    if (!position || !position.timestamp) return false
-    const fiveMinutes = 5 * 60 * 1000
-    return Date.now() - position.timestamp < fiveMinutes
-  }
-
-  // Fonction de réinitialisation
-  function resetFilters() {
-    // Réinitialiser tous les filtres
-    document.querySelectorAll('input[name="horaire"]:checked').forEach((radio) => {
-      radio.checked = false
-    })
-
-    if (searchInput) searchInput.value = ""
-    if (serviceSearchInput) serviceSearchInput.value = ""
-
-    // Désactiver la géolocalisation
-    isLocationActive = false
-    userPosition = null
-    locationButton.classList.remove("active")
-
-    // Utiliser les données initiales
-    const initialStores = window.stores || []
-    updateStoresList(initialStores)
-    updateMap(initialStores)
-
-    showMessage("Filtres réinitialisés avec succès", "success")
-  }
-
-  // Fonctions utilitaires
-  function getHoraireLabel(horaire) {
-    const labels = {
-      open_now: "Ouvert maintenant",
-      morning: "Matin",
-      afternoon: "Après-midi",
-      evening: "Soir",
-      weekend: "Week-end",
-    }
-    return labels[horaire] || horaire
-  }
-
-  function showLoading(show) {
-    const loader = document.getElementById("loader")
-    if (loader) loader.style.display = show ? "block" : "none"
-  }
-
-  function showError(message) {
-    showMessage(message, "error")
-  }
-
-  function showMessage(message, type = "info") {
-    const messageElement = document.createElement("div")
-    messageElement.style.position = "fixed"
-    messageElement.style.top = "1rem"
-    messageElement.style.left = "50%"
-    messageElement.style.transform = "translateX(-50%)"
-    messageElement.style.zIndex = "1000"
-    messageElement.style.padding = "0.75rem 1.5rem"
-    messageElement.style.borderRadius = "0.5rem"
-    messageElement.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.1)"
-    messageElement.style.fontSize = "0.9rem"
-    messageElement.style.textAlign = "center"
-    messageElement.style.maxWidth = "90%"
-    messageElement.style.animation = "slideDown 0.3s ease-out"
-
-    // Couleurs selon le type
-    switch (type) {
-      case "success":
-        messageElement.style.backgroundColor = "#f0fff4"
-        messageElement.style.border = "1px solid #c6f6d5"
-        messageElement.style.color = "#38a169"
-        break
-      case "error":
-        messageElement.style.backgroundColor = "#fff1f1"
-        messageElement.style.border = "1px solid #fee2e2"
-        messageElement.style.color = "#dc2626"
-        break
-      case "info":
-      default:
-        messageElement.style.backgroundColor = "#f0f9ff"
-        messageElement.style.border = "1px solid #bae6fd"
-        messageElement.style.color = "#0369a1"
-        break
-    }
-
-    messageElement.textContent = message
-    document.body.appendChild(messageElement)
-
-    setTimeout(() => {
-      messageElement.style.opacity = "0"
-      messageElement.style.transition = "opacity 0.3s ease-out"
-      setTimeout(() => {
-        if (document.body.contains(messageElement)) {
-          document.body.removeChild(messageElement)
-        }
-      }, 300)
-    }, 4000)
-  }
-
-  // Mettre à jour la liste des magasins
-  function updateStoresList(stores) {
-    if (!storesContainer) return
-
-    storesContainer.innerHTML = ""
-
-    if (!stores || stores.length === 0) {
-      storesContainer.innerHTML = `
-                <div class="no-results">
-                    <i data-lucide="search-x"></i>
-                    <h3>Aucun résultat trouvé</h3>
-                    <p>Essayez de modifier vos critères de recherche ou utilisez le bouton "Réinitialiser" pour afficher toutes les boutiques.</p>
-                </div>`
-
-      if (typeof lucide.createIcons === "function") {
-        lucide.createIcons()
-      }
-      return
-    }
-
-    stores.forEach((store) => {
-      const storeCard = createStoreCard(store)
-      storesContainer.appendChild(storeCard)
-    })
-
-    if (typeof lucide.createIcons === "function") {
-      lucide.createIcons()
-    }
-  }
-
-  // Créer une carte de magasin
-  function createStoreCard(store) {
-    const card = document.createElement("div")
-    card.className = "store-card"
-    card.setAttribute("data-lat", store.latitude)
-    card.setAttribute("data-lng", store.longitude)
-    card.setAttribute("id", `store-${store.id}`)
-
-    const isOpen = store.is_open === true || (store.today_status && store.today_status.toLowerCase().includes("ouvert"))
-    const statusClass = isOpen ? "open" : "closed"
-
-    let services = ""
-    if (store.services) {
-      if (Array.isArray(store.services)) {
-        services = store.services.join(", ")
-      } else if (typeof store.services === "object") {
-        services = Object.values(store.services).join(", ")
-      } else {
-        services = store.services
-      }
-    }
-
-    card.innerHTML = `
-            <div class="store-header">
-                <span class="store-badge">
-                    ${escapeHtml(services || "Service non défini")}
-                </span>
-                <span class="store-status ${statusClass}">
-                    ${escapeHtml(isOpen ? "Ouvert" : "Fermé")}
-                </span>
-            </div>
-            
-            ${
-              store.ouvert_jusqua && !store.is_closed
-                ? `
-            <div class="store-hours">
-                <i data-lucide="clock" class="hours-icon"></i>
-                <span>Ouvert jusqu'à ${formatTime(store.ouvert_jusqua)}</span>
-            </div>
-            `
-                : ""
-            }
-            
-            <div class="store-info">
-                <div class="store-details">
-                    <div class="store-location">${escapeHtml(store.nom.toUpperCase())}-${escapeHtml(store.ville || "")}</div>
-                    <div class="store-address">${escapeHtml(store.adresse || "")}</div>
-                    ${store.distance ? `<div class="store-distance">À ${Math.round(store.distance * 10) / 10} km</div>` : ""}
-                </div>
-            </div>
-            
-            <div class="store-contact">
-                ${
-                  store.phone
-                    ? `
-                    <div class="store-phone">
-                        <a href="tel:${store.phone.replace(/\s+/g, "")}" class="phone-link">
-                            ${escapeHtml(store.phone)}
-                        </a>
-                    </div>
-                `
-                    : ""
-                }                        
-                <div class="store-locate" onclick="centerMapOnStore(${store.latitude}, ${store.longitude})">
-                    <i data-lucide="map-pin"></i>
-                    Localiser sur la carte
-                </div>
-                
-                <div class="store-hours-toggle" onclick="toggleHours(this)">
-                    HORAIRES <i data-lucide="chevron-down"></i>
-                    <div class="hours-dropdown">
-                        ${store.formatted_weekly_hours || "Horaires non disponibles"}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="store-actions">
-                ${
-                  store.lien_rdv
-                    ? `
-                    <a href="${escapeHtml(store.lien_rdv)}" target="_blank" class="appointment-button">
-                        PRENDRE RENDEZ-VOUS
-                    </a>
-                `
-                    : `
-                    <button class="appointment-button" disabled>
-                        PRENDRE RENDEZ-VOUS
-                    </button>
-                `
-                }
-                
-                <a href="/stores/${store.id}" class="details-button">
-                    VOIR LA FICHE DU POINT DE VENTE
-                </a>
-            </div>
-        `
-
-    return card
-  }
-
-  function formatTime(timeString) {
-    try {
-      const date = new Date(`2000-01-01T${timeString}`)
-      return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-    } catch (e) {
-      return timeString
-    }
-  }
-
-  function escapeHtml(unsafe) {
-    if (!unsafe) return ""
-    return String(unsafe)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;")
-  }
-
-  function debounce(func, wait) {
-    let timeout
-    return function () {
-      const args = arguments
-      clearTimeout(timeout)
-      timeout = setTimeout(() => {
-        func.apply(this, args)
-      }, wait)
-    }
-  }
-})
-
-
-   </script>
-
     {{-- THIS IS THE MAP PART --}}
     <script>
         // Variables globales pour la carte
@@ -2189,7 +1900,8 @@ document.addEventListener("DOMContentLoaded", () => {
         let markers = [];
         let infoWindow;
         let markerCluster;
-        
+        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+
         // Stocker les données initiales pour la réinitialisation
         window.stores = stores;
         
@@ -2251,7 +1963,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 {
                     featureType: "water",
                     elementType: "all",
-                    stylers: [{ color: "#0A2E2E" }, { visibility: "on" }],
+                    stylers: [{ color: primaryColor }, { visibility: "on" }],
                 },
             ]
         });
@@ -2263,7 +1975,7 @@ document.addEventListener("DOMContentLoaded", () => {
         infoWindow = new google.maps.InfoWindow();
         
         // Ajouter les marqueurs pour chaque boutique
-        
+        addMarkersToMap(stores);
         
         // Ajuster la vue pour inclure tous les marqueurs
         if (markers.length > 0) {
@@ -2629,7 +2341,5 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     </script>
-
-    
 </body>
 </html>

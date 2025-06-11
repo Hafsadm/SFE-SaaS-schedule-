@@ -12,12 +12,19 @@ class Setting extends Model
     protected $fillable = [
         'key',
         'value',
-        'type'
+        'type',
+        'user_id'  // AJOUT: Pour lier les paramètres à un utilisateur spécifique
     ];
 
     protected $casts = [
         'value' => 'string',
     ];
+
+    // Relation avec l'utilisateur
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function getValueAttribute($value)
     {
@@ -36,5 +43,26 @@ class Setting extends Model
         } else {
             $this->attributes['value'] = $value;
         }
+    }
+
+    // Méthode statique pour récupérer les paramètres d'un utilisateur
+    public static function getUserSettings($userId, $keys = [])
+    {
+        $query = self::where('user_id', $userId);
+        
+        if (!empty($keys)) {
+            $query->whereIn('key', $keys);
+        }
+        
+        return $query->pluck('value', 'key')->toArray();
+    }
+
+    // Méthode statique pour mettre à jour un paramètre utilisateur
+    public static function setUserSetting($userId, $key, $value)
+    {
+        return self::updateOrCreate(
+            ['user_id' => $userId, 'key' => $key],
+            ['value' => $value]
+        );
     }
 }

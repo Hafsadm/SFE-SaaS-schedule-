@@ -14,8 +14,8 @@
 <style>
     /* Variables de couleur */
     :root {
-        --primary: #0A2E2E; 
-        --secondary: #2A6363; 
+        --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+        --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
         --tertiary: #8E6E53;
         --light: #C69C72; 
         --text-dark: #000000; 
@@ -1021,7 +1021,7 @@ body {
                     </div>
                 </div>
                 
-                <!-- Personnel -->
+                <!-- Personne -->
                 <div class="section">
                     <h2 class="section-title">
                         <i data-lucide="users" class="w-5 h-5"></i>
@@ -1348,7 +1348,7 @@ body {
 </button>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVXn3v4gNvgDImCifWbY5iZJLCUaRdVFI&callback=initMap" async defer></script>
 
     
 <script>

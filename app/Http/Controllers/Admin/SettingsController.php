@@ -4,26 +4,328 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\User;
+use App\Services\CssGeneratorService;
+use App\Services\ThemeService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
+
 
 class SettingsController extends Controller
 {
+    protected $cssGenerator;
+    protected $themeService;
+
+    public function __construct(CssGeneratorService $cssGenerator, ThemeService $themeService)
+    {
+        $this->cssGenerator = $cssGenerator;
+        $this->themeService = $themeService;
+
+    }
+
     public function index()
     {
         return view('admin.settings.index');
     }
 
-    public function appearance()
+    public function system()
     {
-        $settings = $this->getSettings([
-            'theme',
-            'primary_color',
-            'secondary_color',
-            'accent_color',
-            'logo'
+        $user = Auth::user();
+        
+        // Récupérer les paramètres depuis la table users ET settings
+        $settings = [
+            // Depuis la table users
+            'app_name' => $user->website_name ?? 'Mon SaaS',
+            'app_description' => $user->description ?? 'Système de gestion des horaires de points de vente',
+            'company_name' => $user->company_name ?? 'Ma Société',
+            'website_url' => $user->website_url ?? 'mon-saas.com',
+            'timezone' => $user->timezone ?? 'Europe/Paris',
+            'language' => $user->locale ?? 'fr',
+            
+            // Depuis la table settings
+            'date_format' => $this->getUserSetting($user->id, 'date_format', 'd/m/Y'),
+            'time_format' => $this->getUserSetting($user->id, 'time_format', 'H:i'),
+            'maintenance_mode' => $this->getUserSetting($user->id, 'maintenance_mode', false),
+            'maintenance_message' => $this->getUserSetting($user->id, 'maintenance_message', 'L\'application est temporairement indisponible pour maintenance. Veuillez réessayer plus tard.'),
+        ];
+
+        // Récupérer les couleurs du thème pour le CSS
+        $themeColors = [
+            'primary_color' => $user->primary_color ?? '#0A2E2E',
+            'secondary_color' => $user->secondary_color ?? '#2A6363',
+        ];
+
+        return view('admin.settings.system', compact('settings', 'themeColors'));
+    }
+
+    public function updateSystem(Request $request)
+    {
+        // Validation des données
+        $validator = Validator::make($request->all(), [
+            'app_name' => 'required|string|max:255',
+            'app_description' => 'nullable|string|max:1000',
+            'company_name' => 'required|string|max:255',
+            'website_url' => 'required|string|max:255',
+            'timezone' => 'required|string',
+            'language' => 'required|string|in:fr,en,es,de',
+            'date_format' => 'required|string|in:d/m/Y,m/d/Y,Y-m-d',
+            'time_format' => 'required|string|in:H:i,g:i A',
+            'maintenance_message' => 'nullable|string|max:500'
         ]);
+
+        if ($validator->fails()) {
+            Log::error('Validation échouée:', $validator->errors()->toArray());
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        try {
+            $user = Auth::user();
+            
+            Log::info('Début de la mise à jour des paramètres système pour l\'utilisateur: ' . $user->id);
+
+            DB::transaction(function () use ($user, $request) {
+                
+                // 1. METTRE À JOUR LA TABLE USERS
+                $userUpdateData = [
+                    'website_name' => $request->app_name,
+                    'description' => $request->app_description,
+                    'company_name' => $request->company_name,
+                    'website_url' => $this->cleanWebsiteUrl($request->website_url),
+                    'timezone' => $request->timezone,
+                    'locale' => $request->language,
+                    'settings_updated_at' => now(),
+                ];
+
+                $updated = User::where('id', $user->id)->update($userUpdateData);
+                Log::info('Mise à jour table users réussie:', ['updated' => $updated]);
+
+                // 2. METTRE À JOUR LA TABLE SETTINGS (méthode sécurisée)
+                $this->safeUpdateUserSetting($user->id, 'date_format', $request->date_format);
+                $this->safeUpdateUserSetting($user->id, 'time_format', $request->time_format);
+                $this->safeUpdateUserSetting($user->id, 'maintenance_mode', $request->has('maintenance_mode') ? 'true' : 'false');
+                
+                if ($request->filled('maintenance_message')) {
+                    $this->safeUpdateUserSetting($user->id, 'maintenance_message', $request->maintenance_message);
+                }
+
+                Log::info('Tous les paramètres système mis à jour avec succès');
+            });
+
+            return redirect()->route('admin.settings.system')
+                ->with('success', 'Les paramètres système ont été mis à jour avec succès.');
+
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la mise à jour des paramètres système: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue lors de la mise à jour des paramètres: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    /**
+     * MÉTHODE SÉCURISÉE : Mettre à jour ou créer un paramètre (évite absolument les doublons)
+     */
+    private function safeUpdateUserSetting($userId, $key, $value)
+    {
+        try {
+            Log::info("Tentative de mise à jour du paramètre: {$key} = {$value} pour user {$userId}");
+            
+            // Vérifier d'abord si le paramètre existe
+            $existingSetting = Setting::where('user_id', $userId)
+                                    ->where('key', $key)
+                                    ->first();
+            
+            if ($existingSetting) {
+                // Le paramètre existe, le mettre à jour
+                $existingSetting->value = $value;
+                $existingSetting->updated_at = now();
+                $result = $existingSetting->save();
+                
+                Log::info("Paramètre existant mis à jour: {$key} = {$value}, résultat: " . ($result ? 'succès' : 'échec'));
+                return $existingSetting;
+            } else {
+                // Le paramètre n'existe pas, le créer
+                $newSetting = new Setting();
+                $newSetting->user_id = $userId;
+                $newSetting->key = $key;
+                $newSetting->value = $value;
+                $newSetting->created_at = now();
+                $newSetting->updated_at = now();
+                $result = $newSetting->save();
+                
+                Log::info("Nouveau paramètre créé: {$key} = {$value}, résultat: " . ($result ? 'succès' : 'échec'));
+                return $newSetting;
+            }
+            
+        } catch (\Exception $e) {
+            Log::error("Erreur lors de la mise à jour du paramètre {$key}: " . $e->getMessage());
+            
+            // En cas d'erreur, essayer une approche alternative avec DB::statement
+            try {
+                Log::info("Tentative de récupération avec requête SQL directe pour {$key}");
+                
+                $result = DB::statement("
+                    INSERT INTO settings (user_id, key, value, created_at, updated_at) 
+                    VALUES (?, ?, ?, NOW(), NOW()) 
+                    ON DUPLICATE KEY UPDATE 
+                    value = VALUES(value), 
+                    updated_at = NOW()
+                ", [$userId, $key, $value]);
+                
+                Log::info("Requête SQL directe réussie pour {$key}");
+                return true;
+                
+            } catch (\Exception $e2) {
+                Log::error("Erreur même avec la requête SQL directe pour {$key}: " . $e2->getMessage());
+                throw $e2;
+            }
+        }
+    }
+
+    /**
+     * Vider le cache de l'application
+     */
+    public function clearCache()
+    {
+        try {
+            Artisan::call('cache:clear');
+            Artisan::call('config:clear');
+            Artisan::call('view:clear');
+            Artisan::call('route:clear');
+            
+            Log::info('Cache vidé avec succès');
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Cache vidé avec succès ! Les modifications seront visibles immédiatement.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors du vidage du cache: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du vidage du cache: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Tester la connexion à la base de données
+     */
+    public function testConnection()
+    {
+        try {
+            $pdo = DB::connection()->getPdo();
+            $result = DB::select('SELECT 1 as test');
+            $connectionName = DB::getDefaultConnection();
+            $databaseName = DB::connection()->getDatabaseName();
+            
+            Log::info('Test de connexion réussi');
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Connexion à la base de données OK !\nBase: {$databaseName}\nConnexion: {$connectionName}"
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erreur de connexion: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur de connexion à la base de données: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Exporter la configuration
+     */
+    public function exportConfig()
+    {
+        try {
+            $user = Auth::user();
+            
+            $config = [
+                'informations_generales' => [
+                    'app_name' => $user->website_name,
+                    'company_name' => $user->company_name,
+                    'description' => $user->description,
+                    'website_url' => $user->website_url,
+                ],
+                'parametres_regionaux' => [
+                    'timezone' => $user->timezone,
+                    'language' => $user->locale,
+                    'date_format' => $this->getUserSetting($user->id, 'date_format', 'd/m/Y'),
+                    'time_format' => $this->getUserSetting($user->id, 'time_format', 'H:i'),
+                ],
+                'maintenance' => [
+                    'maintenance_mode' => $this->getUserSetting($user->id, 'maintenance_mode', false),
+                    'maintenance_message' => $this->getUserSetting($user->id, 'maintenance_message', ''),
+                ],
+                'meta' => [
+                    'exported_at' => now()->toISOString(),
+                    'exported_by' => $user->name,
+                    'version' => '1.0'
+                ]
+            ];
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Configuration exportée avec succès !',
+                'data' => $config
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'export: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'export: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // Méthodes utilitaires
+    private function getUserSetting($userId, $key, $default = null)
+    {
+        try {
+            $setting = Setting::where('user_id', $userId)->where('key', $key)->first();
+            $value = $setting ? $setting->value : $default;
+            
+            // Convertir les valeurs booléennes
+            if ($value === 'true') return true;
+            if ($value === 'false') return false;
+            
+            return $value;
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la récupération du paramètre ' . $key . ': ' . $e->getMessage());
+            return $default;
+        }
+    }
+
+    private function cleanWebsiteUrl($url)
+    {
+        $cleanUrl = preg_replace('/^https?:\/\//', '', $url);
+        $cleanUrl = preg_replace('/^www\./', '', $cleanUrl);
+        return rtrim($cleanUrl, '/');
+    }
+
+        public function appearance()
+    {
+        $user = Auth::user();
+        
+        // Récupérer les paramètres d'apparence depuis le modèle User
+        $settings = [
+            'theme' => $user->theme ?? 'light',
+            'primary_color' => $user->primary_color ?? '#0A2E2E',
+            'secondary_color' => $user->secondary_color ?? '#2A6363',
+            'accent_color' => $user->accent_color ?? '#8E6E53',
+            'logo' => $user->logo
+        ];
 
         return view('admin.settings.appearance', compact('settings'));
     }
@@ -45,187 +347,74 @@ class SettingsController extends Controller
         }
 
         try {
-            // Sauvegarder les couleurs et le thème
-            $this->updateSetting('theme', $request->theme);
-            $this->updateSetting('primary_color', $request->primary_color);
-            $this->updateSetting('secondary_color', $request->secondary_color);
-            $this->updateSetting('accent_color', $request->accent_color);
+            $user = Auth::user();
+            $logoPath = $user->logo;
 
             // Gérer l'upload du logo
             if ($request->hasFile('logo')) {
+                Log::info('Logo upload détecté pour l\'utilisateur: ' . $user->id);
+                
                 // Supprimer l'ancien logo s'il existe
-                $oldLogo = $this->getSetting('logo');
-                if ($oldLogo && Storage::exists('public/' . $oldLogo)) {
-                    Storage::delete('public/' . $oldLogo);
+                if ($user->logo && Storage::disk('public')->exists($user->logo)) {
+                    Storage::disk('public')->delete($user->logo);
+                    Log::info('Ancien logo supprimé: ' . $user->logo);
                 }
 
+                // Créer le dossier logos s'il n'existe pas
+                if (!Storage::disk('public')->exists('logos')) {
+                    Storage::disk('public')->makeDirectory('logos');
+                }
+
+                // Générer un nom unique pour le fichier
+                $file = $request->file('logo');
+                $fileName = 'user_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                
                 // Sauvegarder le nouveau logo
-                $logoPath = $request->file('logo')->store('logos', 'public');
-                $this->updateSetting('logo', $logoPath);
+                $logoPath = $file->storeAs('logos', $fileName, 'public');
+                
+                if (!$logoPath) {
+                    Log::error('Erreur lors de la sauvegarde du logo');
+                    return redirect()->back()
+                        ->with('error', 'Erreur lors de la sauvegarde du logo.')
+                        ->withInput();
+                }
+                
+                Log::info('Nouveau logo sauvegardé: ' . $logoPath);
             }
+
+            // Mettre à jour SEULEMENT la table users (plus simple et évite les conflits)
+            DB::transaction(function () use ($user, $request, $logoPath) {
+                User::where('id', $user->id)->update([
+                    'theme' => $request->theme,
+                    'primary_color' => $request->primary_color,
+                    'secondary_color' => $request->secondary_color,
+                    'accent_color' => $request->accent_color,
+                    'logo' => $logoPath,
+                    'settings_updated_at' => now()
+                ]);
+            });
+
+            // Générer le fichier CSS personnalisé
+            try {
+                $this->cssGenerator->generateUserCss($user->id);
+                Log::info('CSS généré avec succès pour l\'utilisateur: ' . $user->id);
+            } catch (\Exception $e) {
+                Log::warning('Erreur lors de la génération du CSS: ' . $e->getMessage());
+            }
+            
+            // Invalider le cache des couleurs
+            $this->themeService->clearUserColorsCache($user->id);
 
             return redirect()->route('admin.settings.appearance')
                 ->with('success', 'Les paramètres d\'apparence ont été mis à jour avec succès.');
 
         } catch (\Exception $e) {
+            Log::error('Erreur lors de la mise à jour des paramètres d\'apparence: ' . $e->getMessage());
             return redirect()->back()
-                ->with('error', 'Une erreur est survenue lors de la mise à jour des paramètres.')
+                ->with('error', 'Une erreur est survenue lors de la mise à jour des paramètres: ' . $e->getMessage())
                 ->withInput();
         }
     }
 
-    public function notifications()
-    {
-        $settings = $this->getSettings([
-            'email_notifications',
-            'push_notifications',
-            'sms_notifications',
-            'notification_frequency'
-        ]);
 
-        return view('admin.settings.notifications', compact('settings'));
-    }
-
-    public function updateNotifications(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email_notifications' => 'boolean',
-            'push_notifications' => 'boolean',
-            'sms_notifications' => 'boolean',
-            'notification_frequency' => 'required|in:immediate,daily,weekly',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        try {
-            $this->updateSetting('email_notifications', $request->boolean('email_notifications'));
-            $this->updateSetting('push_notifications', $request->boolean('push_notifications'));
-            $this->updateSetting('sms_notifications', $request->boolean('sms_notifications'));
-            $this->updateSetting('notification_frequency', $request->notification_frequency);
-
-            return redirect()->route('admin.settings.notifications')
-                ->with('success', 'Les paramètres de notifications ont été mis à jour avec succès.');
-
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Une erreur est survenue lors de la mise à jour des paramètres.')
-                ->withInput();
-        }
-    }
-
-    public function security()
-    {
-        $settings = $this->getSettings([
-            'two_factor_auth',
-            'session_timeout',
-            'password_expiry',
-            'login_attempts'
-        ]);
-
-        return view('admin.settings.security', compact('settings'));
-    }
-
-    public function updateSecurity(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'two_factor_auth' => 'boolean',
-            'session_timeout' => 'required|integer|min:5|max:1440',
-            'password_expiry' => 'required|integer|min:30|max:365',
-            'login_attempts' => 'required|integer|min:3|max:10',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        try {
-            $this->updateSetting('two_factor_auth', $request->boolean('two_factor_auth'));
-            $this->updateSetting('session_timeout', $request->session_timeout);
-            $this->updateSetting('password_expiry', $request->password_expiry);
-            $this->updateSetting('login_attempts', $request->login_attempts);
-
-            return redirect()->route('admin.settings.security')
-                ->with('success', 'Les paramètres de sécurité ont été mis à jour avec succès.');
-
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Une erreur est survenue lors de la mise à jour des paramètres.')
-                ->withInput();
-        }
-    }
-
-    public function system()
-    {
-        $settings = $this->getSettings([
-            'app_name',
-            'app_timezone',
-            'app_locale',
-            'maintenance_mode',
-            'debug_mode'
-        ]);
-
-        return view('admin.settings.system', compact('settings'));
-    }
-
-    public function updateSystem(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'app_name' => 'required|string|max:255',
-            'app_timezone' => 'required|string',
-            'app_locale' => 'required|string|in:fr,en,es,de',
-            'maintenance_mode' => 'boolean',
-            'debug_mode' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        try {
-            $this->updateSetting('app_name', $request->app_name);
-            $this->updateSetting('app_timezone', $request->app_timezone);
-            $this->updateSetting('app_locale', $request->app_locale);
-            $this->updateSetting('maintenance_mode', $request->boolean('maintenance_mode'));
-            $this->updateSetting('debug_mode', $request->boolean('debug_mode'));
-
-            return redirect()->route('admin.settings.system')
-                ->with('success', 'Les paramètres système ont été mis à jour avec succès.');
-
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Une erreur est survenue lors de la mise à jour des paramètres.')
-                ->withInput();
-        }
-    }
-
-    private function getSettings(array $keys)
-    {
-        $settings = [];
-        foreach ($keys as $key) {
-            $settings[$key] = $this->getSetting($key);
-        }
-        return $settings;
-    }
-
-    private function getSetting($key, $default = null)
-    {
-        $setting = Setting::where('key', $key)->first();
-        return $setting ? $setting->value : $default;
-    }
-
-    private function updateSetting($key, $value)
-    {
-        Setting::updateOrCreate(
-            ['key' => $key],
-            ['value' => $value]
-        );
-    }
 }

@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite(entrypoints: 'resources/js/app.jsx')
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
@@ -14,12 +13,12 @@
     
     <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
+     @include('components.dynamic-theme')
     <style>
         /* Variables de couleur */
         :root {
-            --primary: #0A2E2E; 
-            --secondary: #2A6363; 
+            --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+            --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
             --tertiary: #8E6E53;
             --light: #C69C72; 
             --text-dark: #000000; 
@@ -297,8 +296,13 @@
                 justify-content: center;
             }
         }
+
     </style>
     @stack('styles')
+    
+    @if(isset($userCustomCss))
+        <link href="{{ $userCustomCss }}" rel="stylesheet">
+    @endif
 </head>
 <body>
     <div class="main-container">

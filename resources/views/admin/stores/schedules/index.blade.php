@@ -175,18 +175,17 @@
 
 <style>
     :root {
-        --primary: #429182;
-        --secondary: #337b8d;
-        --light-beige: #F9F5EF;
-        --dark-beige: #1b5858;
-        --text-dark: #000000;
-        --text-light: #FFFFFF;
+        --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+        --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
+        --tertiary: #8E6E53;
+        --light: #C69C72; 
+        --text-dark: #000000; 
+        --text-light: #FFFFFF; 
         --success: #5DBB63;
         --error: #dc3545;
-        --border: #E6D8C3;
-        --card-shadow: 0 4px 12px rgba(27, 88, 88, 0.1);
-        --sunday-bg: rgba(255, 243, 224, 0.7);
-        --holiday-bg: rgba(255, 235, 238, 0.7);
+        --warning: #f59e0b;
+        --border: #E6D8C3; 
+        --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
     }
 
     .schedules-container {

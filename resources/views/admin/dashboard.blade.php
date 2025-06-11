@@ -7,8 +7,8 @@
 <style>
     /* Variables de couleur - Nouvelle palette */
     :root {
-        --primary: #0A2E2E; 
-        --secondary: #2A6363; 
+       --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+        --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
         --tertiary: #8E6E53;
         --light: #C69C72; 
         --text-dark: #000000; 

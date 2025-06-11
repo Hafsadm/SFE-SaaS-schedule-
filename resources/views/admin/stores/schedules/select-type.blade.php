@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title', 'Choisir le type d\'horaire')
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+
+
 @section('content')
 <div class="select-type-container">
     <div class="select-type-header">
@@ -13,7 +17,7 @@
     <div class="type-cards">
         <div class="type-card">
             <div class="card-icon">
-                <i data-lucide="calendar"></i>
+                <i class="fi fi-rr-calendar-clock"></i>
             </div>
             <h2>Horaire régulier</h2>
             <p>Définir les horaires d'ouverture habituels pour chaque jour de la semaine.</p>
@@ -24,7 +28,7 @@
 
         <div class="type-card">
             <div class="card-icon">
-                <i data-lucide="alert-triangle"></i>
+            <i class="fi fi-rr-calendar-exclamation"></i>
             </div>
             <h2>Exception</h2>
             <p>Définir une exception pour une date spécifique (fermeture exceptionnelle, horaires modifiés...).</p>
@@ -35,7 +39,7 @@
 
         <div class="type-card">
             <div class="card-icon">
-                <i data-lucide="calendar-off"></i>
+                <i class="fi fi-rr-calendar-plus"></i>
             </div>
             <h2>Jour férié</h2>
             <p>Définir un jour férié où le magasin sera fermé.</p>
@@ -48,16 +52,17 @@
 
 <style>
     :root {
-        --primary: #429182; 
-        --secondary: #337b8d; 
-        --light-beige: #F9F5EF;
-        --dark-beige: #1b5858; 
+        --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+        --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
+        --tertiary: #8E6E53;
+        --light: #C69C72; 
         --text-dark: #000000; 
         --text-light: #FFFFFF; 
         --success: #5DBB63;
         --error: #dc3545;
+        --warning: #f59e0b;
         --border: #E6D8C3; 
-        --card-shadow: 0 4px 12px rgba(27, 88, 88, 0.1);
+        --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
     }
 
     .select-type-container {
@@ -104,7 +109,7 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.75rem 1.5rem;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--dark-beige) 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         color: var(--text-light);
         border: none;
         border-radius: 30px 0;
@@ -173,9 +178,11 @@
     }
 
     .card-icon i {
-        width: 40px;
-        height: 40px;
-        color: var(--primary);
+        width: 190px;
+        height: 38px;
+        color: Var(--primary);
+        font-weight: 600;
+        font-size: 2rem;
     }
 
     .type-card h2 {

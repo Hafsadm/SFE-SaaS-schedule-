@@ -14,8 +14,8 @@
     <style>
         /* Variables de couleur */
         :root {
-            --color-primary: #429182;;
-            --color-primary-light: #337b8d;
+           --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+           --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
             --color-secondary: #D2B48C;
             --color-background: #ffffff;
             --color-card: #FFFFFF;

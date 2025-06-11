@@ -9,14 +9,20 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        // Récupérer l'admin par son slug s'il est fourni
+        // Récupérer l'admin par son slug s'il est fourni dans l'URL
         $admin = null;
         $adminSlug = $request->route('admin');
+        
+        // Si pas de slug dans l'URL, essayer de récupérer depuis la session (domaine)
+        if (!$adminSlug) {
+            $adminSlug = Session::get('current_admin_slug');
+        }
         
         if ($adminSlug) {
             $admin = User::where('admin_slug', $adminSlug)
@@ -49,6 +55,27 @@ class HomeController extends Controller
         // Filtrer par admin si spécifié
         if ($admin) {
             $query->where('user_id', $admin->id);
+        } else {
+            // Si aucun admin n'est spécifié et qu'on est en mode multi-tenant,
+            // on peut soit montrer tous les stores, soit rediriger vers une page d'erreur
+            $currentDomain = $request->getHost();
+            $cleanDomain = preg_replace('/^www\./', '', $currentDomain);
+            
+            if (!in_array($cleanDomain, ['localhost', '127.0.0.1']) && 
+                !str_ends_with($cleanDomain, '.test') && 
+                !str_ends_with($cleanDomain, '.local')) {
+                // En production, on ne montre que les stores des admins qui ont configuré leur domaine
+                $adminId = Session::get('current_admin_id');
+                if ($adminId) {
+                    $query->where('user_id', $adminId);
+                } else {
+                    // Aucun admin trouvé pour ce domaine
+                    return view('user.domain-error', [
+                        'domain' => $cleanDomain,
+                        'message' => 'Ce domaine n\'est pas configuré dans notre système.'
+                    ]);
+                }
+            }
         }
 
         $stores = $query->get();
@@ -68,11 +95,30 @@ class HomeController extends Controller
         $query = Store::with(['schedules', 'exceptions', 'holidays']);
         
         // Filtrer par admin si spécifié
-        $adminSlug = $request->input('admin_slug') ?? session('current_admin_slug');
+        $adminSlug = $request->input('admin_slug') ?? Session::get('current_admin_slug');
+        $adminId = Session::get('current_admin_id');
+        
         if ($adminSlug) {
             $admin = User::where('admin_slug', $adminSlug)->first();
             if ($admin) {
                 $query->where('user_id', $admin->id);
+            }
+        } elseif ($adminId) {
+            // Utiliser l'ID admin de la session (détecté par le domaine)
+            $query->where('user_id', $adminId);
+        } else {
+            // Si on est sur un domaine spécifique mais qu'aucun admin n'est trouvé
+            $currentDomain = $request->getHost();
+            $cleanDomain = preg_replace('/^www\./', '', $currentDomain);
+            
+            if (!in_array($cleanDomain, ['localhost', '127.0.0.1']) && 
+                !str_ends_with($cleanDomain, '.test') && 
+                !str_ends_with($cleanDomain, '.local')) {
+                // En production, on renvoie une erreur
+                return response()->json([
+                    'error' => 'Ce domaine n\'est pas configuré dans notre système.',
+                    'stores' => []
+                ], 403);
             }
         }
 
@@ -121,10 +167,7 @@ class HomeController extends Controller
         return response()->json($stores);
     }
 
-    /**
-     * NOUVELLE MÉTHODE OPTIMISÉE pour la géolocalisation
-     * Récupère les magasins autour d'une position avec calcul de distance optimisé
-     */
+    // Vos méthodes existantes (inchangées)
     private function getStoresNearLocation($query, $userLat, $userLng, $radiusKm = 50)
     {
         // Validation des coordonnées
@@ -184,9 +227,6 @@ class HomeController extends Controller
         return $stores;
     }
 
-    /**
-     * NOUVELLE MÉTHODE pour appliquer les filtres d'horaires
-     */
     private function applyScheduleFilter($query, $horaireFilter)
     {
         $now = Carbon::now();
@@ -254,7 +294,6 @@ class HomeController extends Controller
         }
     }
 
-    // Vos méthodes existantes (inchangées)
     private function addScheduleInfo(Store $store)
     {
         $today = Carbon::today();

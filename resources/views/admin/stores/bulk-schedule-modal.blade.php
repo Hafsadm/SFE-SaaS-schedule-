@@ -3,6 +3,7 @@
 
    /* Styles pour le formulaire dans la modal */
     .form-section {
+        
         margin-bottom: 1.5rem;
         padding-bottom: 1.5rem;
         border-bottom: 1px solid var(--border);
@@ -15,7 +16,7 @@
     }
 
     .form-section h3 {
-        color: var(--primary);
+        color: #e9ecef;
         font-size: 1.2rem;
         margin-bottom: 1rem;
         font-weight: 600;
@@ -272,10 +273,10 @@
 
 
 </style>
-<div id="bulk-schedule-modal" class="modal">
-    <div class="modal-content">
+<div id="bulk-schedule-modal" class="modal" >
+    <div class="modal-content" style="background-color: #fff;">
         <div class="modal-header">
-            <h2>Gestion des horaires en masse</h2>
+            <h2 style="color:#fff ;">Gestion des horaires en masse</h2>
             <span class="close-modal">&times;</span>
         </div>
         <div class="modal-body">

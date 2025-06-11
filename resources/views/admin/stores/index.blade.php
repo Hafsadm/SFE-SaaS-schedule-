@@ -2,23 +2,28 @@
 
 @section('title', 'Points de vente')
 
+<!-- Injection des couleurs dynamiques -->
+@include('components.dynamic-theme')
 
 <style>
-    /* Variables */
-    :root {
-        --primary: #0A2E2E; 
-        --secondary: #2A6363; 
+
+ :root {
+        --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+        --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
+        /* --light: {{ $themeColors['accent_color'] ?? '#8E6E53' }};  */
+
         --tertiary: #8E6E53;
         --light: #C69C72; 
         --text-dark: #000000; 
         --text-light: #FFFFFF; 
         --success: #5DBB63;
         --error: #dc3545;
+        --warning: #f59e0b;
         --border: #E6D8C3; 
         --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
     }
 
-    /* Base */
+    /* Base - Les variables CSS sont maintenant injectées par le composant dynamic-theme */
     body {
         font-family: 'Georgia', sans-serif;
         color: var(--text-dark);
@@ -71,7 +76,7 @@
         background-color: rgba(255, 255, 255, 0.2);
         color: var(--text-light);
         padding: 0.5rem 1rem;
-        border-radius: 30px 20px   ;
+        border-radius: 40px;
         text-decoration: none;
         font-weight: 500;
         font-size: 0.9rem;
@@ -112,7 +117,7 @@
         width: 100%;
         padding: 0.75rem 1rem 0.75rem 2.5rem;
         border: 1px solid var(--border);
-        border-radius: 30px ;
+        border-radius: 30px;
         font-size: 0.9rem;
         background-color: var(--text-light);
         transition: all 0.3s ease;
@@ -313,18 +318,37 @@
         max-height: calc(100vh - 180px);
         overflow-y: auto;
         padding-right: 0.5rem;
-    }
-
-    /* Ajouter ces styles à votre section <style> existante */
-
-    .stores-details {
-        overflow-x: hidden; /* Empêcher le défilement horizontal */
+        overflow-x: hidden;
     }
 
     .store-card {
-        max-width: 100%; /* S'assurer que la carte ne dépasse pas la largeur du conteneur */
-        box-sizing: border-box; /* Inclure padding et border dans la largeur */
-        overflow-x: hidden; /* Empêcher le défilement horizontal dans les cartes */
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+        background: var(--text-light);
+        border-radius: 30px 0;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border);
+        position: relative;
+        overflow-y: auto;
+        max-height: calc(100vh - 200px);
+        display: none;
+    }
+
+    .store-card.active {
+        display: block;
+    }
+
+    .store-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary), var(--secondary));
     }
 
     /* Améliorer la réactivité des grilles dans les cartes */
@@ -353,34 +377,6 @@
     .stores-details::-webkit-scrollbar-thumb {
         background-color: var(--secondary);
         border-radius: 3px;
-    }
-
-    /* Carte de boutique */
-    .store-card {
-        background: var(--text-light);
-        border-radius: 30px 0;
-        padding: 1.5rem;
-        box-shadow: var(--card-shadow);
-        transition: all 0.3s ease;
-        border: 1px solid var(--border);
-        position: relative;
-        overflow-y: auto; /* Ajout du défilement vertical */
-        max-height: calc(100vh - 200px); /* Hauteur maximale pour permettre le défilement */
-        display: none; /* Caché par défaut, affiché lors de la sélection */
-    }
-
-    .store-card.active {
-        display: block;
-    }
-
-    .store-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 5px;
-        height: 100%;
-        background: linear-gradient(to bottom, var(--primary), var(--secondary));
     }
 
     .store-header {
@@ -412,16 +408,6 @@
         font-size: 0.8rem;
         font-weight: 600;
         align-self: flex-start;
-    }
-
-    .store-info {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.2rem;
-        margin-bottom: 1.2rem;
-        padding: 1.2rem;
-        background-color: rgba(10, 46, 46, 0.05);
-        border-radius: 20px 0;
     }
 
     .info-section {
@@ -481,13 +467,12 @@
     }
 
     .hours-content {
-    
         padding: 1rem;
         display: none;
     }
 
     .day-schedule {
-      color: var(--text-light)
+        color: var(--primary);
         padding: 0.75rem 0;
         border-bottom: 1px solid var(--border);
     }
@@ -505,7 +490,7 @@
 
     .day-name {
         font-weight: 600;
-        color: var(--text-light);
+        color: var(--primary);
         margin-bottom: 0.5rem;
     }
 
@@ -617,7 +602,7 @@
         background-color: rgba(255, 255, 255, 0.2);
         color: var(--text-light);
         padding: 0.5rem 1rem;
-        border-radius: 30px 0;
+        border-radius:20px;
         border: none;
         text-decoration: none;
         font-weight: 500;
@@ -658,7 +643,7 @@
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         color: var(--text-light);
         padding: 0.8rem 1.5rem;
-        border-radius: 30px 0;
+        border-radius: 20px;
         border: none;
         text-decoration: none;
         font-weight: 500;
@@ -745,7 +730,6 @@
         color: var(--text-dark);
     }
 
- 
     /* Responsive */
     @media (max-width: 1200px) {
         .content-container {
@@ -972,13 +956,12 @@
     }
 </style>
 
-
 @section('content')
 <div class="admin-container">
     <!-- Sidebar pour la navigation entre les points de vente -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h2>  STORES </h2>
+            <h2>STORES</h2>
             <button id="selection-mode-btn" class="selection-mode-btn">
                 <i class="fas fa-check-square"></i>
                 Sélectionner
@@ -1028,12 +1011,10 @@
 
         <div class="content-container">
             <div class="map-container" id="map-container">
-                <div class="map-controls">
-                </div>
+                <div class="map-controls"></div>
                 <div id="map" style="width: 100%; height: 100%;"></div>
             </div>
 
-          
             <div class="stores-details-container">
                 <div class="stores-details" id="stores-details">
                     @foreach($stores as $store)
@@ -1119,50 +1100,43 @@
         </div>
     </div>
 </div>
+
 {{-- Inclusion du composant de modal de gestion des horaires en masse --}}
 @include('admin.stores.bulk-schedule-modal')
 
-
 <script>
-    // Déclaration des variables globales
+// Déclaration des variables globales
 let activeStoreId = null
 let map
 const markers = []
 let infoWindow
 let bounds
 let markerCluster
-let isSelectStoreRunning = false // Variable pour éviter les appels récursifs
-let debounceTimer = null // Pour le debouncing
+let isSelectStoreRunning = false
+let debounceTimer = null
 
 // Fonction optimisée pour sélectionner une seule boutique et afficher ses détails
 function selectStore(storeId) {
-  // Éviter les appels récursifs et les appels trop fréquents
   if (isSelectStoreRunning || activeStoreId === storeId) return
 
-  // Debouncing pour éviter les appels multiples rapprochés
   clearTimeout(debounceTimer)
   debounceTimer = setTimeout(() => {
     isSelectStoreRunning = true
 
     try {
-      // Mettre à jour l'ID du point de vente actif
       activeStoreId = storeId
 
-      // Optimisation: utiliser des sélecteurs plus spécifiques et limiter les opérations DOM
       const selectedCard = document.getElementById(`store-${storeId}`)
       const selectedItem = document.querySelector(`.store-item[data-id="${storeId}"]`)
 
-      // Masquer toutes les cartes de magasin d'abord (optimisé)
       document.querySelectorAll(".store-card.active").forEach((card) => {
         card.classList.remove("active")
         card.style.display = "none"
       })
 
-      // Réinitialiser l'élément actif dans la sidebar (optimisé)
       const activeItem = document.querySelector(".store-item.active")
       if (activeItem) activeItem.classList.remove("active")
 
-      // Mettre en évidence la boutique sélectionnée
       if (selectedCard) {
         selectedCard.classList.add("active")
         selectedCard.style.display = "block"
@@ -1171,7 +1145,6 @@ function selectStore(storeId) {
 
       if (selectedItem) {
         selectedItem.classList.add("active")
-        // Utiliser scrollIntoViewIfNeeded si disponible (plus performant)
         if (selectedItem.scrollIntoViewIfNeeded) {
           selectedItem.scrollIntoViewIfNeeded()
         } else {
@@ -1179,25 +1152,20 @@ function selectStore(storeId) {
         }
       }
 
-      // Centrer la carte sur le marqueur correspondant
       const marker = markers.find((m) => m.storeId === Number(storeId))
       if (marker) {
-        // Arrêter l'animation de tous les marqueurs (optimisé)
         markers.forEach((m) => {
           if (m.getAnimation()) m.setAnimation(null)
         })
 
-        // Animer le marqueur sélectionné
         marker.setAnimation(google.maps.Animation.BOUNCE)
         setTimeout(() => {
           marker.setAnimation(null)
         }, 1500)
 
-        // Centrer la carte sur le marqueur
         map.setCenter(marker.getPosition())
         map.setZoom(15)
 
-        // Ouvrir l'infoWindow sans déclencher d'événements supplémentaires
         const content = `
           <div style="padding: 10px; max-width: 200px;">
             <h3 style="margin-bottom: 5px; color: #000">${marker.title || ""}</h3>
@@ -1211,15 +1179,13 @@ function selectStore(storeId) {
         infoWindow.open(map, marker)
       }
     } finally {
-      // Réinitialiser le flag pour permettre de futurs appels
       isSelectStoreRunning = false
     }
-  }, 100) // Délai de debounce de 100ms
+  }, 100)
 }
 
-// Fonction pour ajouter des marqueurs à la carte (optimisée)
+// Fonction pour ajouter des marqueurs à la carte
 function addMarkersToMap() {
-  // Récupérer les données des boutiques
   let stores
   try {
     stores = JSON.parse(document.getElementById("stores-data").textContent)
@@ -1228,16 +1194,13 @@ function addMarkersToMap() {
     return
   }
 
-  // Vérifier si stores est un tableau
   if (!Array.isArray(stores)) {
     console.error("Les données des boutiques ne sont pas un tableau:", stores)
     return
   }
 
-  // Créer tous les marqueurs en une seule fois
   const validStores = stores.filter((store) => isValidCoordinate(store.latitude, store.longitude))
 
-  // Pré-calculer les positions pour éviter les calculs répétés
   const positions = validStores.map((store) => ({
     position: {
       lat: Number.parseFloat(store.latitude),
@@ -1248,7 +1211,6 @@ function addMarkersToMap() {
     address: store.adresse,
   }))
 
-  // Ajouter les marqueurs par lots pour améliorer les performances
   const batchSize = 20
   for (let i = 0; i < positions.length; i += batchSize) {
     const batch = positions.slice(i, i + batchSize)
@@ -1267,23 +1229,18 @@ function addMarkersToMap() {
 
           markers.push(marker)
 
-          // Ajouter un événement de clic sur le marqueur
           marker.addListener("click", () => {
-            // Utiliser directement selectStore sans déclencher d'autres événements
             selectStore(data.storeId)
           })
         })
 
-        // Si c'est le dernier lot, créer le cluster et ajuster la vue
         if (i + batchSize >= positions.length) {
-          // Ajuster la vue pour inclure tous les marqueurs
           if (markers.length > 0) {
             bounds = new google.maps.LatLngBounds()
             markers.forEach((marker) => bounds.extend(marker.getPosition()))
             map.fitBounds(bounds)
           }
 
-          // Créer un MarkerClusterer si la bibliothèque est disponible
           if (markers.length > 0) {
             if (typeof MarkerClusterer !== "undefined") {
               createMarkerCluster()
@@ -1294,16 +1251,14 @@ function addMarkersToMap() {
         }
       },
       i === 0 ? 0 : 100,
-    ) // Premier lot immédiatement, les autres avec un délai
+    )
   }
 }
 
-// Initialisation de la carte avec Google Maps (optimisée)
+// Initialisation de la carte avec Google Maps
 function initMap() {
-  // Coordonnées par défaut (centre du Maroc)
   const defaultLocation = { lat: 31.7917, lng: -7.0926 }
 
-  // Initialiser la carte avec les styles pour masquer les frontières du Sahara Occidental
   map = new google.maps.Map(document.getElementById("map"), {
     center: defaultLocation,
     zoom: 5,
@@ -1312,7 +1267,6 @@ function initMap() {
     fullscreenControl: true,
     styles: [
       {
-        // Masquer toutes les frontières des pays
         featureType: "administrative.country",
         elementType: "geometry.stroke",
         stylers: [{ visibility: "off" }],
@@ -1360,30 +1314,22 @@ function initMap() {
     ],
   })
 
-  // Créer une fenêtre d'info
   infoWindow = new google.maps.InfoWindow()
 
-  // Charger les frontières des pays de manière asynchrone
   setTimeout(() => {
     loadCountryBorders()
   }, 500)
 
-  // Ajouter les marqueurs pour chaque boutique
   addMarkersToMap()
 }
 
-// Fonction pour charger les frontières des pays (optimisée)
 function loadCountryBorders() {
-  // Charger le GeoJSON des frontières mondiales
   map.data.loadGeoJson("https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json")
 
-  // Styler chaque pays: masquer le Sahara Occidental, dessiner les autres
   map.data.setStyle((feature) => {
     const name = feature.getProperty("name")
     return {
-      // pas de remplissage
       fillOpacity: 0,
-      // style de bordure pour les "autres" pays
       strokeColor: "#444",
       strokeWeight: 1,
       strokeOpacity: name === "Western Sahara" ? 0 : 1,
@@ -1391,7 +1337,6 @@ function loadCountryBorders() {
   })
 }
 
-// Fonction pour créer le cluster de marqueurs (inchangée)
 function createMarkerCluster() {
   if (markerCluster) {
     markerCluster.clearMarkers()
@@ -1404,7 +1349,6 @@ function createMarkerCluster() {
   })
 }
 
-// Fonction pour charger la bibliothèque MarkerClusterer (inchangée)
 function loadMarkerClusterer() {
   const script = document.createElement("script")
   script.src = "https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"
@@ -1425,7 +1369,6 @@ function loadMarkerClusterer() {
   document.head.appendChild(script)
 }
 
-// Fonction pour vérifier si les coordonnées sont valides (optimisée)
 function isValidCoordinate(lat, lng) {
   if (!lat || !lng) return false
 
@@ -1435,7 +1378,6 @@ function isValidCoordinate(lat, lng) {
   return !isNaN(latNum) && !isNaN(lngNum) && latNum >= -90 && latNum <= 90 && lngNum >= -180 && lngNum <= 180
 }
 
-// Centrer la carte sur une boutique (optimisée)
 function centerMapOnStore(lat, lng) {
   if (!map) return
 
@@ -1443,14 +1385,12 @@ function centerMapOnStore(lat, lng) {
   map.setCenter(position)
   map.setZoom(16)
 
-  // Trouver le marqueur correspondant
   const marker = markers.find((m) => {
     const pos = m.getPosition()
     return pos && Math.abs(pos.lat() - position.lat()) < 0.0001 && Math.abs(pos.lng() - position.lng()) < 0.0001
   })
 
   if (marker) {
-    // Ouvrir l'infoWindow directement sans déclencher d'événements supplémentaires
     const content = `
       <div style="padding: 10px; max-width: 200px;">
         <h3 style="margin-bottom: 5px; color: #000">${marker.title || ""}</h3>
@@ -1463,12 +1403,10 @@ function centerMapOnStore(lat, lng) {
     infoWindow.setContent(content)
     infoWindow.open(map, marker)
 
-    // Sélectionner la boutique
     selectStore(marker.storeId)
   }
 }
 
-// Afficher/masquer les horaires (optimisée)
 function toggleHours(element) {
   const content = element.parentNode.querySelector(".hours-content")
   const icon = element.querySelector(".hours-toggle-icon")
@@ -1480,7 +1418,6 @@ function toggleHours(element) {
   icon.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)"
 }
 
-// Filtrer la sidebar (optimisée avec debounce)
 let filterTimer = null
 function filterSidebar() {
   clearTimeout(filterTimer)
@@ -1494,10 +1431,9 @@ function filterSidebar() {
 
       item.style.display = storeName.includes(searchText) || storeAddress.includes(searchText) ? "flex" : "none"
     })
-  }, 200) // Délai de debounce de 200ms
+  }, 200)
 }
 
-// Nouvelle fonction pour gérer la sélection multiple de boutiques (optimisée)
 function handleMultipleSelection() {
   const selectionModeBtn = document.getElementById("selection-mode-btn")
   const storeCheckboxes = document.querySelectorAll(".store-checkbox")
@@ -1513,7 +1449,6 @@ function handleMultipleSelection() {
     return
   }
 
-  // Fonction pour mettre à jour le bouton d'action en masse (optimisée)
   function updateBulkActionButton() {
     const checkedStores = document.querySelectorAll(".store-selector:checked")
 
@@ -1521,12 +1456,10 @@ function handleMultipleSelection() {
       bulkActionBtn.disabled = checkedStores.length === 0
     }
 
-    // Mettre à jour le compteur
     if (selectedCount) {
       selectedCount.textContent = checkedStores.length
     }
 
-    // Mettre à jour la liste des magasins sélectionnés
     if (selectedStoresList) {
       selectedStoresList.innerHTML = ""
     }
@@ -1535,7 +1468,6 @@ function handleMultipleSelection() {
       selectedStoresInputs.innerHTML = ""
     }
 
-    // Créer un fragment pour améliorer les performances
     const listFragment = document.createDocumentFragment()
     const inputsFragment = document.createDocumentFragment()
 
@@ -1549,7 +1481,6 @@ function handleMultipleSelection() {
 
       const storeName = storeNameElement.textContent
 
-      // Ajouter un tag pour chaque magasin sélectionné
       if (selectedStoresList) {
         const storeTag = document.createElement("div")
         storeTag.className = "selected-store-tag"
@@ -1558,7 +1489,6 @@ function handleMultipleSelection() {
           <span class="remove-tag" data-store-id="${storeId}">&times;</span>
         `
 
-        // Ajouter un événement pour supprimer le tag
         const removeTag = storeTag.querySelector(".remove-tag")
         if (removeTag) {
           removeTag.addEventListener("click", function () {
@@ -1574,7 +1504,6 @@ function handleMultipleSelection() {
         listFragment.appendChild(storeTag)
       }
 
-      // Ajouter un input caché pour chaque magasin sélectionné
       if (selectedStoresInputs) {
         const storeInput = document.createElement("input")
         storeInput.type = "hidden"
@@ -1584,7 +1513,6 @@ function handleMultipleSelection() {
       }
     })
 
-    // Ajouter les fragments au DOM en une seule opération
     if (selectedStoresList) {
       selectedStoresList.appendChild(listFragment)
     }
@@ -1594,40 +1522,33 @@ function handleMultipleSelection() {
     }
   }
 
-  // Gestion du bouton de mode sélection
   selectionModeBtn.addEventListener("click", function () {
     const isActive = this.classList.toggle("active")
 
-    // Afficher/masquer les cases à cocher
     storeCheckboxes.forEach((checkbox) => {
       checkbox.style.display = isActive ? "flex" : "none"
       const input = checkbox.querySelector("input")
       if (input) {
-        input.checked = false // Décocher toutes les cases
+        input.checked = false
       }
     })
 
-    // Changer le texte du bouton
     this.innerHTML = isActive
       ? '<i class="fas fa-times"></i> Annuler'
       : '<i class="fas fa-check-square"></i> Sélectionner'
 
-    // Afficher/masquer le bouton d'action en masse
     if (bulkActionBtn) {
       bulkActionBtn.style.display = isActive ? "flex" : "none"
-      bulkActionBtn.disabled = true // Désactiver le bouton par défaut
+      bulkActionBtn.disabled = true
     }
 
-    // Mettre à jour le compteur
     updateBulkActionButton()
   })
 
-  // Ajouter des écouteurs d'événements pour les cases à cocher
   document.querySelectorAll(".store-selector").forEach((checkbox) => {
     checkbox.addEventListener("change", updateBulkActionButton)
   })
 
-  // Ouvrir la modal lors du clic sur le bouton d'action en masse
   if (bulkActionBtn && modal) {
     bulkActionBtn.addEventListener("click", () => {
       modal.style.display = "block"
@@ -1635,13 +1556,11 @@ function handleMultipleSelection() {
     })
   }
 
-  // Fermer la modal
   if (closeModal && modal) {
     closeModal.addEventListener("click", () => {
       modal.style.display = "none"
     })
 
-    // Fermer la modal en cliquant en dehors
     window.addEventListener("click", (event) => {
       if (event.target === modal) {
         modal.style.display = "none"
@@ -1650,16 +1569,12 @@ function handleMultipleSelection() {
   }
 }
 
-// Initialiser les fonctionnalités au chargement de la page (optimisée)
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM chargé, initialisation des fonctionnalités")
 
-  // Initialiser la gestion de la sélection multiple
   handleMultipleSelection()
 
-  // Initialiser la carte de manière asynchrone
   if (typeof google !== "undefined" && google.maps) {
-    // Utiliser requestAnimationFrame pour s'assurer que le DOM est complètement rendu
     requestAnimationFrame(() => {
       initMap()
     })
@@ -1667,7 +1582,6 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Google Maps n'est pas encore chargé")
   }
 
-  // Gestion des types d'action dans la modal
   const actionTypes = document.querySelectorAll('input[name="action_type"]')
   const regularScheduleSection = document.getElementById("regular-schedule-section")
   const exceptionSection = document.getElementById("exception-section")
@@ -1677,13 +1591,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (actionTypes.length > 0) {
     actionTypes.forEach((radio) => {
       radio.addEventListener("change", function () {
-        // Masquer toutes les sections
         if (regularScheduleSection) regularScheduleSection.style.display = "none"
         if (exceptionSection) exceptionSection.style.display = "none"
         if (temporaryClosureSection) temporaryClosureSection.style.display = "none"
         if (holidaySection) holidaySection.style.display = "none"
 
-        // Afficher la section correspondante
         switch (this.value) {
           case "regular_schedule":
             if (regularScheduleSection) regularScheduleSection.style.display = "block"
@@ -1702,7 +1614,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  // Gestion de l'affichage des créneaux horaires après fermeture temporaire
   const afterClosure = document.getElementById("after_closure")
   const afterClosureCustom = document.getElementById("after-closure-custom")
 
@@ -1712,14 +1623,11 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 })
-
-
 </script>
 
-
- <script id="stores-data" type="application/json" style="display: none;">
+<script id="stores-data" type="application/json" style="display: none;">
     {!! json_encode($stores) !!}
 </script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVXn3v4gNvgDImCifWbY5iZJLCUaRdVFI&callback=initMap" async defer></script>
 @endsection

@@ -7,8 +7,8 @@
 <style>
     /* Variables de couleur */
      :root {
-           --primary: #0A2E2E; 
-        --secondary: #143333; 
+    --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+        --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
         --primary-light: #5aad9e;
         --primary-dark: #337b8d;
         --secondary-light: #ffffff;

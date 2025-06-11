@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\ExceptionController;
 use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\StoreManagementController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\ScheduleDashboardController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -40,6 +40,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/security', [SettingsController::class, 'updateSecurity'])->name('security.update');
         Route::get('/system', [SettingsController::class, 'system'])->name('system');
         Route::post('/system', [SettingsController::class, 'updateSystem'])->name('system.update');
+        // Ajouter ces routes dans le groupe settings
+        Route::post('/clear-cache', [SettingsController::class, 'clearCache'])->name('clear-cache');
+        Route::get('/export-config-pdf', [SettingsController::class, 'exportConfigPdf'])->name('export-config-pdf');
+        Route::post('/test-connection', [SettingsController::class, 'testConnection'])->name('test-connection');
     });
     
     Route::get('/stores/{store}/subsidiaries', [StoreController::class, 'manageSubsidiaries'])->name('stores.subsidiaries');
@@ -111,4 +115,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/stores/{store}/staff/{staff}/edit', [StoreManagementController::class, 'editStaff'])->name('stores.staff.edit');
     Route::put('/stores/{store}/staff/{staff}', [StoreManagementController::class, 'updateStaff'])->name('stores.staff.update');
     Route::delete('/stores/{store}/staff/{staff}', [StoreManagementController::class, 'destroyStaff'])->name('stores.staff.destroy');
+
+      Route::prefix('translations')->name('translations.')->group(function () {
+        Route::get('/', [TranslationController::class, 'index'])->name('index');
+        Route::post('/add-language', [TranslationController::class, 'addLanguage'])->name('add-language');
+        Route::delete('/remove-language/{languageCode}', [TranslationController::class, 'removeLanguage'])->name('remove-language');
+        Route::post('/auto-translate', [TranslationController::class, 'autoTranslate'])->name('auto-translate');
+        Route::post('/detect-language', [TranslationController::class, 'detectLanguage'])->name('detect-language');
+        Route::post('/translate-files', [TranslationController::class, 'translateLanguageFiles'])->name('translate-files');
+    });
+
 });
+
+
+
+

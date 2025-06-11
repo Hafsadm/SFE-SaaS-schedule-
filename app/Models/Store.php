@@ -139,7 +139,7 @@ public function getTodayStatusAttribute()
     // Vérifie jour férié
     $holiday = $this->holidays()->whereDate('holiday_date', $today)->first();
     if ($holiday) {
-        return $holiday->label ?? 'Fermeture (jour férié)';
+        return $holiday->label ?? 'Fermé (jour férié)';
     }
 
     // Vérifie exception
@@ -147,7 +147,7 @@ public function getTodayStatusAttribute()
     if ($exception) {
         return $exception->label 
             ? 'Fermeture exceptionnelle : ' . $exception->label 
-            : 'Fermeture exceptionnelle';
+            : 'Fermé';
     }
 
     // Vérifier l'horaire régulier pour aujourd'hui

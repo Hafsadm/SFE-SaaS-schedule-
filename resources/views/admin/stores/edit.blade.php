@@ -299,23 +299,25 @@
 
 <style>
     :root {
-        --primary: #235c5cc9; 
-        --secondary: #337b8d; 
-        --light-beige: #F9F5EF;
-        --dark-beige: #1b5858; 
+        --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+        --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
+        /* --light: {{ $themeColors['accent_color'] ?? '#8E6E53' }};  */
+
+        --tertiary: #8E6E53;
+        --light: #C69C72; 
         --text-dark: #000000; 
         --text-light: #FFFFFF; 
         --success: #5DBB63;
+        --error: #dc3545;
+        --warning: #f59e0b;
         --border: #E6D8C3; 
-        --danger: #dc3545;
-        --shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        --transition: all 0.3s ease;
+        --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
     }
 
     /* Styles généraux */
     body {
         background-color: #f5f5f5;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Georgia', serif;
     }
 
 
@@ -330,6 +332,7 @@
     -webkit-backdrop-filter: blur(5px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 2.5rem;
+    background: linear-gradient(135deg, #0A2E2E 0%, #2A6363 100%);  
 }
 
 .header-title {
@@ -846,7 +849,7 @@
     .form-section:nth-child(7) { animation-delay: 0.7s; }
 </style>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_xQsTc41ShFh3sMnafHjUEht-8ZrDoM8&libraries=places&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLcjtNpP0apwxa7aQp1oW01YXQrtE2cgE&libraries=places&callback=initMap" async defer></script>
 <script>
     let map;
     let marker;

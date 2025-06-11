@@ -1,4 +1,5 @@
 @extends('layouts.app')
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
 
 @section('content')
 <div class="schedules-dashboard-container">
@@ -8,7 +9,7 @@
             <h1 class="dashboard-title">Tableau de bord des horaires</h1>
             <div class="header-actions">
                 <a href="{{ route('admin.schedules.calendar') }}" class="action-button secondary">
-                    <i data-lucide="calendar"></i>
+                    <i class="fi fi-rr-calendar-days"></i>
                     Vue calendrier
                 </a>
             </div>
@@ -17,7 +18,7 @@
         <div class="stats-cards">
             <div class="stat-card">
                 <div class="stat-icon open">
-                    <i data-lucide="check-circle"></i>
+                    <i class="fi fi-rr-check-circle" style="color: #1f9b5d"></i>
                 </div>
                 <div class="stat-content">
                     <h3>Ouverts aujourd'hui</h3>
@@ -26,7 +27,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-icon closed">
-                    <i data-lucide="x-circle"></i>
+                    <i class="fi fi-rr-circle-xmark" style="color: #dc3545"></i>
                 </div>
                 <div class="stat-content">
                     <h3>Fermés aujourd'hui</h3>
@@ -35,7 +36,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-icon exception">
-                    <i data-lucide="alert-triangle"></i>
+                    <i class="fi fi-rr-sensor-alert" style="color: #cc851b"></i>
                 </div>
                 <div class="stat-content">
                     <h3>Exceptions à venir</h3>
@@ -44,7 +45,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-icon holiday">
-                    <i data-lucide="calendar-off"></i>
+                    <i class="fi fi-rr-calendar-xmark"  style="color: #7e9ad6"></i>
                 </div>
                 <div class="stat-content">
                     <h3>Jours fériés à venir</h3>
@@ -157,19 +158,25 @@
 
 <style>
     :root {
-           --primary: #0A2E2E; 
-        --secondary: #143333; 
+        --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+        --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
         --primary-light: #5aad9e;
         --primary-dark: #337b8d;
         --secondary-light: #ffffff;
         --secondary-dark: #0a2e2e;
         --tertiary: #8E6E53;
+        --card-bg: #0A2E2E;
+        --background: #ffffff;
+         --text-muted: #ffffff;
+        --border-color: #2a6363;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         --light: #C69C72; 
         --text-dark: #000000; 
         --text-light: #FFFFFF; 
         --success: #5DBB63;
         --error: #dc3545;
-        --border: #E6D8C3; 
+        --background: #F9F5EF;
+        --border-color : #E6D8C3;
         --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
     }
 
@@ -238,13 +245,13 @@
     }
 
     .action-button.secondary {
-        background: var(--card-bg);
+        background: var(--primary);
         color: var(--secondary-light);
         border: 1px solid var(--secondary);
     }
 
     .action-button.primary:hover {
-        background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
         transform: translateY(-2px);
         box-shadow: 0 6px 15px rgba(66, 145, 130, 0.2);
         
@@ -264,7 +271,7 @@
     }
 
     .stat-card {
-        background: var(--card-bg);
+        background: var(--primary);
         padding: 1.5rem;
         border-radius: 30px 0;
         box-shadow: var(--shadow);
@@ -288,7 +295,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--primary);
+        font-size: 1.5rem;
     }
 
     .stat-icon.open {
@@ -314,7 +321,7 @@
     .stat-content h3 {
         margin: 0 0 0.25rem 0;
         font-size: 0.9rem;
-        color: var(--text-muted);
+        color: var(--text-light);
     }
 
     .stat-value {
@@ -612,15 +619,7 @@
     }
 
     /* Dark mode */
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --card-bg: #0a2e2e;
-            --background: #ffffff;
-            --text-dark: #ffffff;
-            --text-muted: #ffffff;
-            --border-color: #2a6363;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
+
         
         .schedules-dashboard-container {
             background-color: var(--background);

@@ -140,20 +140,26 @@
 </div>
 
 <style>
-  :root {
-           --primary: #0A2E2E; 
-        --secondary: #143333; 
+:root {
+        --primary: {{ $themeColors['primary_color'] ?? '#0A2E2E' }}; 
+        --secondary: {{ $themeColors['secondary_color'] ?? '#2A6363' }}; 
         --primary-light: #5aad9e;
         --primary-dark: #337b8d;
         --secondary-light: #ffffff;
         --secondary-dark: #0a2e2e;
         --tertiary: #8E6E53;
+        --card-bg: #0A2E2E;
+        --background: #ffffff;
+         --text-muted: #ffffff;
+        --border-color: #2a6363;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         --light: #C69C72; 
         --text-dark: #000000; 
         --text-light: #FFFFFF; 
         --success: #5DBB63;
         --error: #dc3545;
-        --border: #E6D8C3; 
+        --background: #F9F5EF;
+        --border-color : #E6D8C3;
         --card-shadow: 0 4px 12px rgba(10, 46, 46, 0.1);
     }
 
@@ -271,19 +277,17 @@
         
     }
 
-    .store-filter label {
-        font-weight: 500;
-        color: #8E6E53;
-        font-family: Georgia, 'Times New Roman', Times, serif;
-        font-size: 1rem;
-    }
 
     .store-select {
         padding: 0.75rem 1rem;
         border: 1px solid var(--border-color);
         border-radius: 30px 0;
-        background: #000000;
-        color: #0a2e2e;
+        background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+        color: #ffffff;
+        font-size: 1rem; 
+        font-weight: 400;
+        font-family: 'Georgia', 'Times New Roman', Times, serif;
+        appearance: none;
         min-width: 200px;
         transition: var(--transition);
     }
@@ -308,27 +312,23 @@
     .calendar-days {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        background: var(--secondary);
+        background: var(--primary);
         color: var(--text-light);
     }
 
     .day-header {
         padding: 1rem;
+        background:linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
         text-align: center;
         font-weight: 600;
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .day-header.sunday {
-        background: var(--secondary-dark);
-    }
 
-    .day-header:last-child {
-        border-right: none;
-    }
 
     .calendar-dates {
         display: grid;
+        color: var(--secondary-light) ;
         grid-template-columns: repeat(7, 1fr);
         grid-auto-rows: minmax(120px, auto);
     }
@@ -539,23 +539,23 @@
     }
 
     .legend-color.exception {
-        background: rgba(255, 193, 7, 0.2);
+        background: rgba(255, 193, 7, 0.288);
         border: 2px solid var(--warning);
     }
 
     .legend-color.holiday {
-        background: rgba(23, 162, 184, 0.2);
+        background: rgba(23, 163, 184, 0.438);
         border: 2px solid var(--info);
     }
 
     .legend-color.sunday {
-        background: rgba(27, 88, 88, 0.2);
+        background: rgba(218, 84, 7, 0.247);
         border: 2px solid var(--secondary);
     }
 
     .legend-text {
         font-size: 0.9rem;
-        color: var(--text-dark);
+        color: var(--text-light);
     }
 
     /* Responsive */
